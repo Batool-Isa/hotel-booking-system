@@ -2,18 +2,26 @@ package com.ga.hotel_booking_app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
-@ToString(exclude = {"password","userProfile"})
+@ToString(exclude = {
+        "password",
+        "userProfile",
+        "roles",
+        "emailVerificationTokens",
+        "passwordResetTokens"
+})
 public class User {
     @Id
     @Column
@@ -54,4 +62,8 @@ public class User {
     @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<EmailVerificationToken> emailVerificationTokens;
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private Set<PasswordResetToken> passwordResetTokens;
+
 }

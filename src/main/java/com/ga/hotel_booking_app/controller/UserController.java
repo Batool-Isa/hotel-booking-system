@@ -1,9 +1,11 @@
 package com.ga.hotel_booking_app.controller;
 
 import com.ga.hotel_booking_app.dto.request.ForgotPasswordRequest;
+import com.ga.hotel_booking_app.dto.request.ResetPasswordRequest;
 import com.ga.hotel_booking_app.model.User;
 import com.ga.hotel_booking_app.dto.request.LoginRequest;
 import com.ga.hotel_booking_app.service.UserService;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,14 +31,14 @@ public class UserController {
         System.out.println("User Controller calling ---> verfiy email");
         return userService.verifyEmail(token);
     }
-    @PostMapping("/forget-password")
-    public ResponseEntity<?> forgetPassword(@RequestBody ForgotPasswordRequest request){
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request){
         System.out.println("User Controller calling ---> forget password");
-        return userService.forgetPassword(request);
+        return userService.forgotPassword(request);
     }
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestParam String token){
+    @PostMapping("/reset-link")
+    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestBody ResetPasswordRequest request) throws BadRequestException {
         System.out.println("User Controller calling ---> reset password");
-        return userService.resetPassword(token);
+        return userService.resetPassword(token, request);
     }
 }

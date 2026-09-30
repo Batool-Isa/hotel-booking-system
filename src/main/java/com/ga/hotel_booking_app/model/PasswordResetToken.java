@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "email_verification_tokens")
-public class EmailVerificationToken {
+@Table(name = "password_reset_tokens")
+public class PasswordResetToken {
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
