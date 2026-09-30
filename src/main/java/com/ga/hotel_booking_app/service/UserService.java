@@ -1,6 +1,7 @@
 package com.ga.hotel_booking_app.service;
 
 import com.ga.hotel_booking_app.dto.EmailDetails;
+import com.ga.hotel_booking_app.dto.request.ForgotPasswordRequest;
 import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;
 import com.ga.hotel_booking_app.exception.custom.InvalidCredentialsException;
 import com.ga.hotel_booking_app.exception.custom.InvalidVerificationTokenException;
@@ -245,6 +246,35 @@ public class UserService {
         userRepository.save(user);
         emailVerificationTokenRepository.save(verificationToken);
         return "Email Verified Successfully";
+
+    }
+
+    public ResponseEntity<?> forgetPassword(ForgotPasswordRequest request) {
+        User user = userRepository.findUserByEmail(request.getEmail());
+        if (user != null){
+          //  emailService.sendSimpleMail();
+
+
+            //create reset link
+            String resetPasswordLink = createResetPasswordLink();
+
+            // send email
+            emailService.sendSimpleMail();
+
+      //If the email is registered, a password reset link has been sent
+        }else{
+            throw new InformationNotFoundException("User with email "+request.getEmail()+"not found");
+        }
+
+    }
+
+    public void createResetPasswordLink(){
+        String token = UUID.randomUUID().toString();
+        String resetLink = "http://localhost:8000/auth/users/reset-link?token?"+token;
+
+    }
+    public ResponseEntity<?> resetPassword(String token) {
+
 
     }
 }

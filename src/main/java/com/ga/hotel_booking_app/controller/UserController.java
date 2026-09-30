@@ -1,5 +1,6 @@
 package com.ga.hotel_booking_app.controller;
 
+import com.ga.hotel_booking_app.dto.request.ForgotPasswordRequest;
 import com.ga.hotel_booking_app.model.User;
 import com.ga.hotel_booking_app.dto.request.LoginRequest;
 import com.ga.hotel_booking_app.service.UserService;
@@ -27,5 +28,15 @@ public class UserController {
     public String verifyEmail(@RequestParam(name = "token") String token){
         System.out.println("User Controller calling ---> verfiy email");
         return userService.verifyEmail(token);
+    }
+    @PostMapping("/forget-password")
+    public ResponseEntity<?> forgetPassword(@RequestBody ForgotPasswordRequest request){
+        System.out.println("User Controller calling ---> forget password");
+        return userService.forgetPassword(request);
+    }
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam String token){
+        System.out.println("User Controller calling ---> reset password");
+        return userService.resetPassword(token);
     }
 }
