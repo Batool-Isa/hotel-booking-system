@@ -24,7 +24,7 @@ public class User {
     private String email;
     @Column
     private String password;
-    @Column
+    @Column(nullable = false, columnDefinition = "varchar(255) DEFAULT 'UNVERIFIED' ")
     private boolean emailVerified;
     @Enumerated(EnumType.STRING)
     @Column

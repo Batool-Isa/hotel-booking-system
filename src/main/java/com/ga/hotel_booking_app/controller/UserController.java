@@ -1,8 +1,10 @@
 package com.ga.hotel_booking_app.controller;
 
 import com.ga.hotel_booking_app.model.User;
+import com.ga.hotel_booking_app.model.request.LoginRequest;
 import com.ga.hotel_booking_app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,5 +20,10 @@ public class UserController {
     public User register(@RequestBody User user){
         System.out.println("User Controller calling ---> register");
     return userService.register(user);
+    }
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest){
+        System.out.println("User Controller calling ---> login");
+        return userService.loginUser(loginRequest);
     }
 }
