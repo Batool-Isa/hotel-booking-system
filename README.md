@@ -72,8 +72,8 @@ I am using code first appoach in implementing this project.Also this project is 
 [JIRA Board Link](https://batooltaher124.atlassian.net/jira/software/projects/KAN/boards/1?filter=&groupBy=none&atlOrigin=eyJpIjoiZjE4NWM5NzU5ZWM1NGExZDk0OTJmODJkMGZiYzc0NmEiLCJwIjoiaiJ9)
 
 ### ERD
-Provide a link/image of your ERD.
 
+![ERD.png](ERD.png)
 ### Planning
 Provide a link to your planning documentation/GitHub Project showing:
 
@@ -97,6 +97,10 @@ Access the API.
 Access Swagger/OpenAPI.
 Unsolved Problems
 Document any unresolved issues.
+
+## Rescource Used
+[Spring Boot - Sending Email via SMTP
+](https://www.geeksforgeeks.org/springboot/spring-boot-sending-email-via-smtp/)
 
 ## Major Challenges
 Explain the major technical problems you encountered and how you solved them.
