@@ -1,14 +1,11 @@
 package com.ga.hotel_booking_app.controller;
 
 import com.ga.hotel_booking_app.model.User;
-import com.ga.hotel_booking_app.model.request.LoginRequest;
+import com.ga.hotel_booking_app.dto.request.LoginRequest;
 import com.ga.hotel_booking_app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth/users")
@@ -25,5 +22,10 @@ public class UserController {
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest){
         System.out.println("User Controller calling ---> login");
         return userService.loginUser(loginRequest);
+    }
+    @GetMapping("/verify-email")
+    public String verifyEmail(@RequestParam(name = "token") String token){
+        System.out.println("User Controller calling ---> verfiy email");
+        return userService.verifyEmail(token);
     }
 }

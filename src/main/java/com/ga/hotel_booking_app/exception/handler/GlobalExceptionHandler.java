@@ -2,6 +2,7 @@ package com.ga.hotel_booking_app.exception.handler;
 
 import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;
 import com.ga.hotel_booking_app.exception.custom.InvalidCredentialsException;
+import com.ga.hotel_booking_app.exception.custom.InvalidVerificationTokenException;
 import com.ga.hotel_booking_app.exception.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -38,5 +39,17 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+    }
+    @ExceptionHandler(InvalidVerificationTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidVerificationTokenException(InvalidVerificationTokenException ex,
+                                                                  HttpServletRequest request){
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "INVALID_VERFICATION_TOKEN",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }

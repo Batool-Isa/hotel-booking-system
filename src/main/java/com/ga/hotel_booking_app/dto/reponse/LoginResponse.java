@@ -1,4 +1,4 @@
-package com.ga.hotel_booking_app.model.reponse;
+package com.ga.hotel_booking_app.dto.reponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -6,10 +6,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * 401 Error thrown when user try to login using invalid credentials
+ * 401 Error thrown when user try to log in using invalid credentials
  */
 @ResponseStatus(HttpStatus.UNAUTHORIZED)
-public class InvalidCredentialsException extends BadCredentialsException {
+public class InvalidCredentialsException extends RuntimeException  {
     public InvalidCredentialsException(@Nullable String msg) {
         super(msg);
     }

@@ -1,4 +1,4 @@
-package com.ga.hotel_booking_app.model.request;
+package com.ga.hotel_booking_app.dto.request;
 
 import lombok.Getter;
 

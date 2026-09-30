@@ -1,5 +1,6 @@
 package com.ga.hotel_booking_app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
@@ -24,10 +25,10 @@ public class User {
     private String email;
     @Column
     private String password;
-    @Column(nullable = false, columnDefinition = "varchar(255) DEFAULT 'UNVERIFIED' ")
-    private boolean emailVerified;
+    @Column(nullable = false)
+    private boolean emailVerified = false;
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(nullable = false)
     private Status status;
     public enum Status {
         ACTIVE,
@@ -50,4 +51,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private Set<EmailVerificationToken> emailVerificationTokens;
 }
