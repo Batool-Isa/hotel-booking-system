@@ -6,9 +6,12 @@ import com.ga.hotel_booking_app.service.PasswordResetService;
 import com.ga.hotel_booking_app.service.UserService;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/auth/users")
@@ -18,10 +21,13 @@ public class UserController {
     @Autowired
     private PasswordResetService passwordResetService;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+    @PostMapping(
+            value = "/register",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )    public ResponseEntity<?> register(@Valid @ModelAttribute RegisterRequest request,
+                                      @RequestParam("image") MultipartFile image) {
         System.out.println("User Controller calling ---> register");
-        return userService.register(request);
+        return userService.register(request, image);
     }
 
     @PostMapping("/login")
@@ -52,5 +58,16 @@ public class UserController {
     public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest request)  {
         System.out.println("User Controller calling ---> change password");
         return passwordResetService.changePassword(request);
+    }
+    @GetMapping("/profile")
+    public ResponseEntity<?> getUserProfile()  {
+        System.out.println("User Controller calling ---> get user profile");
+        return userService.getUserProfile();
+    }
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateUserProfile(@Valid @ModelAttribute UpdateProfileRequest request,
+                                               @RequestPart(value = "image", required = false)MultipartFile image)  {
+        System.out.println("User Controller calling ---> update user profile");
+        return userService.updateUserProfile(request, image);
     }
 }

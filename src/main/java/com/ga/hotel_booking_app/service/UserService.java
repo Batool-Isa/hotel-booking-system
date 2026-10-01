@@ -1,6 +1,8 @@
 package com.ga.hotel_booking_app.service;
 
+import com.ga.hotel_booking_app.dto.reponse.UserProfileResponse;
 import com.ga.hotel_booking_app.dto.request.RegisterRequest;
+import com.ga.hotel_booking_app.dto.request.UpdateProfileRequest;
 import com.ga.hotel_booking_app.exception.custom.*;
 import com.ga.hotel_booking_app.model.EmailVerificationToken;
 import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
@@ -11,6 +13,7 @@ import com.ga.hotel_booking_app.security.JwtUtils;
 import com.ga.hotel_booking_app.model.User;
 import com.ga.hotel_booking_app.repository.UserRepository;
 import com.ga.hotel_booking_app.security.MyUserDetails;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -22,7 +25,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -61,6 +69,11 @@ public class UserService {
         this.emailService = emailService;
     }
 
+    public User getCurrentLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return userRepository.findUserByEmail(email);
+    }
 
     /**
      * Finds the user by its email address
@@ -72,18 +85,21 @@ public class UserService {
         return userRepository.findUserByEmail(email);
     }
 
+    private final String UPLOAD_DIR = "uploads/";
+
     /**
      * Register a new user into the system
-     *
+     * <p>
      * Check if the email address doesn't exists, otherwise throw an exists 409 error.
      * Password is being encoded before saving
      * User status set to unverified at the start
      * An email verification sent with verification token
      *
      * @param request that holds all user information
+     * @param image profile image
      * @return saved user
      */
-    public ResponseEntity<?> register(RegisterRequest request) {
+    public ResponseEntity<?> register(RegisterRequest request, MultipartFile image) {
         System.out.println("User service calling ----> register");
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new InformationExistException(
@@ -105,14 +121,38 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setStatus(User.Status.UNVERIFIED);
-        user.setUserProfile(profile);
 
+        String profileImage = uploadeImage(image);
+        profile.setProfileImageUrl(profileImage);
+        user.setUserProfile(profile);
         User savedUser = userRepository.save(user);
         EmailVerificationToken token = createEmailVerificationToken(savedUser);
         emailService.sendVerificationEmail(token);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse(
                 "Registered successfully, please verify your email"
         ));
+    }
+
+    public String uploadeImage(MultipartFile image) {
+        try {
+            Path uploadPath = Paths.get(UPLOAD_DIR);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            String originalNameFile = image.getOriginalFilename();
+            //generate uniq id
+            String uniqueId = UUID.randomUUID().toString().substring(10);
+            // create file name
+            String imageFileName = uniqueId + "-" + originalNameFile;
+            // create file path
+            Path filePath = uploadPath.resolve(imageFileName);
+
+            image.transferTo(filePath);
+            return (UPLOAD_DIR + imageFileName);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not save image", e);
+        }
     }
 
     /**
@@ -186,4 +226,31 @@ public class UserService {
 
     }
 
+    public ResponseEntity<?> getUserProfile() {
+        User user = getCurrentLoggedInUser();
+        UserProfile profile = user.getUserProfile();
+        UserProfileResponse response = new UserProfileResponse();
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
+        response.setFirstName(profile.getFirstName());
+        response.setLastName(profile.getLastName());
+        response.setPhone(profile.getPhone());
+        response.setProfileImageUrl(profile.getProfileImageUrl());
+        response.setRoles(user.getRoles());
+        return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<?> updateUserProfile(@Valid UpdateProfileRequest request, MultipartFile image) {
+        User user = getCurrentLoggedInUser();
+        UserProfile profile = user.getUserProfile();
+        user.setUsername(request.getUsername());
+        profile.setFirstName(request.getFirstName());
+        profile.setLastName(request.getLastName());
+        profile.setPhone(request.getPhone());
+        String profileImage = uploadeImage(image);
+        profile.setProfileImageUrl(profileImage);
+        user.setUserProfile(profile);
+        userRepository.save(user);
+        return ResponseEntity.ok(new MessageResponse("Profile updated successfully"));
+    }
 }
