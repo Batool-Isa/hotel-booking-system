@@ -20,19 +20,19 @@ public class UserProfile {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
+    @Column(nullable = false, length = 50)
     private String firstName;
-    @Column
+    @Column(nullable = false, length = 50)
     private String lastName;
-    @Column
+   @Column(nullable = false, length = 50)
     private String phone;
     @Column
     private String profileImageUrl;
     @CreationTimestamp
-    @Column
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
     @UpdateTimestamp
-    @Column
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
     @JsonIgnore
     @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)

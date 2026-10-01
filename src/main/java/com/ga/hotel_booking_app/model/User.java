@@ -1,6 +1,7 @@
 package com.ga.hotel_booking_app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -27,17 +28,18 @@ public class User {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String username;
-    @Column
+    @Column(unique = true, nullable = false)
     private String email;
-    @Column
+    @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     @Column(nullable = false)
     private boolean emailVerified = false;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Status status;
+    private Status status = Status.UNVERIFIED;
     public enum Status {
         ACTIVE,
         INACTIVE,
@@ -47,10 +49,10 @@ public class User {
     @JoinColumn(name = "profile_id", referencedColumnName = "id")
     private UserProfile userProfile;
     @CreationTimestamp
-    @Column
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
     @UpdateTimestamp
-    @Column
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
     @ManyToMany
     @JoinTable(
@@ -66,4 +68,7 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<PasswordResetToken> passwordResetTokens;
 
+    public String getPassword() {
+        return password;
+    }
 }

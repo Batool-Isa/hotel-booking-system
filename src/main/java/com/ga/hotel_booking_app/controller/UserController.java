@@ -1,11 +1,10 @@
 package com.ga.hotel_booking_app.controller;
 
-import com.ga.hotel_booking_app.dto.request.ForgotPasswordRequest;
-import com.ga.hotel_booking_app.dto.request.ResetPasswordRequest;
+import com.ga.hotel_booking_app.dto.request.*;
 import com.ga.hotel_booking_app.model.User;
-import com.ga.hotel_booking_app.dto.request.LoginRequest;
 import com.ga.hotel_booking_app.service.PasswordResetService;
 import com.ga.hotel_booking_app.service.UserService;
+import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +19,13 @@ public class UserController {
     private PasswordResetService passwordResetService;
 
     @PostMapping("/register")
-    public User register(@RequestBody User user) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         System.out.println("User Controller calling ---> register");
-        return userService.register(user);
+        return userService.register(request);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
         System.out.println("User Controller calling ---> login");
         return userService.loginUser(loginRequest);
     }
@@ -38,14 +37,20 @@ public class UserController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         System.out.println("User Controller calling ---> forget password");
         return passwordResetService.forgotPassword(request);
     }
 
     @PostMapping("/reset-link")
-    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestBody ResetPasswordRequest request) throws BadRequestException {
+    public ResponseEntity<?> resetPassword(@RequestParam String token,
+                                          @Valid @RequestBody ResetPasswordRequest request) throws BadRequestException {
         System.out.println("User Controller calling ---> reset password");
         return passwordResetService.resetPassword(token, request);
+    }
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest request)  {
+        System.out.println("User Controller calling ---> change password");
+        return passwordResetService.changePassword(request);
     }
 }

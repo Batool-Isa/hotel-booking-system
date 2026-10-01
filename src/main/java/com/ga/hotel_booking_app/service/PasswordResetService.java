@@ -1,22 +1,23 @@
 package com.ga.hotel_booking_app.service;
 
 import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
+import com.ga.hotel_booking_app.dto.request.ChangePasswordRequest;
 import com.ga.hotel_booking_app.dto.request.ForgotPasswordRequest;
 import com.ga.hotel_booking_app.dto.request.ResetPasswordRequest;
 import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;
+import com.ga.hotel_booking_app.exception.custom.InvalidCredentialsException;
 import com.ga.hotel_booking_app.exception.custom.InvalidTokenException;
+import com.ga.hotel_booking_app.exception.custom.PasswordMismatchException;
 import com.ga.hotel_booking_app.model.PasswordResetToken;
 import com.ga.hotel_booking_app.model.User;
-import com.ga.hotel_booking_app.repository.EmailVerificationTokenRepository;
 import com.ga.hotel_booking_app.repository.PasswordResetTokenRepository;
 import com.ga.hotel_booking_app.repository.UserRepository;
-import com.ga.hotel_booking_app.security.JwtUtils;
 import com.ga.hotel_booking_app.security.MyUserDetails;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,35 +25,28 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * Service responsible for all operations related to password managment
+ * Service responsible for all operations related to password management
  */
 @Service
 public class PasswordResetService {
+    public static User getCurrentLoggedInUser() {
+        MyUserDetails userDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userDetails.getUser();
+    }
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtils jwtUtils;
-    private final AuthenticationManager authenticationManager;
-    private MyUserDetails myUserDetails;
-    private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
-    private EmailService emailService;
+    private final EmailService emailService;
 
 
     @Autowired
     public PasswordResetService(UserRepository userRepository,
-                       @Lazy PasswordEncoder passwordEncoder,
-                       JwtUtils jwtUtils,
-                       @Lazy AuthenticationManager authenticationManager,
-                       @Lazy MyUserDetails myUserDetails,
-                       EmailVerificationTokenRepository emailVerificationTokenRepository,
-                       EmailService emailService,
-                       PasswordResetTokenRepository passwordResetTokenRepository) {
+                                @Lazy PasswordEncoder passwordEncoder,
+                                EmailService emailService,
+                                PasswordResetTokenRepository passwordResetTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
-        this.jwtUtils = jwtUtils;
-        this.myUserDetails = myUserDetails;
-        this.emailVerificationTokenRepository = emailVerificationTokenRepository;
         this.emailService = emailService;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
@@ -78,8 +72,6 @@ public class PasswordResetService {
     }
 
 
-
-
     public ResponseEntity<?> resetPassword(String token, ResetPasswordRequest request) throws BadRequestException {
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
                 .orElseThrow(() -> new InformationNotFoundException("Reset Token not found"));
@@ -91,7 +83,7 @@ public class PasswordResetService {
             throw new InvalidTokenException("Reset Token has been already used");
         }
         if (!request.getPassword().equals(request.getConfirmedPassword())) {
-            throw new BadRequestException("Password not matching");
+            throw new PasswordMismatchException("New password and confirmation password do not match");
         }
         resetToken.setUsedAt(LocalDateTime.now());
         User user = resetToken.getUser();
@@ -99,5 +91,19 @@ public class PasswordResetService {
         passwordResetTokenRepository.save(resetToken);
         userRepository.save(user);
         return ResponseEntity.ok(new MessageResponse("Password reset successfully"));
+    }
+
+    public ResponseEntity<?> changePassword(ChangePasswordRequest request) {
+        User user = getCurrentLoggedInUser();
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new InvalidCredentialsException("Current password is incorrect");
+        }
+        if (!request.getNewPassword().equals(request.getConfirmedPassword())) {
+            throw new PasswordMismatchException("New password and confirmation password do not match");
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        return ResponseEntity.ok(new MessageResponse("Password changed successfully"));
+
     }
 }

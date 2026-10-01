@@ -22,7 +22,7 @@ public class EmailVerificationToken {
     @Column(unique = true, nullable = false)
     private String token;
     @CreationTimestamp
-    @Column
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
     @Column
     private LocalDateTime usedAt;

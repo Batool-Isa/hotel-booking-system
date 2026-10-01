@@ -1,20 +1,19 @@
 package com.ga.hotel_booking_app.service;
 
-import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;
-import com.ga.hotel_booking_app.exception.custom.InvalidCredentialsException;
-import com.ga.hotel_booking_app.exception.custom.InvalidTokenException;
+import com.ga.hotel_booking_app.dto.request.RegisterRequest;
+import com.ga.hotel_booking_app.exception.custom.*;
 import com.ga.hotel_booking_app.model.EmailVerificationToken;
 import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
 import com.ga.hotel_booking_app.dto.request.LoginRequest;
+import com.ga.hotel_booking_app.model.UserProfile;
 import com.ga.hotel_booking_app.repository.EmailVerificationTokenRepository;
-import com.ga.hotel_booking_app.repository.PasswordResetTokenRepository;
 import com.ga.hotel_booking_app.security.JwtUtils;
-import com.ga.hotel_booking_app.exception.custom.InformationExistException;
 import com.ga.hotel_booking_app.model.User;
 import com.ga.hotel_booking_app.repository.UserRepository;
 import com.ga.hotel_booking_app.security.MyUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,7 +27,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * Service responsible for all operations realtede to user
+ * Service responsible for all operations related to user
  * such as login, register and verify email.
  */
 @Service
@@ -39,12 +38,11 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private MyUserDetails myUserDetails;
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
-    private final PasswordResetTokenRepository passwordResetTokenRepository;
-    private EmailService emailService;
+    private final EmailService emailService;
 
 
     /**
-     * creates user service and injects all required dependancies
+     * creates user service and injects all required dependencies
      */
     @Autowired
     public UserService(UserRepository userRepository,
@@ -53,8 +51,7 @@ public class UserService {
                        @Lazy AuthenticationManager authenticationManager,
                        @Lazy MyUserDetails myUserDetails,
                        EmailVerificationTokenRepository emailVerificationTokenRepository,
-                       EmailService emailService,
-                       PasswordResetTokenRepository passwordResetTokenRepository) {
+                       EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -62,12 +59,12 @@ public class UserService {
         this.myUserDetails = myUserDetails;
         this.emailVerificationTokenRepository = emailVerificationTokenRepository;
         this.emailService = emailService;
-        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
 
     /**
      * Finds the user by its email address
+     *
      * @param email User's email address
      * @return the user that has the given email address
      */
@@ -83,31 +80,45 @@ public class UserService {
      * User status set to unverified at the start
      * An email verification sent with verification token
      *
-     * @param user user information provided during registeration
+     * @param request that holds all user information
      * @return saved user
      */
-    public User register(User user) {
+    public ResponseEntity<?> register(RegisterRequest request) {
         System.out.println("User service calling ----> register");
-        if (!userRepository.existsByEmail(user.getEmail())) {
-            user.setPassword(
-                    passwordEncoder.encode(user.getPassword())
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new InformationExistException(
+                    "User with email " + request.getEmail() + " already exists!"
             );
-            user.setStatus(User.Status.UNVERIFIED);
-            User savedUser = userRepository.save(user);
-
-            // create email verification token
-            EmailVerificationToken token = createEmailVerificationToken(user);
-            //send email
-            emailService.sendVerificationEmail(token);
-            return savedUser;
-        } else {
-            throw new InformationExistException("User with email " + user.getEmail() + " already exist!");
         }
+        if (!request.getPassword().equals(request.getConfirmedPassword())) {
+            throw new PasswordMismatchException(
+                    "Password and confirmation password do not match"
+            );
+        }
+        UserProfile profile = new UserProfile();
+        profile.setFirstName(request.getFirstName());
+        profile.setLastName(request.getLastName());
+        profile.setPhone(request.getPhone());
+
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setStatus(User.Status.UNVERIFIED);
+        user.setUserProfile(profile);
+
+        User savedUser = userRepository.save(user);
+        EmailVerificationToken token = createEmailVerificationToken(savedUser);
+        emailService.sendVerificationEmail(token);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse(
+                "Registered successfully, please verify your email"
+        ));
     }
 
     /**
      * Creates an email verification token for a user
      * This token is only valid for 24 hours
+     *
      * @param user new user
      * @return token created
      */
@@ -124,6 +135,7 @@ public class UserService {
 
     /**
      * Authenticates a user and generate a JWT token
+     *
      * @param loginRequest request with user credentials ( email and password )
      * @return login response with Jwt token
      */
