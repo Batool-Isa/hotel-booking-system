@@ -240,17 +240,25 @@ public class UserService {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<?> updateUserProfile(@Valid UpdateProfileRequest request, MultipartFile image) {
+    public ResponseEntity<?> updateUserProfile(@Valid UpdateProfileRequest request) {
         User user = getCurrentLoggedInUser();
         UserProfile profile = user.getUserProfile();
         user.setUsername(request.getUsername());
         profile.setFirstName(request.getFirstName());
         profile.setLastName(request.getLastName());
         profile.setPhone(request.getPhone());
+        user.setUserProfile(profile);
+        userRepository.save(user);
+        return ResponseEntity.ok(new MessageResponse("Profile updated successfully"));
+    }
+
+    public ResponseEntity<?> updateProfileImage(MultipartFile image) {
+        User user = getCurrentLoggedInUser();
+        UserProfile profile = user.getUserProfile();
         String profileImage = uploadeImage(image);
         profile.setProfileImageUrl(profileImage);
         user.setUserProfile(profile);
         userRepository.save(user);
-        return ResponseEntity.ok(new MessageResponse("Profile updated successfully"));
+        return ResponseEntity.ok(new MessageResponse("Image Profile updated successfully"));
     }
 }

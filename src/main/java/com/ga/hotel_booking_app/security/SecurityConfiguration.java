@@ -51,7 +51,11 @@ public class SecurityConfiguration {
                                 "/auth/users/register",
                                 "/auth/users/verify-email",
                                 "/auth/users/forgot-password",
-                                "/auth/users/reset-link"
+                                "/auth/users/reset-link",
+                                "/auth/users/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 );
