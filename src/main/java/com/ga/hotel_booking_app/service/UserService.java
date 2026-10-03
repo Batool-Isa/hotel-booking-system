@@ -7,8 +7,10 @@ import com.ga.hotel_booking_app.exception.custom.*;
 import com.ga.hotel_booking_app.model.EmailVerificationToken;
 import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
 import com.ga.hotel_booking_app.dto.request.LoginRequest;
+import com.ga.hotel_booking_app.model.Role;
 import com.ga.hotel_booking_app.model.UserProfile;
 import com.ga.hotel_booking_app.repository.EmailVerificationTokenRepository;
+import com.ga.hotel_booking_app.repository.RoleRepository;
 import com.ga.hotel_booking_app.security.JwtUtils;
 import com.ga.hotel_booking_app.model.User;
 import com.ga.hotel_booking_app.repository.UserRepository;
@@ -32,6 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -47,7 +50,7 @@ public class UserService {
     private MyUserDetails myUserDetails;
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final EmailService emailService;
-
+    private final RoleRepository roleRepository;
 
     /**
      * creates user service and injects all required dependencies
@@ -59,7 +62,8 @@ public class UserService {
                        @Lazy AuthenticationManager authenticationManager,
                        @Lazy MyUserDetails myUserDetails,
                        EmailVerificationTokenRepository emailVerificationTokenRepository,
-                       EmailService emailService) {
+                       EmailService emailService,
+                       RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -67,6 +71,7 @@ public class UserService {
         this.myUserDetails = myUserDetails;
         this.emailVerificationTokenRepository = emailVerificationTokenRepository;
         this.emailService = emailService;
+        this.roleRepository = roleRepository;
     }
 
     public User getCurrentLoggedInUser() {
@@ -96,7 +101,7 @@ public class UserService {
      * An email verification sent with verification token
      *
      * @param request that holds all user information
-     * @param image profile image
+     * @param image   profile image
      * @return saved user
      */
     public ResponseEntity<?> register(RegisterRequest request, MultipartFile image) {
@@ -124,6 +129,10 @@ public class UserService {
 
         String profileImage = uploadeImage(image);
         profile.setProfileImageUrl(profileImage);
+
+        Role role = roleRepository.findByName(Role.RoleName.CUSTOMER)
+                .orElseThrow(()-> new InformationExistException("Customer role not found"));
+        user.getRoles().add(role);
         user.setUserProfile(profile);
         User savedUser = userRepository.save(user);
         EmailVerificationToken token = createEmailVerificationToken(savedUser);

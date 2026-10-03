@@ -1,6 +1,9 @@
 package com.ga.hotel_booking_app.security;
 
+import com.ga.hotel_booking_app.model.Role;
+import com.ga.hotel_booking_app.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -52,7 +55,6 @@ public class SecurityConfiguration {
                                 "/auth/users/verify-email",
                                 "/auth/users/forgot-password",
                                 "/auth/users/reset-link",
-                                "/auth/users/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"
@@ -68,5 +70,6 @@ public class SecurityConfiguration {
             AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
+
 
 }

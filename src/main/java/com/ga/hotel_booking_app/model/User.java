@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -60,7 +61,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
     @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<EmailVerificationToken> emailVerificationTokens;
