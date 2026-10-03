@@ -1,7 +1,9 @@
 package com.ga.hotel_booking_app.config;
 
+import com.ga.hotel_booking_app.model.Amenity;
 import com.ga.hotel_booking_app.model.Role;
 import com.ga.hotel_booking_app.model.User;
+import com.ga.hotel_booking_app.repository.AmenityRepository;
 import com.ga.hotel_booking_app.repository.RoleRepository;
 import com.ga.hotel_booking_app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @RequiredArgsConstructor
 public class DataSeeder {
-
-
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AmenityRepository amenityRepository;
 
     @Bean
     CommandLineRunner seedData() {
@@ -29,6 +30,8 @@ public class DataSeeder {
             // Seed users
             seedAdmin();
             seedHotelManager();
+
+            seedAmenities();
         };
     }
 
@@ -77,5 +80,29 @@ public class DataSeeder {
         manger.getRoles().add(managerRole);
 
         userRepository.save(manger);
+    }
+
+    private void seedAmenities() {
+
+        String[] amenities = {
+                "Wi-Fi",
+                "Swimming Pool",
+                "Gym",
+                "Parking",
+                "Restaurant",
+                "Spa",
+                "Breakfast",
+                "Beach Access",
+                "Room Service",
+                "Air Conditioning"
+        };
+
+        for (String name : amenities) {
+            if (amenityRepository.findByName(name).isEmpty()) {
+                Amenity amenity = new Amenity();
+                amenity.setName(name);
+                amenityRepository.save(amenity);
+            }
+        }
     }
 }
