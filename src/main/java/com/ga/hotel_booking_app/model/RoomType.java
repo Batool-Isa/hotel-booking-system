@@ -1,36 +1,37 @@
 package com.ga.hotel_booking_app.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "hotel_images")
-@ToString
-public class HotelImage {
+@Table(name = "room_types")
+public class RoomType {
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(unique = true, nullable = false)
-    private String imageURL;
-    @Column
-    private String altText ;
+    private String name;
+    @Column(unique = true)
+    private String description;
     @Column(nullable = false)
-    private boolean isPrimary = false;
+    private int max_guests;
     @CreationTimestamp
-    @Column
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "hotel_id", nullable = false)
-    private Hotel hotel;
-}
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
+}

@@ -40,10 +40,12 @@ public class Hotel {
     private String phone;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Status status = Status.UNVERIFIED;
+    private Status status = Status.PENDING_APPROVAL;
     public enum Status {
-        VERIFIED,
-        UNVERIFIED
+        PENDING_APPROVAL,
+        ACTIVE,
+        REJECTED,
+        INACTIVE
     }
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

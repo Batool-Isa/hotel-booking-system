@@ -8,4 +8,5 @@ import lombok.Setter;
 public class HotelImageResponse {
     private Long id;
     private String imageUrl;
+    private String AltText;
 }
