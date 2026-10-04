@@ -132,7 +132,7 @@ public class UserService {
 
         Role role = roleRepository.findByName(Role.RoleName.CUSTOMER)
                 .orElseThrow(()-> new InformationExistException("Customer role not found"));
-        user.getRoles().add(role);
+        user.setRole(role);
         user.setUserProfile(profile);
         User savedUser = userRepository.save(user);
         EmailVerificationToken token = createEmailVerificationToken(savedUser);
@@ -245,7 +245,7 @@ public class UserService {
         response.setLastName(profile.getLastName());
         response.setPhone(profile.getPhone());
         response.setProfileImageUrl(profile.getProfileImageUrl());
-        response.setRoles(user.getRoles());
+        response.setRole(user.getRole());
         return ResponseEntity.ok(response);
     }
 

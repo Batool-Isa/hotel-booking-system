@@ -42,6 +42,9 @@ public class Room {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
-    private Set<HotelImage> images = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name="hotel_id", nullable = false)
+    private Hotel hotel;
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
+    private Set<RoomImage> images = new HashSet<>();
 }

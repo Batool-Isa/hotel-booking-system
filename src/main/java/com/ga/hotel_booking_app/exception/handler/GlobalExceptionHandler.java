@@ -1,9 +1,6 @@
 package com.ga.hotel_booking_app.exception.handler;
 
-import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;
-import com.ga.hotel_booking_app.exception.custom.InvalidCredentialsException;
-import com.ga.hotel_booking_app.exception.custom.InvalidTokenException;
-import com.ga.hotel_booking_app.exception.custom.PasswordMismatchException;
+import com.ga.hotel_booking_app.exception.custom.*;
 import com.ga.hotel_booking_app.exception.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -60,6 +57,18 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 "PASSWORD_MISMATCH",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+    @ExceptionHandler(InvalidInformationException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidInformationExceptionException(InvalidInformationException ex,
+                                                                         HttpServletRequest request){
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "INVALID_INFORMATION",
                 ex.getMessage(),
                 request.getRequestURI()
         );

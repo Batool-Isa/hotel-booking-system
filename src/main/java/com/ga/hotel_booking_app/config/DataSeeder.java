@@ -3,6 +3,7 @@ package com.ga.hotel_booking_app.config;
 import com.ga.hotel_booking_app.model.Amenity;
 import com.ga.hotel_booking_app.model.Role;
 import com.ga.hotel_booking_app.model.User;
+import com.ga.hotel_booking_app.model.UserProfile;
 import com.ga.hotel_booking_app.repository.AmenityRepository;
 import com.ga.hotel_booking_app.repository.RoleRepository;
 import com.ga.hotel_booking_app.repository.UserRepository;
@@ -51,35 +52,67 @@ public class DataSeeder {
     }
 
     private void seedAdmin() {
-        // create admin
-        Role adminRole = roleRepository.findByName(Role.RoleName.ADMIN)
-                .orElseThrow();
 
-        User admin = new User();
-        admin.setUsername("admin");
-        admin.setEmail("admin@vibestay.com");
-        admin.setPassword(passwordEncoder.encode("Admin123!"));
-        admin.setEmailVerified(true);
-        admin.setStatus(User.Status.ACTIVE);
-        admin.getRoles().add(adminRole);
 
-        userRepository.save(admin);
+            if (userRepository.existsByEmail("admin@vibestay.com")) {
+                return;
+            }
+
+            // Find admin role
+            Role adminRole = roleRepository.findByName(Role.RoleName.ADMIN)
+                    .orElseThrow();
+
+            // Create profile
+            UserProfile profile = new UserProfile();
+            profile.setFirstName("VibeStay");
+            profile.setLastName("Admin");
+            profile.setPhone("+97330000000");
+
+            // Create admin
+            User admin = new User();
+            admin.setUsername("admin");
+            admin.setEmail("admin@vibestay.com");
+            admin.setPassword(passwordEncoder.encode("Admin123!"));
+            admin.setEmailVerified(true);
+            admin.setStatus(User.Status.ACTIVE);
+            admin.setRole(adminRole);
+
+            // Assign profile
+            admin.setUserProfile(profile);
+
+            userRepository.save(admin);
+
     }
 
     private void seedHotelManager() {
-        // create manager
+
+        if (userRepository.existsByEmail("hotel-manager1@vibestay.com")) {
+            return;
+        }
+
+        // Find manager role
         Role managerRole = roleRepository.findByName(Role.RoleName.HOTEL_MANAGER)
                 .orElseThrow();
 
-        User manger = new User();
-        manger.setUsername("hotel-manager1");
-        manger.setEmail("hotel-manager1@vibestay.com");
-        manger.setPassword(passwordEncoder.encode("hotel-manager123!"));
-        manger.setEmailVerified(true);
-        manger.setStatus(User.Status.ACTIVE);
-        manger.getRoles().add(managerRole);
+        // Create profile
+        UserProfile profile = new UserProfile();
+        profile.setFirstName("Hotel");
+        profile.setLastName("Manager");
+        profile.setPhone("+97331111111");
 
-        userRepository.save(manger);
+        // Create manager
+        User manager = new User();
+        manager.setUsername("hotel-manager1");
+        manager.setEmail("hotel-manager1@vibestay.com");
+        manager.setPassword(passwordEncoder.encode("hotel-manager123!"));
+        manager.setEmailVerified(true);
+        manager.setStatus(User.Status.ACTIVE);
+        manager.setRole(managerRole);
+
+        // Assign profile
+        manager.setUserProfile(profile);
+
+        userRepository.save(manager);
     }
 
     private void seedAmenities() {

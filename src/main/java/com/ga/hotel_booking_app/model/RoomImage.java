@@ -27,6 +27,7 @@ public class RoomImage {
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "room_id", nullable = false)
-    private Hotel hotel;
+    private Room room;
+
 }
 

@@ -19,5 +19,5 @@ public class UserProfileResponse {
     private String lastName;
     private String phone;
     private String profileImageUrl;
-    private Set<Role> roles;
+    private Role role;
 }

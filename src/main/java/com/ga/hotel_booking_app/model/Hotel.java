@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "hotels")
-@ToString(exclude = "images")
+@ToString(exclude = {"images", "amenities", "managers"})
 public class Hotel {
     @Id
     @Column
@@ -23,7 +24,7 @@ public class Hotel {
     private Long id;
     @Column(unique = true, nullable = false)
     private String name;
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String description;
     @Column(nullable = false)
     private String address;
@@ -31,10 +32,10 @@ public class Hotel {
     private String city;
     @Column(nullable = false)
     private String country;
-    @Column(nullable = false)
-    private String latitude;
-    @Column(nullable = false)
-    private String longitude ;
+    @Column
+    private BigDecimal latitude;
+    @Column
+    private BigDecimal longitude ;
     @Column(nullable = false)
     private String phone;
     @Enumerated(EnumType.STRING)
@@ -62,6 +63,9 @@ public class Hotel {
     @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
     private Set<HotelImage> images = new HashSet<>();
 
-    @OneToMany(mappedBy = "hotel")
+    @OneToMany(mappedBy = "hotel",fetch = FetchType.LAZY)
     private Set<HotelAmenity> amenities = new HashSet<>();
+
+    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
+    private Set<Room> rooms = new HashSet<>();
 }
