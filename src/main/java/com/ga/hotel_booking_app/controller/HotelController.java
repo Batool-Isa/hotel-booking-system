@@ -12,7 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/hotels")
+@RequestMapping("/api/hotels")
 public class HotelController {
 
     @Autowired
@@ -27,5 +27,19 @@ public class HotelController {
         System.out.println("Hotel Controller calling ---> create");
         return hotelService.create(request);
     }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get hotel information by Id", description = "Fetches all hotel information by Id")
+    public ResponseEntity<?> getHotel(@PathVariable("id") Long id) {
+        System.out.println("Hotel Controller calling ---> get hotel");
+        return hotelService.getHotel(id);
+    }
+    @GetMapping
+    @Operation(summary = "Get all hotels", description = "Fetches all hotels with its information")
+    public ResponseEntity<?> getHotels() {
+        System.out.println("Hotel Controller calling ---> get hotels");
+        return hotelService.getHotels();
+    }
+
 
 }
