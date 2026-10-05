@@ -51,10 +51,10 @@ public class AvailabilityService {
         // get only active booking
         List<Booking> bookingList = new ArrayList<>();
         for (Hotel h : hotelList) {
-             bookingList.addAll(bookingRepository.findByHotelIdAndStatus(h.getId(), Booking.Status.CONFIRMED));
+            bookingList.addAll(bookingRepository.findByHotelIdAndStatus(h.getId(), Booking.Status.CONFIRMED));
         }
         // gets booking that overlap
-        List<Booking> overLappedBookings =  bookingList.stream()
+        List<Booking> overLappedBookings = bookingList.stream()
                 .filter(b ->
                         b.getCheckOut().isAfter(request.getCheckIn())
                                 && b.getCheckIn().isBefore(request.getCheckOut())).toList();
@@ -73,17 +73,19 @@ public class AvailabilityService {
             response.setCity(hotel.getCity());
             response.setCountry(hotel.getCountry());
             response.setHotelName(hotel.getName());
-            List<Room> hotelActiveRooms = hotel.getRooms().stream().filter(r->r.getStatus().equals(Room.Status.ACTIVE)).toList();
+            List<Room> hotelActiveRooms = hotel.getRooms().stream().filter(r -> r.getStatus().equals(Room.Status.ACTIVE)).toList();
             for (Room r : hotelActiveRooms) {
                 //check if room can't be booked
-                if (rooms.contains(r)){
-                continue;
+                if (rooms.contains(r)) {
+                    continue;
                 }
                 RoomResponse roomResponse = new RoomResponse();
                 roomResponse.setId(r.getId());
                 roomResponse.setRoomTypeName(r.getRoomType().getName());
                 roomResponse.setPricePerNight(r.getPricePerNight());
-                roomResponse.setCapacity(r.getCapacity());
+                roomResponse.setMaxAdults(r.getMaxAdults());
+                roomResponse.setMaxChildren(r.getMaxChildren());
+                roomResponse.setMaxOccupancy(r.getMaxOccupancy());
                 roomResponse.setRoomNumber(r.getRoomNumber());
                 roomResponse.setFloorNumber(r.getFloorNumber());
                 roomResponseList.add(roomResponse);

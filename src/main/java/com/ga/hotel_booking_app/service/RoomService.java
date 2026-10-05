@@ -3,7 +3,6 @@ package com.ga.hotel_booking_app.service;
 import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
 import com.ga.hotel_booking_app.dto.reponse.RoomResponse;
 import com.ga.hotel_booking_app.dto.request.CreateRoomRequest;
-import com.ga.hotel_booking_app.dto.request.RoomTypeRequest;
 import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;
 import com.ga.hotel_booking_app.exception.custom.InvalidInformationException;
 import com.ga.hotel_booking_app.exception.custom.UnauthorizedActionException;
@@ -65,8 +64,13 @@ public class RoomService {
         }
         room.setRoomNumber(request.getRoomNumber());
         room.setFloorNumber(request.getFloorNumber());
-        room.setCapacity(request.getCapacity());
+        room.setMaxAdults(request.getMaxAdults());
+        room.setMaxChildren(request.getMaxChildren());
         room.setPricePerNight(request.getPricePerNight());
+        room.setMaxAdults(request.getMaxAdults());
+        room.setMaxChildren(request.getMaxChildren());
+        room.setMaxOccupancy(request.getMaxOccupancy());
+
         room.setStatus(Room.Status.ACTIVE);
         room.setHotel(hotel);
         room.setRoomType(type);
@@ -102,7 +106,10 @@ public class RoomService {
             response.setFloorNumber(room.getFloorNumber());
             response.setRoomTypeId(room.getRoomType().getId());
             response.setRoomTypeName(room.getRoomType().getName());
-            response.setCapacity(room.getCapacity());
+            response.setMaxAdults(room.getMaxAdults());
+            response.setMaxChildren(room.getMaxChildren());
+            response.setMaxOccupancy(room.getMaxOccupancy());
+
             response.setPricePerNight(room.getPricePerNight());
             response.setStatus(room.getStatus().name());
             response.setHotelId(room.getHotel().getId());
