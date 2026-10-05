@@ -70,4 +70,6 @@ public class Hotel {
 
     @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
     private Set<Room> rooms = new HashSet<>();
+    @OneToOne(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private ChildPolicy childPolicy;
 }

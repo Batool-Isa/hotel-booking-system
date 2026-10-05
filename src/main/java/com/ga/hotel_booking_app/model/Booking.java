@@ -17,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "bookings")
-@ToString(exclude = {"user", "rooms"})
+@ToString(exclude = {"user", "bookingRooms ", "guests"})
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,13 +51,12 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    @ManyToMany
-    @JoinTable(
-            name = "booking_rooms",
-            joinColumns = @JoinColumn(name = "booking_id"),
-            inverseJoinColumns = @JoinColumn(name = "room_id")
+    @OneToMany(
+            mappedBy = "booking",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
-    private Set<Room> rooms = new HashSet<>();
+    private Set<BookingRoom> bookingRooms  = new HashSet<>();
 
     public enum Status {
         PENDING,
@@ -65,4 +64,6 @@ public class Booking {
         CANCELLED,
         COMPLETED
     }
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BookingGuest> guests = new HashSet<>();
 }

@@ -1,6 +1,7 @@
 package com.ga.hotel_booking_app.repository;
 
 import com.ga.hotel_booking_app.model.Booking;
+import com.ga.hotel_booking_app.model.BookingRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,5 +13,6 @@ import java.util.Optional;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByStatus(Booking.Status status);
     List<Booking> findByHotelId(Long hotelId);
+    List<Booking> findByHotelIdAndStatus(Long hotelId,Booking.Status status);
 
 }
