@@ -18,8 +18,8 @@ public class RoomTypeController {
 //    GET    /api/room-types
 //    GET    /api/room-types/{id}
 //    PUT    /api/room-types/{id}
-    @Autowired
-    private RoomTypeService roomTypeService;
+@Autowired
+private RoomTypeService roomTypeService;
 
     @GetMapping
     @PreAuthorize("hasAnyRole('HOTEL_MANAGER','ADMIN')")

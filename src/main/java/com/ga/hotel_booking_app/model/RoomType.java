@@ -36,5 +36,7 @@ public class RoomType {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+    @OneToMany(mappedBy = "roomType", fetch = FetchType.LAZY)
+    private Set<Room> rooms = new HashSet<>();
 
 }
