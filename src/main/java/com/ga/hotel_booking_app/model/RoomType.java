@@ -15,6 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@ToString
 @Table(name = "room_types")
 public class RoomType {
     @Id
@@ -23,15 +24,17 @@ public class RoomType {
     private Long id;
     @Column(unique = true, nullable = false)
     private String name;
-    @Column(unique = true)
-    private String description;
     @Column(nullable = false)
-    private int max_guests;
+    private String description;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status = Status.ACTIVE;
+    public enum Status {
+        ACTIVE,
+        INACTIVE
+    }
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
 
 }

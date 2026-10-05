@@ -30,12 +30,16 @@ public class Room {
     private String phone;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Status status = Status.AVAILABLE;
+    private Status status = Status.ACTIVE;
     public enum Status {
-        AVAILABLE,
-        UNAVAILABLE,
+        ACTIVE,
+        INACTIVE,
         UNDER_MAINTENANCE
     }
+    @Column
+    private double pricePerNight;
+    @Column
+    private int capacity;
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -43,7 +47,7 @@ public class Room {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
     @ManyToOne
-    @JoinColumn(name="hotel_id", nullable = false)
+    @JoinColumn(name = "hotel_id", nullable = false)
     private Hotel hotel;
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
     private Set<RoomImage> images = new HashSet<>();
