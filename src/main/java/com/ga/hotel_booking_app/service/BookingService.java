@@ -43,6 +43,9 @@ public class BookingService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public User getCurrentLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
@@ -185,6 +188,7 @@ public class BookingService {
         booking.setAdults(totalAdults);
         booking.setChildren(totalChildren);
         bookingRepository.save(booking);
+        notificationService.sendBookingNotification(booking);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new MessageResponse("Booking created successfully"));
 
@@ -272,6 +276,8 @@ public class BookingService {
         }
         booking.setStatus(Booking.Status.CANCELLED);
         bookingRepository.save(booking);
+        notificationService.sendBookingNotification(booking);
+
         return ResponseEntity.ok(new MessageResponse("Booking canceled successfully"));
     }
 
@@ -324,6 +330,7 @@ public class BookingService {
             }
             booking.setStatus(Booking.Status.COMPLETED);
             bookingRepository.save(booking);
+            notificationService.sendBookingNotification(booking);
             return ResponseEntity.ok(new MessageResponse("Booking status updated successfully"));
         }
 }

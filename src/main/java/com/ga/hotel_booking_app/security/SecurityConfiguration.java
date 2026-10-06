@@ -56,7 +56,8 @@ public class SecurityConfiguration {
                                 "/auth/users/reset-link",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/ws/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/hotels/**").permitAll()
                         .anyRequest().authenticated()
