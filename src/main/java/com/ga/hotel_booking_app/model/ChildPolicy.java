@@ -24,7 +24,8 @@ public class ChildPolicy {
 
     @Column(nullable = false)
     private Integer childMaxAge;
-
+    @Column(nullable = false)
+    private boolean infantsCountTowardOccupancy;
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

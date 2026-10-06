@@ -70,6 +70,7 @@ public class ChildPolicyService {
 
         childPolicy.setInfantMaxAge(request.getInfantMaxAge());
         childPolicy.setChildMaxAge(request.getChildMaxAge());
+        childPolicy.setChildMaxAge(request.getChildMaxAge());
         childPolicy.setHotel(hotel);
 
         childPolicyRepository.save(childPolicy);
