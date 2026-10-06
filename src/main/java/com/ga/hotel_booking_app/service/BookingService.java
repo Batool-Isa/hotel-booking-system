@@ -1,15 +1,18 @@
 package com.ga.hotel_booking_app.service;
 
+import com.ga.hotel_booking_app.dto.reponse.BookingGuestResponse;
+import com.ga.hotel_booking_app.dto.reponse.BookingResponse;
+import com.ga.hotel_booking_app.dto.reponse.BookingRoomResponse;
 import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
 import com.ga.hotel_booking_app.dto.request.BookingGuestRequest;
-
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
-
 import com.ga.hotel_booking_app.dto.request.BookingRequest;
 import com.ga.hotel_booking_app.dto.request.BookingRoomRequest;
+import com.ga.hotel_booking_app.dto.request.BookingStatusRequest;
 import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;
 import com.ga.hotel_booking_app.exception.custom.InvalidInformationException;
+import com.ga.hotel_booking_app.exception.custom.UnauthorizedActionException;
 import com.ga.hotel_booking_app.model.*;
 import com.ga.hotel_booking_app.repository.BookingRepository;
 import com.ga.hotel_booking_app.repository.HotelRepository;
@@ -106,13 +109,10 @@ public class BookingService {
                 // check booking that might overlap
                 List<Booking> overlappingBookings = bookingRepository.findOverlappingBookings(r.getRoomId()
                         , Booking.Status.CONFIRMED, request.getCheckIn(), request.getCheckOut());
-                if (overlappingBookings.size() > 0) {
+                if (!overlappingBookings.isEmpty()) {
                     throw new InvalidInformationException("Booking room at these days is overlapped");
                 }
-
             }
-
-
         }
 
         // insert into booking table
@@ -186,4 +186,141 @@ public class BookingService {
                 .body(new MessageResponse("Booking created successfully"));
 
     }
+
+    public ResponseEntity<?> getMyBookings() {
+        User user = getCurrentLoggedInUser();
+        List<Booking> bookingList = bookingRepository.findByUserId(user.getId());
+        List<BookingResponse> responses = bookingList.stream()
+                .map(b -> mapToBookingResponse((b))).toList();
+        return ResponseEntity.ok(responses);
+    }
+
+    private BookingResponse mapToBookingResponse(Booking booking) {
+        BookingResponse response = new BookingResponse();
+        response.setId(booking.getId());
+        response.setBookingReference(booking.getBookingReference());
+        response.setHotelId(booking.getHotel().getId());
+        response.setHotelName(booking.getHotel().getName());
+        response.setCheckIn(booking.getCheckIn());
+        response.setCheckOut(booking.getCheckOut());
+        response.setStatus(booking.getStatus().name());
+        response.setAdults(booking.getAdults());
+        response.setChildren(booking.getChildren());
+        response.setTotalAmount(booking.getTotalAmount());
+        response.setSpecialRequest(booking.getSpecialRequest());
+        List<BookingRoomResponse> rooms = booking.getBookingRooms()
+                .stream()
+                .map(this::mapToBookingRoomResponse)
+                .toList();
+        response.setRooms(rooms);
+        return response;
+    }
+
+    private BookingRoomResponse mapToBookingRoomResponse(BookingRoom bookingRoom) {
+        BookingRoomResponse response = new BookingRoomResponse();
+        response.setRoomId(bookingRoom.getRoom().getId());
+        response.setRoomNumber(bookingRoom.getRoom().getRoomNumber());
+        response.setRoomTypeName(
+                bookingRoom.getRoom().getRoomType().getName()
+        );
+        response.setPricePerNight(bookingRoom.getPricePerNight());
+        List<BookingGuestResponse> guests = bookingRoom.getGuests()
+                .stream()
+                .map(guest -> {
+                    BookingGuestResponse guestResponse = new BookingGuestResponse();
+                    guestResponse.setId(guest.getId());
+                    guestResponse.setName(guest.getName());
+                    guestResponse.setAge(guest.getAge());
+                    guestResponse.setGuestType(guest.getGuestType().name());
+                    return guestResponse;
+                })
+                .toList();
+
+        response.setGuests(guests);
+
+        return response;
+    }
+
+    public ResponseEntity<?> cancelBooking(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(()-> new InformationNotFoundException("Booking with id "+bookingId+ " not found"));
+        User user = getCurrentLoggedInUser();
+        if (user.getRole().getName().equals(Role.RoleName.CUSTOMER) && !booking.getUser().getId().equals(user.getId())){
+            throw new UnauthorizedActionException("You are not authorized to cancel this booking");
+        }
+        if(user.getRole().getName().equals(Role.RoleName.HOTEL_MANAGER)){
+            boolean isHotelManger = booking.getHotel().getManagers().stream()
+                    .anyMatch(m->m.getId().equals(user.getId()));
+            if(!isHotelManger){
+                throw new UnauthorizedActionException("You are not authorized to cancel this booking");
+            }
+        }
+        if (booking.getStatus().equals(Booking.Status.CANCELLED)) {
+            throw new InvalidInformationException("This booking is already cancelled");
+        }
+
+        if (booking.getStatus().equals(Booking.Status.COMPLETED)) {
+            throw new InvalidInformationException("A completed booking can't be cancelled");
+        }
+
+        // only confirmed booking can be canceled
+        if(!booking.getStatus().equals(Booking.Status.CONFIRMED)){
+            throw new InvalidInformationException("This booking can't be canceled");
+        }
+        booking.setStatus(Booking.Status.CANCELLED);
+        bookingRepository.save(booking);
+        return ResponseEntity.ok(new MessageResponse("Booking canceled successfully"));
+    }
+
+    public ResponseEntity<?> getBookingById(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new InformationNotFoundException("Booking with id " + bookingId + " not found"));
+        User user = getCurrentLoggedInUser();
+        Role.RoleName role = user.getRole().getName();
+        if (role.equals(Role.RoleName.CUSTOMER)
+                && !booking.getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedActionException("You are not authorized to view this booking");
+        }
+        if (role.equals(Role.RoleName.HOTEL_MANAGER)) {
+                boolean isHotelManager = booking.getHotel()
+                        .getManagers().stream().anyMatch(manager -> manager.getId().equals(user.getId()));
+                if (!isHotelManager) {
+                    throw new UnauthorizedActionException("You are not authorized to view this booking");
+                }
+            }
+            BookingResponse response = mapToBookingResponse(booking);
+            return ResponseEntity.ok(response);
+
+    }
+
+        public ResponseEntity<?> updateBookingStatus(Long bookingId, BookingStatusRequest request) {
+            Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new InformationNotFoundException("Booking with id " + bookingId + " not found"));
+            User user = getCurrentLoggedInUser();
+            Role.RoleName role = user.getRole().getName();
+            if (role.equals(Role.RoleName.HOTEL_MANAGER)) {
+                boolean isHotelManager = booking.getHotel()
+                        .getManagers().stream().anyMatch(manager -> manager.getId().equals(user.getId()));
+                if (!isHotelManager) {
+                    throw new UnauthorizedActionException("You are not authorized to update this booking");
+                }
+            } else if (!role.equals(Role.RoleName.ADMIN)) {
+                throw new UnauthorizedActionException("You are not authorized to update booking status");
+            }
+
+            Booking.Status currentStatus = booking.getStatus();
+            Booking.Status newStatus = request.getStatus();
+            if (currentStatus.equals(newStatus)) {
+                throw new InvalidInformationException(
+                        "Booking is already " + currentStatus);
+            }
+            if (!currentStatus.equals(Booking.Status.CONFIRMED)) {
+                throw new InvalidInformationException("Booking status cannot be changed from " + currentStatus);
+            }
+            if (!newStatus.equals(Booking.Status.COMPLETED)) {
+                throw new InvalidInformationException("The booking can only be marked as COMPLETED");
+            }
+            booking.setStatus(Booking.Status.COMPLETED);
+            bookingRepository.save(booking);
+            return ResponseEntity.ok(new MessageResponse("Booking status updated successfully"));
+        }
 }
