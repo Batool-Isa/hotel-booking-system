@@ -7,9 +7,11 @@ import com.ga.hotel_booking_app.service.HotelService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/api/hotels")
@@ -36,25 +38,26 @@ public class HotelController {
     public ResponseEntity<?> getHotels(@RequestParam(required = false) String search,
                                        @RequestParam(required = false) String name,
                                        @RequestParam(required = false) String country,
-                                       @RequestParam(required = false) String city ) {
+                                       @RequestParam(required = false) String city,
+                                       Pageable pageable) {
 
         System.out.println("Hotel Controller calling ---> get hotels");
-        return hotelService.getHotels(search, name, country, city);
+        return hotelService.getHotels(search, name, country, city, pageable);
     }
 
     @GetMapping("/pending")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get all pending hotels ", description = "Fetches all hotels that is need approval")
-    public ResponseEntity<?> getPendingHotels() {
+    public ResponseEntity<?> getPendingHotels(Pageable pageable) {
         System.out.println("Hotel Controller calling ---> get pending hotels");
-        return hotelService.getPendingHotels();
+        return hotelService.getPendingHotels(pageable);
     }
     @GetMapping("/my-hotels")
     @PreAuthorize("hasRole('HOTEL_MANAGER')")
     @Operation(summary = "Get all manager hotels ", description = "Fetches all hotels tha tis assigned to this manager")
-    public ResponseEntity<?> getMangerHotels() {
+    public ResponseEntity<?> getMangerHotels(Pageable pageable) {
         System.out.println("Hotel Controller calling ---> get manager hotels");
-        return hotelService.getMangerHotels();
+        return hotelService.getMangerHotels(pageable);
     }
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','HOTEL_MANAGER')")

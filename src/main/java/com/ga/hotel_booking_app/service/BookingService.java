@@ -5,6 +5,7 @@ import com.ga.hotel_booking_app.dto.reponse.BookingResponse;
 import com.ga.hotel_booking_app.dto.reponse.BookingRoomResponse;
 import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
 import com.ga.hotel_booking_app.dto.request.BookingGuestRequest;
+
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import com.ga.hotel_booking_app.dto.request.BookingRequest;
@@ -20,6 +21,8 @@ import com.ga.hotel_booking_app.repository.RoomRepository;
 import com.ga.hotel_booking_app.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -187,9 +190,9 @@ public class BookingService {
 
     }
 
-    public ResponseEntity<?> getMyBookings() {
+    public ResponseEntity<?> getMyBookings(Pageable pageable) {
         User user = getCurrentLoggedInUser();
-        List<Booking> bookingList = bookingRepository.findByUserId(user.getId());
+        Page<Booking> bookingList = bookingRepository.findByUserId(user.getId(), pageable);
         List<BookingResponse> responses = bookingList.stream()
                 .map(b -> mapToBookingResponse((b))).toList();
         return ResponseEntity.ok(responses);

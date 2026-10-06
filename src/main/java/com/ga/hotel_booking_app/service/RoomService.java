@@ -13,6 +13,8 @@ import com.ga.hotel_booking_app.repository.RoomTypeRepository;
 import com.ga.hotel_booking_app.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -43,16 +45,16 @@ public class RoomService {
 
         Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new InformationNotFoundException("Hotel with id " + id + " not found"));
-       // check if hotel is active
+        // check if hotel is active
         if (!hotel.getStatus().equals(Hotel.Status.ACTIVE)) {
             throw new InvalidInformationException("You can't add room to a hotel that is not active");
         }
         User user = getCurrentLoggedInUser();
-        if(user.getRole().equals(Role.RoleName.HOTEL_MANAGER)){
+        if (user.getRole().getName().equals(Role.RoleName.HOTEL_MANAGER)) {
             // check if manager is assigned to this hotel
             boolean isThisHotelManager = hotel.getManagers().stream()
                     .anyMatch(m -> m.getId().equals(user.getId()));
-            if(!isThisHotelManager){
+            if (!isThisHotelManager) {
                 throw new UnauthorizedActionException("You are not authorized to add room to this hotel");
             }
         }
@@ -78,29 +80,32 @@ public class RoomService {
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Room added successfully"));
     }
 
-    public ResponseEntity<?> getHotelRooms(Long id) {
+    public ResponseEntity<?> getHotelRooms(Long id, Pageable pageable) {
         Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new InformationNotFoundException("Hotel with id " + id + " not found"));
         // check if hotel is active
         if (!hotel.getStatus().equals(Hotel.Status.ACTIVE)) {
             throw new InvalidInformationException("You can't view rooms of a hotel that is not active");
         }
-        List<Room> roomsList = roomRepository.findByHotelId(id);
+        Page<Room> roomsList;
         User user = getCurrentLoggedInUser();
-        if(user.getRole().equals(Role.RoleName.HOTEL_MANAGER)){
+        if (user.getRole().getName().equals(Role.RoleName.HOTEL_MANAGER)) {
             // check if manager is assigned to this hotel
             boolean isThisHotelManager = hotel.getManagers().stream()
                     .anyMatch(m -> m.getId().equals(user.getId()));
-            if(!isThisHotelManager){ // if manger not assigned should not view rooms
-                throw new UnauthorizedActionException( "You can't view rooms of a hotel that is not active");
+            if (!isThisHotelManager) { // if manger not assigned should not view rooms
+                throw new UnauthorizedActionException("You can't view rooms of a hotel that is not active");
             }
-        }else if(user.getRole().equals(Role.RoleName.CUSTOMER)){ // customer can view only active room
-            roomsList = roomsList.stream().filter(r -> r.getStatus().equals(Room.Status.ACTIVE)).toList();
+            roomsList = roomRepository.findByHotelId(hotel.getId(), pageable);
+        } else if (user.getRole().getName().equals(Role.RoleName.CUSTOMER)) { // customer can view only active room
+            roomsList = roomRepository.findByHotelIdAndStatus(hotel.getId(), Room.Status.ACTIVE, pageable);
+        } else { // admin
+            roomsList = roomRepository.findByHotelId(id, pageable);
         }
         List<RoomResponse> responseList = new ArrayList<>();
 
-        for (Room room: roomsList){
-        RoomResponse response = new RoomResponse();
+        for (Room room : roomsList) {
+            RoomResponse response = new RoomResponse();
             response.setId(room.getId());
             response.setRoomNumber(room.getRoomNumber());
             response.setFloorNumber(room.getFloorNumber());
@@ -113,8 +118,8 @@ public class RoomService {
             response.setPricePerNight(room.getPricePerNight());
             response.setStatus(room.getStatus().name());
             response.setHotelId(room.getHotel().getId());
-        responseList.add(response);
+            responseList.add(response);
         }
-return ResponseEntity.ok(responseList);
+        return ResponseEntity.ok(responseList);
     }
 }

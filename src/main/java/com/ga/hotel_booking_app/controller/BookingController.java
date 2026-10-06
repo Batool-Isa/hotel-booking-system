@@ -6,6 +6,7 @@ import com.ga.hotel_booking_app.service.BookingService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +26,9 @@ public class BookingController {
     @GetMapping("/my-bookings")
     @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(summary = "Get Customer's booking", description = "Fetch all customer's booking records")
-    public ResponseEntity<?> getMyBookings(){
+    public ResponseEntity<?> getMyBookings(Pageable pageable){
         System.out.println("Booking controller calling --> get my bookings");
-        return bookingService.getMyBookings();
+        return bookingService.getMyBookings(pageable);
     }
 
     @PatchMapping("/{bookingId}/cancel")

@@ -20,7 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,6 +93,7 @@ public class HotelService {
 
     public HotelResponse buildHotelResponse(Hotel hotel) {
         HotelResponse response = new HotelResponse();
+        response.setId(hotel.getId());
         response.setName(hotel.getName());
         response.setDescription(hotel.getDescription());
         response.setAddress(hotel.getAddress());
@@ -101,7 +103,9 @@ public class HotelService {
         response.setLongitude(hotel.getLongitude());
         response.setPhone(hotel.getPhone());
         response.setUpdatedAt(hotel.getUpdatedAt());
+        response.setCreatedAt(hotel.getCreatedAt());
         //response.getReviewCount(hotel.getreview);
+       // response.getAverageRating(hotel.get)
         List<AmenityResponse> amenities = new ArrayList<>();
 
         for (HotelAmenity hotelAmenity : hotel.getAmenities()) {
@@ -129,24 +133,13 @@ public class HotelService {
     }
 
     public ResponseEntity<?> getHotels(String search, String name,
-                                       String country, String city) {
-        List<Hotel> hotels = hotelRepository.findByStatus(Hotel.Status.ACTIVE);
-        if (search!=null) {
-            hotels.stream().filter(h -> h.getName().toLowerCase().contains(search)).toList();
-        }
-        if (name!=null) {
-            hotels.stream().filter(h -> h.getName().equalsIgnoreCase(name)).toList();
-        }
-        if (city!=null) {
-            hotels.stream().filter(h -> h.getCity().equalsIgnoreCase(city)).toList();
-        }
-        if (country!=null) {
-            hotels.stream().filter(h -> h.getCountry().equalsIgnoreCase(country)).toList();
-        }
-
-        // later add filter by availability and prices and so on.
-
+                                       String country, String city,
+                                       Pageable pageable) {
+        Page<Hotel> hotels = hotelRepository.findFilteredHotels(
+                search, name, city, country, pageable
+        );
         List<HotelResponse> responses = new ArrayList<>();
+
 
         for (Hotel hotel : hotels) {
             HotelResponse hotelResponse = buildHotelResponse(hotel);
@@ -157,8 +150,8 @@ public class HotelService {
 
     }
 
-    public ResponseEntity<?> getPendingHotels() {
-        List<Hotel> hotels = hotelRepository.findByStatus(Hotel.Status.PENDING_APPROVAL);
+    public ResponseEntity<?> getPendingHotels(Pageable pageable) {
+        Page<Hotel> hotels = hotelRepository.findByStatus(Hotel.Status.PENDING_APPROVAL, pageable);
         List<HotelResponse> responses = new ArrayList<>();
         for (Hotel hotel : hotels) {
             HotelResponse hotelResponse = buildHotelResponse(hotel);
@@ -167,9 +160,9 @@ public class HotelService {
         return ResponseEntity.ok(responses);
     }
 
-    public ResponseEntity<?> getMangerHotels() {
+    public ResponseEntity<?> getMangerHotels(Pageable pageable) {
         User manager = getCurrentLoggedInUser();
-        List<Hotel> hotels = hotelRepository.findByManagers_Id(manager.getId());
+        Page<Hotel> hotels = hotelRepository.findByManagers_Id(manager.getId(),pageable);
         List<HotelResponse> responses = new ArrayList<>();
         for (Hotel hotel : hotels) {
             HotelResponse hotelResponse = buildHotelResponse(hotel);
