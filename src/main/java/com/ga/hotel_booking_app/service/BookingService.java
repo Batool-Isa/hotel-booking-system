@@ -2,6 +2,10 @@ package com.ga.hotel_booking_app.service;
 
 import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
 import com.ga.hotel_booking_app.dto.request.BookingGuestRequest;
+
+import java.math.BigDecimal;
+import java.time.temporal.ChronoUnit;
+
 import com.ga.hotel_booking_app.dto.request.BookingRequest;
 import com.ga.hotel_booking_app.dto.request.BookingRoomRequest;
 import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;
@@ -18,11 +22,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class BookingService {
@@ -40,6 +42,7 @@ public class BookingService {
         String email = authentication.getName();
         return userRepository.findUserByEmail(email);
     }
+
     @Transactional
     public ResponseEntity<?> createNewBooking(BookingRequest request) {
         // validate dates
@@ -95,8 +98,8 @@ public class BookingService {
                     total += infantNum;
                 }
                 if (adultNum > room.getMaxAdults()
-                || childrenNum > room.getMaxChildren()
-                || total > room.getMaxOccupancy()) {
+                        || childrenNum > room.getMaxChildren()
+                        || total > room.getMaxOccupancy()) {
                     throw new InvalidInformationException("Invalid number of guests, room can't accommodate this number of guests");
                 }
 
@@ -115,9 +118,12 @@ public class BookingService {
         // insert into booking table
         Booking booking = new Booking();
         User customer = getCurrentLoggedInUser();
-        if(!customer.getStatus().equals(User.Status.ACTIVE)){
-            throw  new InvalidInformationException("Customer with no active satate can'et book");
+        if (!customer.getStatus().equals(User.Status.ACTIVE)) {
+            throw new InvalidInformationException("Customer with no active satate can'et book");
         }
+        String bookingReference = hotel.getName().substring(0, 2).toUpperCase() +
+                UUID.randomUUID().toString().substring(0, 4).toUpperCase();
+        booking.setBookingReference(bookingReference);
         booking.setHotel(hotel);
         booking.setCheckIn(request.getCheckIn());
         booking.setCheckOut(request.getCheckOut());
@@ -125,6 +131,12 @@ public class BookingService {
         booking.setStatus(Booking.Status.CONFIRMED);
         booking.setUser(customer);
         Set<BookingRoom> bookingRooms = new HashSet<>();
+        int totalAdults = 0;
+        int totalChildren = 0;
+
+        // calculate total amount
+        int daysNum = (int) ChronoUnit.DAYS.between(request.getCheckIn(), request.getCheckOut());
+        BigDecimal totalAmount = BigDecimal.valueOf(0.0);
 
         for (BookingRoomRequest roomRequest : bookingRoomRequests) {
 
@@ -136,6 +148,8 @@ public class BookingService {
             bookingRoom.setRoom(room);
             bookingRoom.setPricePerNight(room.getPricePerNight());
 
+            // add room cost
+            totalAmount = totalAmount.add(BigDecimal.valueOf(daysNum).multiply(room.getPricePerNight()));
             List<BookingGuest> bookingGuests = new ArrayList<>();
 
             for (BookingGuestRequest guestRequest : roomRequest.getGuests()) {
@@ -151,8 +165,10 @@ public class BookingService {
                     guest.setGuestType(BookingGuest.GuestType.INFANT);
                 } else if (guestRequest.getAge() <= childPolicy.getChildMaxAge()) {
                     guest.setGuestType(BookingGuest.GuestType.CHILD);
+                    totalChildren++;
                 } else {
                     guest.setGuestType(BookingGuest.GuestType.ADULT);
+                    totalAdults++;
                 }
 
                 bookingGuests.add(guest);
@@ -161,11 +177,11 @@ public class BookingService {
             bookingRoom.setGuests(bookingGuests);
             bookingRooms.add(bookingRoom);
         }
-
+        booking.setTotalAmount(totalAmount);
         booking.setBookingRooms(bookingRooms);
-
+        booking.setAdults(totalAdults);
+        booking.setChildren(totalChildren);
         bookingRepository.save(booking);
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new MessageResponse("Booking created successfully"));
 
