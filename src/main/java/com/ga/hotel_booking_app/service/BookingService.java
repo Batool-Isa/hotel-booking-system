@@ -8,6 +8,7 @@ import com.ga.hotel_booking_app.dto.request.BookingGuestRequest;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
+
 import com.ga.hotel_booking_app.dto.request.BookingRequest;
 import com.ga.hotel_booking_app.dto.request.BookingRoomRequest;
 import com.ga.hotel_booking_app.dto.request.BookingStatusRequest;
@@ -30,6 +31,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.time.LocalDate;
 import java.util.*;
 
@@ -51,6 +53,7 @@ public class BookingService {
     private AuditLogService auditLogService;
     private static final Logger logger =
             LoggerFactory.getLogger(BookingService.class);
+
     public User getCurrentLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
@@ -130,7 +133,7 @@ public class BookingService {
         Booking booking = new Booking();
         User customer = getCurrentLoggedInUser();
         if (!customer.getStatus().equals(User.Status.ACTIVE)) {
-            throw new InvalidInformationException("Customer with no active satate can'et book");
+            throw new InvalidInformationException("Only active customer can book hotels");
         }
         String bookingReference = hotel.getName().substring(0, 2).toUpperCase() +
                 UUID.randomUUID().toString().substring(0, 4).toUpperCase();
@@ -200,7 +203,7 @@ public class BookingService {
                 "BOOKING_CONFIRMED",
                 "BOOKING",
                 booking.getId(),
-                "Customer confirmed booking " + booking.getBookingReference()
+                "Customer " + customer.getUsername() + " confirmed booking " + booking.getBookingReference()
         );
         logger.info(
                 "Booking created: reference={}, userId={}, hotelId={}",
@@ -269,15 +272,15 @@ public class BookingService {
 
     public ResponseEntity<?> cancelBooking(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(()-> new InformationNotFoundException("Booking with id "+bookingId+ " not found"));
+                .orElseThrow(() -> new InformationNotFoundException("Booking with id " + bookingId + " not found"));
         User user = getCurrentLoggedInUser();
-        if (user.getRole().getName().equals(Role.RoleName.CUSTOMER) && !booking.getUser().getId().equals(user.getId())){
+        if (user.getRole().getName().equals(Role.RoleName.CUSTOMER) && !booking.getUser().getId().equals(user.getId())) {
             throw new UnauthorizedActionException("You are not authorized to cancel this booking");
         }
-        if(user.getRole().getName().equals(Role.RoleName.HOTEL_MANAGER)){
+        if (user.getRole().getName().equals(Role.RoleName.HOTEL_MANAGER)) {
             boolean isHotelManger = booking.getHotel().getManagers().stream()
-                    .anyMatch(m->m.getId().equals(user.getId()));
-            if(!isHotelManger){
+                    .anyMatch(m -> m.getId().equals(user.getId()));
+            if (!isHotelManger) {
                 throw new UnauthorizedActionException("You are not authorized to cancel this booking");
             }
         }
@@ -290,19 +293,29 @@ public class BookingService {
         }
 
         // only confirmed booking can be canceled
-        if(!booking.getStatus().equals(Booking.Status.CONFIRMED)){
+        if (!booking.getStatus().equals(Booking.Status.CONFIRMED)) {
             throw new InvalidInformationException("This booking can't be canceled");
         }
         booking.setStatus(Booking.Status.CANCELLED);
         bookingRepository.save(booking);
         notificationService.sendBookingNotification(booking);
         emailService.sendBookingCancellationEmail(booking);
+        String logDescription;
+        if (user.getRole().getName().equals(Role.RoleName.HOTEL_MANAGER)) {
+            logDescription = "Manager " + user.getUsername() + " cancelled booking "
+                    + booking.getBookingReference() + " for user " + booking.getUser().getId();
+        } else if (user.getRole().getName().equals(Role.RoleName.ADMIN)) {
+            logDescription = "Admin " + user.getUsername() + " cancelled booking "
+                    + booking.getBookingReference() + " for user " + booking.getUser().getId();
+        } else {
+            logDescription = "Customer " + user.getUsername() + " cancelled booking " + booking.getBookingReference();
+        }
         auditLogService.log(
                 user,
                 "BOOKING_CANCELLED",
                 "BOOKING",
                 booking.getId(),
-                "Customer cancelled booking " + booking.getBookingReference()
+                logDescription
         );
         logger.info(
                 "Booking cancelled: reference={}, userId={}",
@@ -322,60 +335,71 @@ public class BookingService {
             throw new UnauthorizedActionException("You are not authorized to view this booking");
         }
         if (role.equals(Role.RoleName.HOTEL_MANAGER)) {
-                boolean isHotelManager = booking.getHotel()
-                        .getManagers().stream().anyMatch(manager -> manager.getId().equals(user.getId()));
-                if (!isHotelManager) {
-                    throw new UnauthorizedActionException("You are not authorized to view this booking");
-                }
+            boolean isHotelManager = booking.getHotel()
+                    .getManagers().stream().anyMatch(manager -> manager.getId().equals(user.getId()));
+            if (!isHotelManager) {
+                throw new UnauthorizedActionException("You are not authorized to view this booking");
             }
-            BookingResponse response = mapToBookingResponse(booking);
-            return ResponseEntity.ok(response);
+        }
+        BookingResponse response = mapToBookingResponse(booking);
+        return ResponseEntity.ok(response);
 
     }
 
-        public ResponseEntity<?> updateBookingStatus(Long bookingId, BookingStatusRequest request) {
-            Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new InformationNotFoundException("Booking with id " + bookingId + " not found"));
-            User user = getCurrentLoggedInUser();
-            Role.RoleName role = user.getRole().getName();
-            if (role.equals(Role.RoleName.HOTEL_MANAGER)) {
-                boolean isHotelManager = booking.getHotel()
-                        .getManagers().stream().anyMatch(manager -> manager.getId().equals(user.getId()));
-                if (!isHotelManager) {
-                    throw new UnauthorizedActionException("You are not authorized to update this booking");
-                }
-            } else if (!role.equals(Role.RoleName.ADMIN)) {
-                throw new UnauthorizedActionException("You are not authorized to update booking status");
+    public ResponseEntity<?> updateBookingStatus(Long bookingId, BookingStatusRequest request) {
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new InformationNotFoundException("Booking with id " + bookingId + " not found"));
+        User user = getCurrentLoggedInUser();
+        Role.RoleName role = user.getRole().getName();
+        if (role.equals(Role.RoleName.HOTEL_MANAGER)) {
+            boolean isHotelManager = booking.getHotel()
+                    .getManagers().stream().anyMatch(manager -> manager.getId().equals(user.getId()));
+            if (!isHotelManager) {
+                throw new UnauthorizedActionException("You are not authorized to update this booking");
             }
-
-            Booking.Status currentStatus = booking.getStatus();
-            Booking.Status newStatus = request.getStatus();
-            if (currentStatus.equals(newStatus)) {
-                throw new InvalidInformationException(
-                        "Booking is already " + currentStatus);
-            }
-            if (!currentStatus.equals(Booking.Status.CONFIRMED)) {
-                throw new InvalidInformationException("Booking status cannot be changed from " + currentStatus);
-            }
-            if (!newStatus.equals(Booking.Status.COMPLETED)) {
-                throw new InvalidInformationException("The booking can only be marked as COMPLETED");
-            }
-            booking.setStatus(Booking.Status.COMPLETED);
-            bookingRepository.save(booking);
-            notificationService.sendBookingNotification(booking);
-            auditLogService.log(
-                    user,
-                    "BOOKING_UPDATE",
-                    "BOOKING",
-                    booking.getId(),
-                    "Customer update booking " + booking.getBookingReference()
-            );
-            logger.info(
-                    "Booking status changed: reference={}, oldStatus={}, newStatus={}, userId={}",
-                    booking.getBookingReference(),
-                    currentStatus,
-                    booking.getStatus(),
-                    user.getId()
-            );
-            return ResponseEntity.ok(new MessageResponse("Booking status updated successfully"));
+        } else if (!role.equals(Role.RoleName.ADMIN)) {
+            throw new UnauthorizedActionException("You are not authorized to update booking status");
         }
+
+        Booking.Status currentStatus = booking.getStatus();
+        Booking.Status newStatus = request.getStatus();
+        if (currentStatus.equals(newStatus)) {
+            throw new InvalidInformationException(
+                    "Booking is already " + currentStatus);
+        }
+        if (!currentStatus.equals(Booking.Status.CONFIRMED)) {
+            throw new InvalidInformationException("Booking status cannot be changed from " + currentStatus);
+        }
+        if (!newStatus.equals(Booking.Status.COMPLETED)) {
+            throw new InvalidInformationException("The booking can only be marked as COMPLETED");
+        }
+        booking.setStatus(Booking.Status.COMPLETED);
+        bookingRepository.save(booking);
+        notificationService.sendBookingNotification(booking);
+        String logDescription;
+        if (user.getRole().getName().equals(Role.RoleName.HOTEL_MANAGER)) {
+            logDescription = "Manager " + user.getUsername() + " update booking state from  "
+                    + currentStatus +" to "+request.getStatus()+ " for user " + booking.getUser().getId();
+        } else if (user.getRole().getName().equals(Role.RoleName.ADMIN)) {
+            logDescription = "Admin " + user.getUsername() + " update booking state from  "
+                    + currentStatus +" to "+request.getStatus()+ " for user " + booking.getUser().getId();
+        } else {
+            logDescription = "Customer " + user.getUsername() + " Update booking state from  "
+                    + currentStatus +" to "+request.getStatus();
+        }
+        auditLogService.log(
+                user,
+                "BOOKING_UPDATE",
+                "BOOKING",
+                booking.getId(),
+                logDescription
+        );
+        logger.info(
+                "Booking status changed: reference={}, oldStatus={}, newStatus={}, userId={}",
+                booking.getBookingReference(),
+                currentStatus,
+                booking.getStatus(),
+                user.getId()
+        );
+        return ResponseEntity.ok(new MessageResponse("Booking status updated successfully"));
+    }
 }
