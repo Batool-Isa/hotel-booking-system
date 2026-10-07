@@ -3,140 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VibeStay - Hotel Reservation System</title>
+    <title>VibeStay - Full Hotel Reservation Platform</title>
+    <!-- Vue 3 CDN -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SockJS & STOMP JS for Real-Time WebSocket Notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 </head>
-<body class="bg-gray-100 min-h-screen text-gray-800">
+<body class="bg-gray-50 min-h-screen text-gray-800 font-sans">
 
-<div id="app" class="max-w-4xl mx-auto p-6">
+<div id="app" class="max-w-7xl mx-auto p-4 sm:p-6">
 
+    <!-- ================= NAVBAR / HEADER ================= -->
+    <header class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border mb-6">
+        <div class="flex items-center space-x-3 cursor-pointer" @click="navigate('HOME')">
+            <span class="text-3xl">🏨</span>
+            <div>
+                <h1 class="text-2xl font-black text-indigo-600 tracking-tight">VibeStay</h1>
+                <p class="text-xs text-gray-400 font-medium">Hotel Reservation Platform</p>
+            </div>
+        </div>
 
-    <header class="flex justify-between items-center bg-white p-4 rounded-xl shadow mb-6">
-        <h1 class="text-2xl font-black text-indigo-600 cursor-pointer" @click="navigate('HOME')">🏨 VibeStay</h1>
+        <div class="flex items-center space-x-3">
+            <template v-if="isLoggedIn">
+                <!-- Role Badge -->
+                <span class="text-xs font-bold px-3 py-1 rounded-full border uppercase"
+                      :class="{
+                          'bg-indigo-50 text-indigo-700 border-indigo-200': userRole === 'CUSTOMER',
+                          'bg-amber-50 text-amber-700 border-amber-200': userRole === 'HOTEL_MANAGER',
+                          'bg-emerald-50 text-emerald-700 border-emerald-200': userRole === 'STAFF',
+                          'bg-purple-50 text-purple-700 border-purple-200': userRole === 'ADMIN'
+                      }">
+                    Role: {{ userRole }}
+                </span>
 
-        <div class="flex items-center space-x-4">
-            <button v-if="!isLoggedIn" @click="navigate('LOGIN')"
-                    class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold">Sign In
-            </button>
+                <!-- Role Navigation Buttons -->
+                <button v-if="userRole === 'CUSTOMER'" @click="navigate('MY_BOOKINGS')"
+                        class="text-sm font-bold text-gray-600 hover:text-indigo-600 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition">
+                    📋 My Bookings
+                </button>
+
+                <button v-if="userRole === 'HOTEL_MANAGER' || userRole === 'STAFF'" @click="navigate('MANAGER_DASHBOARD')"
+                        class="text-sm font-bold text-gray-600 hover:text-indigo-600 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition">
+                    🏨 Hotel Dashboard
+                </button>
+
+                <button v-if="userRole === 'ADMIN'" @click="navigate('ADMIN_PANEL')"
+                        class="text-sm font-bold text-gray-600 hover:text-purple-600 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition">
+                    👑 Admin Panel
+                </button>
+
+                <button @click="navigate('PROFILE')"
+                        class="text-sm font-bold text-gray-600 hover:text-indigo-600 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition">
+                    👤 Profile
+                </button>
+
+                <button @click="logout" class="bg-red-500 hover:bg-red-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">
+                    Logout
+                </button>
+            </template>
+
             <template v-else>
-                <span class="text-xs bg-indigo-100 text-indigo-800 font-bold px-3 py-1 rounded-full">Role: {{ userRole }}</span>
-                <button @click="logout" class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs font-bold">Logout</button>
+                <button @click="navigate('LOGIN')" class="text-sm font-bold text-indigo-600 hover:bg-indigo-50 px-4 py-2 rounded-lg transition">Sign In</button>
+                <button @click="navigate('REGISTER')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition">Register</button>
             </template>
         </div>
     </header>
 
-
+    <!-- ================= GLOBAL ALERT BANNER ================= -->
     <div v-if="alertMsg"
-         :class="alertType === 'error' ? 'bg-red-100 text-red-700 border-red-400' : 'bg-green-100 text-green-700 border-green-400'"
-         class="p-4 rounded-xl border mb-6 flex justify-between">
-        <span>{{ alertMsg }}</span>
-        <button @click="alertMsg = ''" class="font-bold">&times;</button>
+         :class="alertType === 'error' ? 'bg-red-50 text-red-700 border-red-300' : 'bg-green-50 text-green-700 border-green-300'"
+         class="p-4 rounded-xl border mb-6 flex justify-between items-center shadow-sm">
+        <div class="flex items-center space-x-2">
+            <span>{{ alertType === 'error' ? '⚠️' : '✅' }}</span>
+            <span class="text-sm font-medium">{{ alertMsg }}</span>
+        </div>
+        <button @click="alertMsg = ''" class="font-bold text-gray-400 hover:text-gray-700">&times;</button>
     </div>
 
-    <section v-if="page === 'LOGIN'" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow border">
-        <h2 class="text-2xl font-extrabold text-center mb-6 text-gray-900">Sign In to VibeStay</h2>
+    <!-- ================= SCREEN 1: LOGIN ================= -->
+    <section v-if="page === 'LOGIN'" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-sm border space-y-6">
+        <div class="text-center">
+            <h2 class="text-2xl font-extrabold text-gray-900">Sign In to VibeStay</h2>
+            <p class="text-xs text-gray-500 mt-1">Access your account and bookings</p>
+        </div>
 
         <form @submit.prevent="handleAuth" class="space-y-4">
             <div>
                 <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Email / Username</label>
-                <input v-model="authForm.email" type="email" placeholder="name@domain.com" required
-                       class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                <input v-model="authForm.email" type="email" placeholder="user@vibestay.com" required
+                       class="w-full border p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
             </div>
 
             <div>
                 <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Password</label>
                 <input v-model="authForm.password" type="password" placeholder="••••••••" required
-                       class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                       class="w-full border p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
             </div>
 
-            <button type="submit"
-                    class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg shadow hover:bg-indigo-700 transition">
+            <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl shadow hover:bg-indigo-700 transition">
                 Sign In
             </button>
         </form>
+
+        <div class="flex justify-between text-xs font-medium text-indigo-600 pt-2 border-t">
+            <a href="#" @click.prevent="navigate('FORGOT_PASSWORD')" class="hover:underline">Forgot password?</a>
+            <a href="#" @click.prevent="navigate('REGISTER')" class="hover:underline">Create account</a>
+        </div>
     </section>
 
-    <section v-if="page === 'HOME'" class="space-y-6">
+    <!-- ================= SCREEN 2: REGISTER ================= -->
+    <section v-if="page === 'REGISTER'" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-sm border space-y-6">
+        <div class="text-center">
+            <h2 class="text-2xl font-extrabold text-gray-900">Create a VibeStay Account</h2>
+            <p class="text-xs text-gray-500 mt-1">Join to explore and book luxury stays</p>
+        </div>
 
+        <form @submit.prevent="handleRegister" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Username</label>
+                <input v-model="regForm.username" type="text" placeholder="johndoe" required
+                       class="w-full border p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Email Address</label>
+                <input v-model="regForm.email" type="email" placeholder="john@domain.com" required
+                       class="w-full border p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Password</label>
+                <input v-model="regForm.password" type="password" placeholder="••••••••" required
+                       class="w-full border p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+            </div>
+
+            <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl shadow hover:bg-indigo-700 transition">
+                Register & Send Verification Token
+            </button>
+        </form>
+        <p class="text-center text-xs text-gray-500">Already registered? <a href="#" @click.prevent="navigate('LOGIN')" class="text-indigo-600 font-bold hover:underline">Sign In</a></p>
+    </section>
+
+    <!-- ================= SCREEN 3: VERIFY EMAIL ================= -->
+    <section v-if="page === 'VERIFY_EMAIL'" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-sm border text-center space-y-4">
+        <span class="text-5xl">✉️</span>
+        <h2 class="text-2xl font-extrabold text-gray-900">Verify Your Email</h2>
+        <p class="text-xs text-gray-500">Enter the token sent to your email to activate your account.</p>
+
+        <input v-model="verifyTokenInput" type="text" placeholder="Enter Verification Token"
+               class="w-full border p-3 rounded-xl text-center focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-mono tracking-widest">
+
+        <button @click="verifyEmailToken" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl shadow hover:bg-indigo-700 transition">
+            Verify Email
+        </button>
+    </section>
+
+    <!-- ================= SCREEN 4: HOME & SEARCH ================= -->
+    <section v-if="page === 'HOME'" class="space-y-6">
         <div class="bg-indigo-600 p-8 rounded-2xl text-white shadow-lg">
             <h2 class="text-3xl font-extrabold mb-2">Find your next stay in Bahrain</h2>
-            <p class="text-indigo-100 mb-6">Search top hotels, resorts, and luxury rooms tailored to your stay.</p>
+            <p class="text-indigo-100 mb-6">Real-time room availability across verified luxury hotels & resorts.</p>
 
-            <form @submit.prevent="fetchHotelsByUserCriteria" class="space-y-4 bg-white p-5 rounded-2xl text-gray-800 shadow">
-
+            <form @submit.prevent="fetchHotelsByUserCriteria" class="space-y-4 bg-white p-5 rounded-2xl text-gray-800 shadow-sm">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Location / City</label>
-                        <input v-model="searchCriteria.city" type="text" placeholder="e.g. Manama, Amwaj, Seef"
-                               class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <label class="block text-xs font-bold uppercase text-gray-500 mb-1">City / Destination</label>
+                        <input v-model="searchCriteria.city" type="text" placeholder="e.g. Manama, Seef, Amwaj" class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Check-in Date</label>
-                        <input v-model="searchCriteria.checkIn" type="date"
-                               class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <input v-model="searchCriteria.checkIn" type="date" class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Check-out Date</label>
-                        <input v-model="searchCriteria.checkOut" type="date"
-                               class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <input v-model="searchCriteria.checkOut" type="date" class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Adults</label>
-                        <input v-model.number="searchCriteria.adults" type="number" min="1" max="10"
-                               class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <input v-model.number="searchCriteria.adults" type="number" min="1" max="10" class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Children</label>
-                        <input v-model.number="searchCriteria.children" type="number" min="0" max="10"
-                               class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <input v-model.number="searchCriteria.children" type="number" min="0" max="10" class="w-full border p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
-                    <div class="flex items-end">
-                        <button type="submit"
-                                class="w-full bg-indigo-600 text-white font-bold py-2.5 px-4 rounded-lg shadow hover:bg-indigo-700 transition">
+                    <div class="flex items-end col-span-2 md:col-span-1">
+                        <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2.5 px-4 rounded-lg shadow hover:bg-indigo-700 transition">
                             🔍 Search Hotels
                         </button>
                     </div>
                 </div>
-
             </form>
         </div>
 
         <div class="space-y-4">
             <h3 class="text-xl font-bold text-gray-800">Available Hotels</h3>
 
-            <!-- State 1: User has not searched yet -->
             <div v-if="!hasSearched" class="bg-white p-8 rounded-2xl text-center border text-gray-500">
-                Enter your location and dates above, then click <strong>"Search Hotels"</strong> to view availability.
+                Enter your location and stay dates above, then click <strong>"Search Hotels"</strong> to inspect real-time availability.
             </div>
 
-            <!-- State 2: User searched but 0 results returned -->
             <div v-else-if="hotels.length === 0" class="bg-white p-8 rounded-2xl text-center border text-gray-500">
                 No hotels found matching your search criteria. Try adjusting your dates or city.
             </div>
 
-            <!-- State 3: Render Hotel Results -->
             <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div v-for="hotel in hotels" :key="hotel.id"
-                     class="bg-white border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition">
+                <div v-for="hotel in hotels" :key="hotel.id" class="bg-white border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition">
                     <div class="h-44 bg-indigo-100 flex items-center justify-center text-5xl">🏨</div>
                     <div class="p-5 space-y-2">
                         <div class="flex justify-between items-start">
                             <h4 class="text-lg font-bold text-gray-900">{{ hotel.name }}</h4>
                             <span class="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded font-bold">⭐ {{ hotel.rating || '4.5' }}</span>
                         </div>
-                        <p class="text-sm text-gray-500">📍 {{ hotel.city || 'Manama, Bahrain' }}</p>
+                        <p class="text-sm text-gray-500">📍 {{ hotel.city }}, {{ hotel.country || 'Bahrain' }}</p>
 
                         <div class="pt-4 flex justify-between items-center border-t">
                             <div>
                                 <span class="text-xs text-gray-400">Starting from</span>
-                                <p class="text-lg font-extrabold text-indigo-600">BHD {{ hotel.startingPrice || 45 }}<span class="text-xs font-normal text-gray-500">/night</span></p>
+                                <p class="text-lg font-extrabold text-indigo-600">BHD {{ hotel.startingPrice }}<span class="text-xs font-normal text-gray-500">/night</span></p>
                             </div>
-                            <button @click="openHotelDetails(hotel)"
-                                    class="bg-indigo-50 text-indigo-600 font-bold px-4 py-2 rounded-lg text-sm hover:bg-indigo-100">
+                            <button @click="openHotelDetails(hotel)" class="bg-indigo-50 text-indigo-600 font-bold px-4 py-2 rounded-lg text-sm hover:bg-indigo-100 transition">
                                 View Hotel
                             </button>
                         </div>
@@ -146,6 +237,7 @@
         </div>
     </section>
 
+    <!-- ================= SCREEN 5: HOTEL DETAILS & ROOMS ================= -->
     <section v-if="page === 'HOTEL_DETAILS'" class="space-y-6">
         <button @click="navigate('HOME')" class="text-sm font-bold text-indigo-600 hover:underline">← Back to Search</button>
 
@@ -153,32 +245,20 @@
             <div class="h-56 bg-indigo-50 rounded-xl flex items-center justify-center text-6xl">🏢</div>
 
             <div>
-                <h2 class="text-3xl font-extrabold text-gray-900">{{ selectedHotel.name || 'VibeStay Grand Hotel' }}</h2>
-                <p class="text-gray-500">📍 {{ selectedHotel.city || 'Manama, Kingdom of Bahrain' }}</p>
-            </div>
-
-            <div>
-                <h4 class="font-bold text-xs uppercase text-gray-400 mb-2">Included Amenities</h4>
-                <div class="flex flex-wrap gap-2">
-                    <span class="bg-gray-100 px-3 py-1 rounded-full text-xs font-semibold">✓ Free High-Speed Wi-Fi</span>
-                    <span class="bg-gray-100 px-3 py-1 rounded-full text-xs font-semibold">✓ Swimming Pool</span>
-                    <span class="bg-gray-100 px-3 py-1 rounded-full text-xs font-semibold">✓ Fitness Gym</span>
-                    <span class="bg-gray-100 px-3 py-1 rounded-full text-xs font-semibold">✓ Free Parking</span>
-                </div>
+                <h2 class="text-3xl font-extrabold text-gray-900">{{ selectedHotel.name }}</h2>
+                <p class="text-gray-500">📍 {{ selectedHotel.address || 'Kingdom of Bahrain' }}, {{ selectedHotel.city }}</p>
             </div>
 
             <div>
                 <h3 class="text-xl font-bold mb-4">Available Rooms</h3>
                 <div class="space-y-3">
-                    <div v-for="room in hotelRooms" :key="room.id"
-                         class="border p-4 rounded-xl flex justify-between items-center">
+                    <div v-for="room in hotelRooms" :key="room.id" class="border p-4 rounded-xl flex justify-between items-center bg-gray-50 hover:bg-white transition">
                         <div>
-                            <h4 class="font-bold text-lg text-gray-900">{{ room.type || 'Deluxe Room' }}</h4>
-                            <p class="text-xs text-gray-500">Capacity: {{ room.capacity || 2 }} Adults</p>
-                            <p class="text-indigo-600 font-extrabold mt-1">BHD {{ room.pricePerNight || 50 }} / night</p>
+                            <h4 class="font-bold text-lg text-gray-900">{{ room.type }}</h4>
+                            <p class="text-xs text-gray-500">Capacity: {{ room.capacity }} Adults | {{ room.maxChildren || 0 }} Children</p>
+                            <p class="text-indigo-600 font-extrabold mt-1">BHD {{ room.pricePerNight }} / night</p>
                         </div>
-                        <button @click="startBooking(room)"
-                                class="bg-indigo-600 text-white font-bold px-5 py-2 rounded-lg text-sm hover:bg-indigo-700">
+                        <button @click="openBookingModal(room)" class="bg-indigo-600 text-white font-bold px-5 py-2 rounded-lg text-sm hover:bg-indigo-700 shadow transition">
                             Book Room
                         </button>
                     </div>
@@ -187,14 +267,140 @@
         </div>
     </section>
 
+    <!-- ================= SCREEN 6: GUEST DETAILS & BOOKING CONFIRMATION ================= -->
+    <section v-if="page === 'BOOKING_FORM'" class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border space-y-6">
+        <button @click="navigate('HOTEL_DETAILS')" class="text-sm font-bold text-indigo-600 hover:underline">← Back to Rooms</button>
+
+        <div>
+            <h2 class="text-2xl font-extrabold text-gray-900">Review & Confirm Booking</h2>
+            <p class="text-xs text-gray-500">Room: {{ selectedRoom.type }} at {{ selectedHotel.name }}</p>
+        </div>
+
+        <div class="bg-indigo-50 p-4 rounded-xl space-y-2 text-sm">
+            <div class="flex justify-between"><span>Check-in:</span><strong class="text-gray-900">{{ searchCriteria.checkIn }}</strong></div>
+            <div class="flex justify-between"><span>Check-out:</span><strong class="text-gray-900">{{ searchCriteria.checkOut }}</strong></div>
+            <div class="flex justify-between border-t pt-2"><span>Total Stay Price:</span><strong class="text-indigo-600 text-lg">BHD {{ calculateTotalPrice() }}</strong></div>
+        </div>
+
+        <!-- Guest Information Entry -->
+        <div class="space-y-4 border-t pt-4">
+            <h3 class="font-bold text-sm uppercase text-gray-500">Guest Information</h3>
+            <div v-for="(guest, idx) in bookingGuests" :key="idx" class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-gray-50 p-3 rounded-xl">
+                <input v-model="guest.firstName" type="text" placeholder="First Name" required class="border p-2 rounded-lg text-xs outline-none">
+                <input v-model="guest.lastName" type="text" placeholder="Last Name" required class="border p-2 rounded-lg text-xs outline-none">
+                <input v-model.number="guest.age" type="number" placeholder="Age" required class="border p-2 rounded-lg text-xs outline-none">
+            </div>
+            <button @click="addGuestRow" class="text-xs font-bold text-indigo-600 hover:underline">+ Add Another Guest</button>
+        </div>
+
+        <button @click="confirmBooking" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl shadow hover:bg-emerald-700 transition">
+            Finalize & Confirm Booking
+        </button>
+    </section>
+
+    <!-- ================= SCREEN 7: MY BOOKINGS (CUSTOMER) ================= -->
+    <section v-if="page === 'MY_BOOKINGS'" class="space-y-6">
+        <h2 class="text-2xl font-extrabold text-gray-900">My Reservations</h2>
+
+        <div v-if="myBookings.length === 0" class="bg-white p-8 rounded-2xl text-center border text-gray-500">
+            You currently have no active reservations.
+        </div>
+
+        <div v-else class="space-y-4">
+            <div v-for="b in myBookings" :key="b.id" class="bg-white border rounded-2xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center space-x-2">
+                        <span class="font-bold text-lg text-gray-900">Ref: #{{ b.reference || b.id }}</span>
+                        <span :class="{
+                            'bg-green-100 text-green-800': b.status === 'CONFIRMED',
+                            'bg-red-100 text-red-800': b.status === 'CANCELLED',
+                            'bg-blue-100 text-blue-800': b.status === 'COMPLETED'
+                        }" class="text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase">
+                            {{ b.status }}
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-500">Dates: {{ b.checkIn }} → {{ b.checkOut }}</p>
+                    <p class="text-sm font-semibold text-indigo-600">Total: BHD {{ b.totalPrice }}</p>
+                </div>
+
+                <button v-if="b.status === 'CONFIRMED'" @click="cancelBooking(b.id)" class="bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 px-4 py-2 rounded-xl text-xs font-bold transition">
+                    Cancel Booking
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= SCREEN 8: MANAGER DASHBOARD ================= -->
+    <section v-if="page === 'MANAGER_DASHBOARD'" class="space-y-6">
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-extrabold text-gray-900">Hotel Manager Portal</h2>
+            <button @click="navigate('CREATE_HOTEL')" class="bg-indigo-600 text-white text-xs font-bold px-4 py-2 rounded-xl shadow hover:bg-indigo-700 transition">+ Submit New Hotel</button>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
+            <h3 class="font-bold text-lg text-gray-800">Assigned Hotel Bookings</h3>
+
+            <div v-if="managerBookings.length === 0" class="text-center py-6 text-gray-400 text-sm">
+                No active bookings found for your assigned hotels.
+            </div>
+
+            <div v-else class="space-y-3">
+                <div v-for="mb in managerBookings" :key="mb.id" class="border p-4 rounded-xl flex justify-between items-center">
+                    <div>
+                        <p class="font-bold text-sm text-gray-900">Booking #{{ mb.id }} — {{ mb.customerName || 'Customer' }}</p>
+                        <p class="text-xs text-gray-500">{{ mb.checkIn }} to {{ mb.checkOut }} | BHD {{ mb.totalPrice }}</p>
+                        <span class="text-xs font-bold uppercase text-indigo-600">Status: {{ mb.status }}</span>
+                    </div>
+
+                    <div class="flex space-x-2" v-if="mb.status === 'CONFIRMED'">
+                        <button @click="updateBookingStatus(mb.id, 'COMPLETED')" class="bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-emerald-700">Mark Completed</button>
+                        <button @click="updateBookingStatus(mb.id, 'CANCELLED')" class="bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-red-700">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= SCREEN 9: ADMIN PANEL ================= -->
+    <section v-if="page === 'ADMIN_PANEL'" class="space-y-6">
+        <h2 class="text-2xl font-extrabold text-gray-900">Platform Admin Management</h2>
+
+        <!-- Audit Log View -->
+        <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
+            <h3 class="font-bold text-lg text-gray-800">System Audit Logs</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                    <tr class="bg-gray-100 text-gray-600 uppercase border-b">
+                        <th class="p-3">User</th>
+                        <th class="p-3">Action</th>
+                        <th class="p-3">Entity</th>
+                        <th class="p-3">Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(log, idx) in auditLogs" :key="idx" class="border-b hover:bg-gray-50">
+                        <td class="p-3 font-bold">{{ log.user || 'System' }}</td>
+                        <td class="p-3 font-mono text-indigo-600">{{ log.action }}</td>
+                        <td class="p-3">{{ log.entity }} #{{ log.entityId }}</td>
+                        <td class="p-3 text-gray-500">{{ log.description }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
 </div>
 
+<!-- ================= VUE 3 LOGIC & SCRIPT ================= -->
 <script>
     const { createApp, ref, onMounted } = Vue;
 
     createApp({
         setup() {
-            const page = ref('LOGIN');
+            // State
+            const page = ref('HOME');
             const isLoggedIn = ref(false);
             const userRole = ref('GUEST');
             const token = ref(localStorage.getItem('vibestay_token') || '');
@@ -202,25 +408,28 @@
             const alertMsg = ref('');
             const alertType = ref('success');
 
-            const authForm = ref({
-                email: '',
-                password: ''
-            });
+            const authForm = ref({ email: '', password: '' });
+            const regForm = ref({ username: '', email: '', password: '' });
+            const verifyTokenInput = ref('');
 
             const searchCriteria = ref({
                 city: 'Manama',
                 checkIn: '2026-10-20',
                 checkOut: '2026-10-23',
                 adults: 2,
-                children: 0,
-                roomType: ''
+                children: 0
             });
 
+            const hasSearched = ref(false);
             const hotels = ref([]);
             const selectedHotel = ref({});
             const hotelRooms = ref([]);
             const selectedRoom = ref({});
-            const hasSearched = ref(false);
+
+            const bookingGuests = ref([{ firstName: '', lastName: '', age: 25 }]);
+            const myBookings = ref([]);
+            const managerBookings = ref([]);
+            const auditLogs = ref([]);
 
             const showAlert = (msg, type = 'success') => {
                 alertMsg.value = msg;
@@ -236,96 +445,16 @@
                 try {
                     const base64Url = jwtToken.split('.')[1];
                     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                    const jsonPayload = decodeURIComponent(
-                        atob(base64)
-                            .split('')
-                            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-                            .join('')
-                    );
+                    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
                     return JSON.parse(jsonPayload);
-                } catch (e) {
-                    return null;
-                }
-            };
-
-            const logout = () => {
-                token.value = '';
-                localStorage.removeItem('vibestay_token');
-                isLoggedIn.value = false;
-                userRole.value = 'GUEST';
-                navigate('LOGIN');
-            };
-
-            const fetchHotelsByUserCriteria = async () => {
-                try {
-                    const requestPayload = {
-                        city: searchCriteria.value.city,
-                        checkIn: searchCriteria.value.checkIn,
-                        checkOut: searchCriteria.value.checkOut,
-                        adults: searchCriteria.value.adults,
-                        children: searchCriteria.value.children
-                    };
-
-                    const headers = { 'Content-Type': 'application/json' };
-                    if (token.value) {
-                        headers['Authorization'] = `Bearer ${token.value}`;
-                    }
-
-                    const res = await fetch('/api/availability/search', {
-                        method: 'POST',
-                        headers: headers,
-                        body: JSON.stringify(requestPayload)
-                    });
-
-                    hasSearched.value = true;
-
-                    if (res.ok) {
-                        const data = await res.json();
-
-                        hotels.value = data.map(hotel => ({
-                            id: hotel.hotelId,
-                            name: hotel.hotelName,
-                            city: hotel.city,
-                            address: hotel.address,
-                            startingPrice: hotel.rooms && hotel.rooms.length > 0 ? hotel.rooms[0].pricePerNight : 50,
-                            rooms: hotel.rooms
-                        }));
-
-                        if (hotels.value.length === 0) {
-                            showAlert('No available hotels found matching your criteria.', 'error');
-                        }
-                    } else {
-                        const errorData = await res.json();
-                        showAlert(errorData.message || 'Checkout date must be after check-in date', 'error');
-                    }
-                } catch (err) {
-                    showAlert('Error connecting to backend availability service', 'error');
-                }
-            };
-
-            const openHotelDetails = (hotel) => {
-                selectedHotel.value = hotel;
-                hotelRooms.value = (hotel.rooms || []).map(r => ({
-                    id: r.id,
-                    type: r.roomTypeName,
-                    pricePerNight: r.pricePerNight,
-                    capacity: r.maxAdults,
-                    maxChildren: r.maxChildren,
-                    roomNumber: r.roomNumber
-                }));
-                navigate('HOTEL_DETAILS');
-            };
-
-            const startBooking = (room) => {
-                selectedRoom.value = room;
-                showAlert(`Selected ${room.type}! Ready to proceed to reservation.`, 'success');
+                } catch (e) { return null; }
             };
 
             const handleAuth = async () => {
                 try {
                     const res = await fetch('/auth/users/login', {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(authForm.value)
                     });
 
@@ -337,50 +466,208 @@
 
                         const decoded = parseJwt(jwtToken);
                         if (decoded) {
-                            userRole.value = decoded.role || decoded.roles?.[0] || decoded.authorities?.[0] || 'CUSTOMER';
+                            userRole.value = decoded.role || decoded.roles?.[0] || 'CUSTOMER';
                         }
 
                         isLoggedIn.value = true;
-                        showAlert('Successfully logged in!');
+                        showAlert('Successfully signed in!');
                         navigate('HOME');
+                        initWebSocket();
                     } else {
-                        showAlert('Invalid email or password', 'error');
+                        showAlert('Invalid credentials or unverified account', 'error');
                     }
                 } catch (err) {
-                    showAlert('Could not connect to Spring Boot backend API', 'error');
+                    showAlert('Error connecting to backend API', 'error');
                 }
+            };
+
+            const handleRegister = async () => {
+                try {
+                    const res = await fetch('/auth/users/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(regForm.value)
+                    });
+
+                    if (res.ok) {
+                        showAlert('Account created! Please enter your email verification token.');
+                        navigate('VERIFY_EMAIL');
+                    } else {
+                        showAlert('Registration failed. Username or Email already in use.', 'error');
+                    }
+                } catch (e) {
+                    showAlert('Error sending registration request', 'error');
+                }
+            };
+
+            const verifyEmailToken = async () => {
+                try {
+                    const res = await fetch(`/auth/users/verify-email?token=${verifyTokenInput.value}`, { method: 'POST' });
+                    if (res.ok) {
+                        showAlert('Email verified successfully! You can now log in.');
+                        navigate('LOGIN');
+                    } else {
+                        showAlert('Invalid or expired verification token', 'error');
+                    }
+                } catch (e) {
+                    showAlert('Error verifying email', 'error');
+                }
+            };
+
+            const fetchHotelsByUserCriteria = async () => {
+                try {
+                    const headers = { 'Content-Type': 'application/json' };
+                    if (token.value) headers['Authorization'] = `Bearer ${token.value}`;
+
+                    const res = await fetch('/api/availability/search', {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify(searchCriteria.value)
+                    });
+
+                    hasSearched.value = true;
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        hotels.value = data.map(h => ({
+                            id: h.hotelId,
+                            name: h.hotelName,
+                            city: h.city,
+                            country: h.country,
+                            address: h.address,
+                            startingPrice: h.rooms && h.rooms.length > 0 ? h.rooms[0].pricePerNight : 50,
+                            rooms: h.rooms
+                        }));
+                    } else {
+                        showAlert('Check-out date must be after check-in date', 'error');
+                    }
+                } catch (e) {
+                    showAlert('Error connecting to search endpoint', 'error');
+                }
+            };
+
+            const openHotelDetails = (hotel) => {
+                selectedHotel.value = hotel;
+                hotelRooms.value = (hotel.rooms || []).map(r => ({
+                    id: r.id,
+                    type: r.roomTypeName,
+                    pricePerNight: r.pricePerNight,
+                    capacity: r.maxAdults,
+                    maxChildren: r.maxChildren
+                }));
+                navigate('HOTEL_DETAILS');
+            };
+
+            const openBookingModal = (room) => {
+                selectedRoom.value = room;
+                navigate('BOOKING_FORM');
+            };
+
+            const calculateTotalPrice = () => {
+                if (!searchCriteria.value.checkIn || !searchCriteria.value.checkOut) return 0;
+                const d1 = new Date(searchCriteria.value.checkIn);
+                const d2 = new Date(searchCriteria.value.checkOut);
+                const nights = Math.max(1, Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24)));
+                return nights * (selectedRoom.value.pricePerNight || 0);
+            };
+
+            const addGuestRow = () => {
+                bookingGuests.value.push({ firstName: '', lastName: '', age: 20 });
+            };
+
+            const confirmBooking = async () => {
+                try {
+                    const payload = {
+                        hotelId: selectedHotel.value.id,
+                        roomId: selectedRoom.value.id,
+                        checkIn: searchCriteria.value.checkIn,
+                        checkOut: searchCriteria.value.checkOut,
+                        guests: bookingGuests.value
+                    };
+
+                    const res = await fetch('/api/bookings', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token.value}`
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (res.ok) {
+                        showAlert('Booking CONFIRMED successfully! Email notification dispatched.');
+                        fetchMyBookings();
+                        navigate('MY_BOOKINGS');
+                    } else {
+                        showAlert('Room is no longer available for these dates.', 'error');
+                    }
+                } catch (e) {
+                    showAlert('Error finalizing booking', 'error');
+                }
+            };
+
+            const fetchMyBookings = async () => {
+                try {
+                    const res = await fetch('/api/bookings/my-bookings', {
+                        headers: { 'Authorization': `Bearer ${token.value}` }
+                    });
+                    if (res.ok) myBookings.value = await res.json();
+                } catch (e) {}
+            };
+
+            const cancelBooking = async (bookingId) => {
+                try {
+                    const res = await fetch(`/api/bookings/${bookingId}/cancel`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token.value}` }
+                    });
+                    if (res.ok) {
+                        showAlert('Reservation cancelled successfully.');
+                        fetchMyBookings();
+                    }
+                } catch (e) {
+                    showAlert('Failed to cancel booking', 'error');
+                }
+            };
+
+            const logout = () => {
+                token.value = '';
+                localStorage.removeItem('vibestay_token');
+                isLoggedIn.value = false;
+                userRole.value = 'GUEST';
+                navigate('LOGIN');
+            };
+
+            const initWebSocket = () => {
+                try {
+                    const socket = new SockJS('/ws');
+                    const stompClient = Stomp.over(socket);
+                    stompClient.connect({}, () => {
+                        stompClient.subscribe('/topic/notifications', (msg) => {
+                            showAlert(`📢 Real-time update: ${msg.body}`);
+                        });
+                    });
+                } catch (e) {}
             };
 
             onMounted(() => {
                 if (token.value) {
                     const decoded = parseJwt(token.value);
                     if (decoded) {
-                        userRole.value = decoded.role || decoded.authorities?.[0] || 'CUSTOMER';
+                        userRole.value = decoded.role || 'CUSTOMER';
                         isLoggedIn.value = true;
-                        page.value = 'HOME';
+                        initWebSocket();
                     }
                 }
             });
 
             return {
-                page,
-                isLoggedIn,
-                userRole,
-                alertMsg,
-                alertType,
-                authForm,
-                hasSearched,
-                searchCriteria,
-                hotels,
-                selectedHotel,
-                hotelRooms,
-                selectedRoom,
-                handleAuth,
-                navigate,
-                logout,
-                fetchHotelsByUserCriteria,
-                openHotelDetails,
-                startBooking
+                page, isLoggedIn, userRole, alertMsg, alertType, authForm, regForm, verifyTokenInput,
+                searchCriteria, hasSearched, hotels, selectedHotel, hotelRooms, selectedRoom,
+                bookingGuests, myBookings, managerBookings, auditLogs,
+                handleAuth, handleRegister, verifyEmailToken, fetchHotelsByUserCriteria,
+                openHotelDetails, openBookingModal, calculateTotalPrice, addGuestRow,
+                confirmBooking, cancelBooking, logout, navigate
             };
         }
     }).mount('#app');

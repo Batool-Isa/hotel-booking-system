@@ -43,6 +43,12 @@ public class UserController {
         return userService.loginUser(loginRequest);
     }
 
+    @PostMapping("/logout")
+    @Operation(summary = "Logout user", description = "Logs out the user and records audit log")
+    public ResponseEntity<?> logoutUser() {
+        System.out.println("User Controller calling ---> logout");
+        return userService.logoutUser();
+    }
     @GetMapping("/verify-email")
     @Operation(summary = "Verify email to activate user account", description = "Check if token is valid and update user status")
     public String verifyEmail(@RequestParam(name = "token") String token) {

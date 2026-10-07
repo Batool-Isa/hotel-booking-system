@@ -299,4 +299,14 @@ public class UserService {
         );
         return ResponseEntity.ok(new MessageResponse("Image Profile updated successfully"));
     }
+
+    public ResponseEntity<?> logoutUser() {
+        User user = getCurrentLoggedInUser();
+        SecurityContextHolder.clearContext();
+        auditLogService.log(
+                user, "USER LOGOUT", "User", user.getId(),
+                "User "+user.getId() +" logged out successfully"
+        );
+        return ResponseEntity.ok(new MessageResponse("User logged in successfully"));
+    }
 }
