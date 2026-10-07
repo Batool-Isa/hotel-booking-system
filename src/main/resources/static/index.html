@@ -888,6 +888,7 @@
                     <button class="tab" :class="{on:ad.tab==='overview'}" @click="adminTab('overview')"><icon name="home" :size="16"></icon>Overview</button>
                     <button class="tab" :class="{on:ad.tab==='pending'}" @click="adminTab('pending')"><icon name="clock" :size="16"></icon>Pending approvals</button>
                     <button class="tab" :class="{on:ad.tab==='hotels'}" @click="adminTab('hotels')"><icon name="building" :size="16"></icon>Hotels</button>
+                    <button class="tab" :class="{on:ad.tab==='users'}" @click="adminTab('users')"><icon name="users" :size="16"></icon>Users</button>
                     <button class="tab" :class="{on:ad.tab==='types'}" @click="adminTab('types')"><icon name="bed" :size="16"></icon>Room types</button>
                     <button class="tab" :class="{on:ad.tab==='status'}" @click="adminTab('status')"><icon name="settings" :size="16"></icon>Hotel status</button>
                     <button class="tab" :class="{on:ad.tab==='bookings'}" @click="adminTab('bookings')"><icon name="calendar" :size="16"></icon>Bookings</button>
@@ -897,6 +898,7 @@
                 <div v-if="ad.tab==='overview'">
                     <div class="grid g3"><div class="card stat"><b>{{ad.counts.pending ?? '–'}}</b><span>Hotels awaiting approval</span><div class="mt"><a class="btn btn-outline btn-sm" href="#/admin?tab=pending">Review</a></div></div>
                         <div class="card stat"><b>{{ad.counts.hotels ?? '–'}}</b><span>Live hotels</span><div class="mt"><a class="btn btn-outline btn-sm" href="#/admin?tab=hotels">Manage</a></div></div>
+                        <div class="card stat"><b>{{ad.counts.users ?? '–'}}</b><span>Registered users</span><div class="mt"><a class="btn btn-outline btn-sm" href="#/admin?tab=users">Manage</a></div></div>
                         <div class="card stat"><b>{{ad.counts.types ?? '–'}}</b><span>Active room types</span><div class="mt"><a class="btn btn-outline btn-sm" href="#/admin?tab=types">Manage</a></div></div></div>
                     <div class="row mt2"><a class="btn btn-primary" href="#/manage/new"><icon name="plus" :size="16"></icon>Create a hotel</a><a class="btn btn-outline" href="#/admin?tab=bookings">Find a booking</a></div>
                 </div>
@@ -928,6 +930,31 @@
                         <tbody><tr v-for="t in roomTypes" :key="t.id"><td>{{t.id}}</td><td><b>{{t.name}}</b></td><td class="small">{{t.description}}</td><td><div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn btn-outline btn-sm" @click="openType(t)"><icon name="edit" :size="14"></icon>Edit</button><button class="btn btn-danger-o btn-sm" @click="setTypeStatus(t,'INACTIVE')">Deactivate</button></div></td></tr></tbody></table></div>
                     <div class="card pad mt"><h4>Re-activate a room type</h4><p class="small muted">Deactivated types disappear from the list above. Enter the type’s ID to bring it back.</p>
                         <form class="row" style="align-items:flex-start" @submit.prevent="activateTypeById"><div style="width:200px"><f-input v-model="typeActivate.id" type="number" min="1" placeholder="Room type ID" :error="typeActivate.err"></f-input></div><button class="btn btn-outline">Activate</button></form></div>
+                </div>
+
+                <div v-if="ad.tab==='users'">
+                    <div class="row between mb"><div><h3 style="margin:0">Users</h3><div class="small muted">Search, filter and activate or deactivate accounts. Users are never deleted – deactivating keeps their data.</div></div></div>
+                    <form class="row mb" @submit.prevent="loadAdminUsers(0)" style="flex-wrap:wrap">
+                        <input v-model="ad.uq.search" placeholder="Search username or email" aria-label="Search users" style="padding:9px 12px;border:1px solid #b5bcc5;border-radius:8px;min-width:230px">
+                        <select v-model="ad.uq.status" aria-label="Status" style="padding:9px 12px;border:1px solid #b5bcc5;border-radius:8px"><option value="">Any status</option><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option><option value="UNVERIFIED">Unverified</option></select>
+                        <select v-model="ad.uq.role" aria-label="Role" style="padding:9px 12px;border:1px solid #b5bcc5;border-radius:8px"><option value="">Any role</option><option value="CUSTOMER">Guest</option><option value="HOTEL_MANAGER">Hotel manager</option><option value="ADMIN">Administrator</option><option value="STAFF">Staff</option></select>
+                        <select v-model="ad.uq.sort" @change="loadAdminUsers(0)" aria-label="Sort" style="padding:9px 12px;border:1px solid #b5bcc5;border-radius:8px"><option value="createdAt,desc">Newest first</option><option value="createdAt,asc">Oldest first</option><option value="username,asc">Username A–Z</option><option value="username,desc">Username Z–A</option></select>
+                        <button class="btn btn-primary btn-sm">Search</button><button type="button" class="btn btn-ghost btn-sm" @click="resetUserFilters">Clear</button>
+                    </form>
+                    <div v-if="ad.loading" class="skel" style="height:160px"></div>
+                    <div v-else-if="!ad.users.length && !ad.error" class="card empty"><div class="big"><icon name="users" :size="30"></icon></div><h3>No users found</h3><p>Try a different search or clear the filters.</p></div>
+                    <div v-else-if="ad.users.length" class="card scroll-x"><table class="t plain"><thead><tr><th>ID</th><th>User</th><th>Role</th><th>Status</th><th>Joined</th><th style="min-width:150px">Actions</th></tr></thead>
+                        <tbody><tr v-for="u in ad.users" :key="u.id"><td>{{u.id}}</td>
+                            <td><b>{{u.username}}</b><div class="xs muted">{{[u.firstName,u.lastName].filter(Boolean).join(' ')}}<template v-if="u.firstName||u.lastName"> · </template>{{u.email}}</div></td>
+                            <td>{{ROLE_LABEL[u.role] || u.role}}</td>
+                            <td><span class="badge" :class="u.status==='ACTIVE'?'b-green':u.status==='INACTIVE'?'b-red':'b-yellow'">{{u.status==='ACTIVE'?'Active':u.status==='INACTIVE'?'Inactive':'Unverified'}}</span></td>
+                            <td class="small">{{fmtDateTime(u.createdAt)}}</td>
+                            <td><span v-if="isSelf(u)" class="xs muted">This is you</span>
+                                <span v-else-if="u.status==='UNVERIFIED'" class="xs muted">Waiting for email verification</span>
+                                <button v-else-if="u.status==='ACTIVE'" class="btn btn-danger-o btn-sm" :disabled="ad.uBusy===u.id" @click="setUserStatus(u,'INACTIVE')">Deactivate</button>
+                                <button v-else class="btn btn-green btn-sm" :disabled="ad.uBusy===u.id" @click="setUserStatus(u,'ACTIVE')">Reactivate</button></td></tr></tbody></table></div>
+                    <div class="pager" v-if="ad.uPages>1"><button class="btn btn-outline btn-sm" :disabled="ad.uPage===0" @click="loadAdminUsers(ad.uPage-1)"><icon name="left" :size="16"></icon>Previous</button><span class="muted small">Page {{ad.uPage+1}} of {{ad.uPages}} · {{ad.uTotal}} users</span><button class="btn btn-outline btn-sm" :disabled="ad.uPage>=ad.uPages-1" @click="loadAdminUsers(ad.uPage+1)">Next</button></div>
+                    <div v-else-if="ad.users.length" class="muted small mt">{{ad.uTotal}} {{ad.uTotal===1?'user':'users'}}</div>
                 </div>
 
                 <div v-if="ad.tab==='status'" class="card pad" style="max-width:640px">
@@ -1130,9 +1157,12 @@
                 if(text){ try{ data = JSON.parse(text); }catch{ data = text; } }
                 if(res.ok) return data;
                 let msg = data && typeof data==='object' ? (data.message||'') : (typeof data==='string' ? data : '');
+                if(res.status===401 && useAuth && auth.token && !(data && data.error)){   // token problem (business 401s such as a wrong password carry an `error` code)
+                    window.__expireSession(); throw new ApiError(401,'Your session has expired. Please sign in again.',data); }
+                if(res.status===429){ const ra = Number(res.headers.get('Retry-After')||(data&&data.retryAfterSeconds)||0); if(ra>0) throw new ApiError(429, `Too many attempts. Please try again in ${ra>=60?Math.ceil(ra/60)+' minute'+(Math.ceil(ra/60)>1?'s':''):ra+' seconds'}.`, data); }
                 if(res.status===403 && !msg){
                     const exp = jwtExp(auth.token);
-                    if(auth.token && exp && exp*1000 < Date.now()){ expireSession(); throw new ApiError(403,'Your session has expired. Please sign in again.',data); }
+                    if(auth.token && exp && exp*1000 < Date.now()){ window.__expireSession(); throw new ApiError(403,'Your session has expired. Please sign in again.',data); }
                     if(!auth.token) throw new ApiError(403,'Please sign in to continue.',data);
                 }
                 throw new ApiError(res.status, friendly(res.status,msg), data);
@@ -1927,19 +1957,43 @@
             }
 
             /* ---------------- admin ---------------- */
-            const ad = reactive({ tab:'overview', pending:[], pPage:0, pNext:false, hotels:[], hPage:0, hNext:false, q:{ search:'', city:'', country:'' }, counts:{ pending:null, hotels:null, types:null }, loading:false, error:'' });
+            const ad = reactive({ tab:'overview', users:[], uPage:0, uPages:0, uTotal:0, uBusy:null, uq:{ search:'', status:'', role:'', sort:'createdAt,desc' }, pending:[], pPage:0, pNext:false, hotels:[], hPage:0, hNext:false, q:{ search:'', city:'', country:'' }, counts:{ pending:null, hotels:null, types:null, users:null }, loading:false, error:'' });
             const cnt = (n,max) => n>=max ? max+'+' : String(n);
             async function loadAdmin(tab){
-                ad.tab = ['overview','pending','hotels','status','types','bookings'].includes(tab) ? tab : 'overview'; ad.error='';
+                ad.tab = ['overview','pending','hotels','users','status','types','bookings'].includes(tab) ? tab : 'overview'; ad.error='';
                 try{
                     if(ad.tab==='overview'){
-                        const [p,h,t] = await Promise.all([ api('GET','/api/hotels/pending',{ query:{ size:50 } }), api('GET','/api/hotels',{ auth:false, query:{ size:50 } }), api('GET','/api/rooms-types') ]);
+                        const [p,h,t,u] = await Promise.all([ api('GET','/api/hotels/pending',{ query:{ size:50 } }), api('GET','/api/hotels',{ auth:false, query:{ size:50 } }), api('GET','/api/rooms-types'), api('GET','/api/admin/users',{ query:{ size:1 } }).catch(() => null) ]);
+                        ad.counts.users = u && u.totalElements!=null ? String(u.totalElements) : null;
                         ad.counts.pending = cnt(p.length,50); ad.counts.hotels = cnt(h.length,50); ad.counts.types = cnt(t.length,1000); roomTypes.value = t;
                     }
                     if(ad.tab==='pending') await loadPending(0);
                     if(ad.tab==='hotels') await loadAdminHotels(0);
+                    if(ad.tab==='users') await loadAdminUsers(0);
                     if(ad.tab==='types') await loadRoomTypes();
                 }catch(e){ ad.error=e.message; }
+            }
+            /** Loads one page of users using the server-side filters (search, status, role) and sorting. */
+            async function loadAdminUsers(p=0){
+                ad.loading=true; ad.error='';
+                try{
+                    const r = await api('GET','/api/admin/users',{ query:{ page:p, size:10, sort:ad.uq.sort, search:ad.uq.search.trim(), status:ad.uq.status, role:ad.uq.role } });
+                    ad.users = r.content || []; ad.uPage = r.page; ad.uPages = r.totalPages; ad.uTotal = r.totalElements;
+                }catch(e){ ad.users=[]; ad.error = e.status===404 ? 'User management needs the updated backend (GET /api/admin/users).' : e.message; }
+                finally{ ad.loading=false; }
+            }
+            function resetUserFilters(){ Object.assign(ad.uq,{ search:'', status:'', role:'', sort:'createdAt,desc' }); loadAdminUsers(0); }
+            const isSelf = u => !!auth.user && auth.user.email===u.email;
+            /** Deactivate (soft delete) or reactivate a user after the admin confirms. */
+            async function setUserStatus(u, status){
+                const off = status==='INACTIVE';
+                const yes = await ask({ title:`${off?'Deactivate':'Reactivate'} “${u.username}”?`, danger:off, confirmText: off?'Deactivate':'Reactivate',
+                    message: off ? 'They won’t be able to sign in and any session they have open stops working. Their data is kept, and you can reactivate them later.' : 'They will be able to sign in again.' });
+                if(!yes) return;
+                ad.uBusy = u.id;
+                try{ const r = await api('PATCH',`/api/admin/users/${u.id}/status`,{ body:{ status } }); toast((r&&r.message)||'Done.'); await loadAdminUsers(ad.uPage); }
+                catch(e){ toast(e.message,'error'); }
+                finally{ ad.uBusy=null; }
             }
             function adminTab(t){ go('/admin?tab='+t); }
             async function loadPending(p=0){ ad.loading=true; try{ const l = await api('GET','/api/hotels/pending',{ query:{ page:p, size:8, sort:'id,asc' } }); ad.pending = Array.isArray(l)?l:[]; ad.pPage=p; ad.pNext=ad.pending.length===8; }catch(e){ ad.error=e.message; } finally{ ad.loading=false; } }
@@ -2047,7 +2101,7 @@
                 hotelF, hotelEditId, saveHotel, useMyLocation,
                 mh, loadManagerHotels, mp, manageTab, roomTypes, loadMRooms, roomF, roomModal, openRoomModal, saveRoom,
                 imgUp, pickHotelImages, dropImage, uploadHotelImages, deleteHotelImage, policyF, savePolicy,
-                ad, adminTab, loadPending, loadAdminHotels, setHotelStatus, statusF, runStatusTool, assignF, assignModal, openAssign, doAssign,
+                ad, adminTab, loadAdminUsers, resetUserFilters, setUserStatus, isSelf, ROLE_LABEL, loadPending, loadAdminHotels, setHotelStatus, statusF, runStatusTool, assignF, assignModal, openAssign, doAssign,
                 typeF, typeModal, openType, saveType, setTypeStatus, typeActivate, activateTypeById, loadRoomTypes,
                 toISO, addDays, tomorrowISO: () => toISO(addDays(new Date(),1)),
             };
