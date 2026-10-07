@@ -31,7 +31,7 @@ public class UserController {
     )
     @Operation(summary = "Register a new user", description = "Create a new user account and send a verification email")
     public ResponseEntity<?> register(@Valid @ModelAttribute RegisterRequest request,
-                                      @RequestParam("image") MultipartFile image) {
+                                      @RequestParam(value = "image", required = false) MultipartFile image) {
         System.out.println("User Controller calling ---> register");
         return userService.register(request, image);
     }

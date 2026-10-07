@@ -111,6 +111,19 @@ public class GlobalExceptionHandler {
         error.setErrors(fieldErrors);
         return ResponseEntity.badRequest().body(error);
     }
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleUploadTooLarge(
+            org.springframework.web.multipart.MaxUploadSizeExceededException ex,
+            HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.PAYLOAD_TOO_LARGE.value(),
+                "FILE_TOO_LARGE",
+                "The file is too large. The maximum size is 1 MB per image",
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(errorResponse);
+    }
     @ExceptionHandler(InformationExistException.class)
     public ResponseEntity<ErrorResponse> handleInformationExist(InformationExistException ex,
                                                                 HttpServletRequest request) {
