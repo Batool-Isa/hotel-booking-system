@@ -36,6 +36,7 @@ public class HotelImageController {
     }
 
     @DeleteMapping("/{imageId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HOTEL_MANAGER')")
     public ResponseEntity<?> deleteImage(@PathVariable("hotelId") Long hotelId,
                                          @PathVariable("imageId") Long imageId) throws IOException {
         System.out.println("Hotel Image Controller calling ---> delete hotel image");
