@@ -42,7 +42,8 @@ public class BookingService {
     private HotelRepository hotelRepository;
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private EmailService emailService;
     @Autowired
     private NotificationService notificationService;
 
@@ -189,6 +190,7 @@ public class BookingService {
         booking.setChildren(totalChildren);
         bookingRepository.save(booking);
         notificationService.sendBookingNotification(booking);
+        emailService.sendBookingConfirmationEmail(booking);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new MessageResponse("Booking created successfully"));
 
@@ -277,6 +279,7 @@ public class BookingService {
         booking.setStatus(Booking.Status.CANCELLED);
         bookingRepository.save(booking);
         notificationService.sendBookingNotification(booking);
+        emailService.sendBookingCancellationEmail(booking);
 
         return ResponseEntity.ok(new MessageResponse("Booking canceled successfully"));
     }
