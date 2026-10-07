@@ -211,6 +211,7 @@ public class BookingService {
         booking.setAdults(totalAdults);
         booking.setChildren(totalChildren);
         bookingRepository.save(booking);
+        BookingResponse bookingResponse = mapToBookingResponse(booking);
         notificationService.sendBookingNotification(booking);
         emailService.sendBookingConfirmationEmail(booking);
         auditLogService.log(
@@ -227,7 +228,7 @@ public class BookingService {
                 hotel.getId()
         );
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new MessageResponse("Booking created successfully"));
+                .body(bookingResponse);
 
     }
 

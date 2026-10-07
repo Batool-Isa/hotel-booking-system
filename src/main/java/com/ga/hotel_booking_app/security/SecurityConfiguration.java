@@ -88,7 +88,8 @@ public class SecurityConfiguration {
                 "/css/**",
                 "/js/**",
                 "/images/**",
-                "/favicon.ico"
+                "/favicon.ico",
+                "/uploads/**"
         );
     }
     @Bean
