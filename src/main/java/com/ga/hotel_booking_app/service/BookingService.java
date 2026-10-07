@@ -28,7 +28,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -48,7 +49,8 @@ public class BookingService {
     private NotificationService notificationService;
     @Autowired
     private AuditLogService auditLogService;
-
+    private static final Logger logger =
+            LoggerFactory.getLogger(BookingService.class);
     public User getCurrentLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
@@ -194,11 +196,17 @@ public class BookingService {
         notificationService.sendBookingNotification(booking);
         emailService.sendBookingConfirmationEmail(booking);
         auditLogService.log(
-                customer.getId(),
+                customer,
                 "BOOKING_CONFIRMED",
                 "BOOKING",
                 booking.getId(),
                 "Customer confirmed booking " + booking.getBookingReference()
+        );
+        logger.info(
+                "Booking created: reference={}, userId={}, hotelId={}",
+                booking.getBookingReference(),
+                customer.getId(),
+                hotel.getId()
         );
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new MessageResponse("Booking created successfully"));
@@ -290,11 +298,16 @@ public class BookingService {
         notificationService.sendBookingNotification(booking);
         emailService.sendBookingCancellationEmail(booking);
         auditLogService.log(
-                user.getId(),
+                user,
                 "BOOKING_CANCELLED",
                 "BOOKING",
                 booking.getId(),
                 "Customer cancelled booking " + booking.getBookingReference()
+        );
+        logger.info(
+                "Booking cancelled: reference={}, userId={}",
+                booking.getBookingReference(),
+                user.getId()
         );
         return ResponseEntity.ok(new MessageResponse("Booking canceled successfully"));
     }
@@ -350,11 +363,18 @@ public class BookingService {
             bookingRepository.save(booking);
             notificationService.sendBookingNotification(booking);
             auditLogService.log(
-                    user.getId(),
+                    user,
                     "BOOKING_UPDATE",
                     "BOOKING",
                     booking.getId(),
                     "Customer update booking " + booking.getBookingReference()
+            );
+            logger.info(
+                    "Booking status changed: reference={}, oldStatus={}, newStatus={}, userId={}",
+                    booking.getBookingReference(),
+                    currentStatus,
+                    booking.getStatus(),
+                    user.getId()
             );
             return ResponseEntity.ok(new MessageResponse("Booking status updated successfully"));
         }
