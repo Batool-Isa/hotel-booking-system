@@ -42,14 +42,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             String jwt = parseJwt(request);
-            System.out.println("jwt: ==> " + jwt);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String email = jwtUtils.getUserEmailFromJwtToken(jwt);
                 System.out.println("email: ==> " + email);
-
                 UserDetails userDetails = this.myUserDetailsService.loadUserByUsername(email);
                 System.out.println("userDetails: ==> " + userDetails.getUsername());
-
+                System.out.println("authorities: ==> " + userDetails.getAuthorities());
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

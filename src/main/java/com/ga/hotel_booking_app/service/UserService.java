@@ -16,6 +16,8 @@ import com.ga.hotel_booking_app.model.User;
 import com.ga.hotel_booking_app.repository.UserRepository;
 import com.ga.hotel_booking_app.security.MyUserDetails;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -51,7 +53,9 @@ public class UserService {
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final EmailService emailService;
     private final RoleRepository roleRepository;
-
+    @Autowired
+    private AuditLogService auditLogService;
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     /**
      * creates user service and injects all required dependencies
      */
@@ -132,11 +136,14 @@ public class UserService {
 
         Role role = roleRepository.findByName(Role.RoleName.CUSTOMER)
                 .orElseThrow(()-> new InformationExistException("Customer role not found"));
-        user.getRoles().add(role);
+        user.setRole(role);
         user.setUserProfile(profile);
         User savedUser = userRepository.save(user);
         EmailVerificationToken token = createEmailVerificationToken(savedUser);
         emailService.sendVerificationEmail(token);
+        auditLogService.log(savedUser, "REGISTER", "User", savedUser.getId(),
+                "User "+savedUser.getUsername()+" registered successfully"
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse(
                 "Registered successfully, please verify your email"
         ));
@@ -204,6 +211,13 @@ public class UserService {
 
             }
             final String JWT = jwtUtils.generateJwtToken(myUserDetails);
+            auditLogService.log(
+                    user,
+                    "Login",
+                    "User",
+                    user.getId(),
+                    "User "+user.getUsername()+" logged in successfully"
+            );
             return ResponseEntity.ok(new MessageResponse(JWT));
         } catch (BadCredentialsException e) {
             throw new InvalidCredentialsException("Invalid email or password");
@@ -231,6 +245,13 @@ public class UserService {
         verificationToken.setUsedAt(LocalDateTime.now());
         userRepository.save(user);
         emailVerificationTokenRepository.save(verificationToken);
+        auditLogService.log(
+                user,
+                "EMAIL VERIFICATION",
+                "User",
+                user.getId(),
+                "User "+user.getUsername()+" email verified successfully"
+        );
         return "Email Verified Successfully";
 
     }
@@ -245,7 +266,7 @@ public class UserService {
         response.setLastName(profile.getLastName());
         response.setPhone(profile.getPhone());
         response.setProfileImageUrl(profile.getProfileImageUrl());
-        response.setRoles(user.getRoles());
+        response.setRole(user.getRole());
         return ResponseEntity.ok(response);
     }
 
@@ -258,6 +279,10 @@ public class UserService {
         profile.setPhone(request.getPhone());
         user.setUserProfile(profile);
         userRepository.save(user);
+        auditLogService.log(
+                user, "UPDATE PROFILE", "User", user.getId(),
+                "User "+user.getUsername()+" updated his/her profile successfully"
+        );
         return ResponseEntity.ok(new MessageResponse("Profile updated successfully"));
     }
 
@@ -268,6 +293,20 @@ public class UserService {
         profile.setProfileImageUrl(profileImage);
         user.setUserProfile(profile);
         userRepository.save(user);
+        auditLogService.log(
+                user, "UPDATE IMAGE PROFILE", "User", user.getId(),
+                "User "+user.getUsername()+" updated his/her image profile successfully"
+        );
         return ResponseEntity.ok(new MessageResponse("Image Profile updated successfully"));
+    }
+
+    public ResponseEntity<?> logoutUser() {
+        User user = getCurrentLoggedInUser();
+        SecurityContextHolder.clearContext();
+        auditLogService.log(
+                user, "USER LOGOUT", "User", user.getId(),
+                "User "+user.getId() +" logged out successfully"
+        );
+        return ResponseEntity.ok(new MessageResponse("User logged in successfully"));
     }
 }

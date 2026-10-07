@@ -1,9 +1,6 @@
 package com.ga.hotel_booking_app.exception.handler;
 
-import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;
-import com.ga.hotel_booking_app.exception.custom.InvalidCredentialsException;
-import com.ga.hotel_booking_app.exception.custom.InvalidTokenException;
-import com.ga.hotel_booking_app.exception.custom.PasswordMismatchException;
+import com.ga.hotel_booking_app.exception.custom.*;
 import com.ga.hotel_booking_app.exception.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -12,6 +9,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -65,15 +65,39 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+    @ExceptionHandler(InvalidInformationException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidInformationExceptionException(InvalidInformationException ex,
+                                                                         HttpServletRequest request){
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "INVALID_INFORMATION",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+    @ExceptionHandler(UnauthorizedActionException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorizedActionException(UnauthorizedActionException ex,
+                                                                                    HttpServletRequest request){
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.FORBIDDEN.value(),
+                "Unauthorized",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationErrors(
             MethodArgumentNotValidException ex,
             HttpServletRequest request) {
 
-        String message = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(error -> error.getDefaultMessage())
+        Map<String, String> fieldErrors = new LinkedHashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(fe -> fieldErrors.putIfAbsent(fe.getField(), fe.getDefaultMessage()));
+
+        String message =fieldErrors.values().stream()
                 .findFirst()
                 .orElse("Validation failed");
 
@@ -84,7 +108,19 @@ public class GlobalExceptionHandler {
                 message,
                 request.getRequestURI()
         );
-
+        error.setErrors(fieldErrors);
         return ResponseEntity.badRequest().body(error);
+    }
+    @ExceptionHandler(InformationExistException.class)
+    public ResponseEntity<ErrorResponse> handleInformationExist(InformationExistException ex,
+                                                                HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value(),
+                "ALREADY_EXISTS",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 }

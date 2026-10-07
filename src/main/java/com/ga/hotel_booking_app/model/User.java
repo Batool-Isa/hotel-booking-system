@@ -20,9 +20,9 @@ import java.util.Set;
 @ToString(exclude = {
         "password",
         "userProfile",
-        "roles",
         "emailVerificationTokens",
-        "passwordResetTokens"
+        "passwordResetTokens",
+        "logs"
 })
 public class User {
     @Id
@@ -55,20 +55,18 @@ public class User {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-    @ManyToMany
-    @JoinTable(
-            name="user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="role_id")
+    private Role role;
     @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<EmailVerificationToken> emailVerificationTokens;
     @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<PasswordResetToken> passwordResetTokens;
-
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private Set<AuditLog> logs ;
     public String getPassword() {
         return password;
     }

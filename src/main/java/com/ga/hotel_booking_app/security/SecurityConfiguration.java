@@ -1,15 +1,15 @@
 package com.ga.hotel_booking_app.security;
 
-import com.ga.hotel_booking_app.model.Role;
-import com.ga.hotel_booking_app.repository.RoleRepository;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +33,7 @@ public class SecurityConfiguration {
 
     /**
      *
-     * Do BCrypt password hashing to store the password securly  in databse
+     * Do BCrypt password hashing to store the password securely  in databse
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -47,7 +47,11 @@ public class SecurityConfiguration {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .authorizeHttpRequests(auth -> auth
+                .exceptionHandling(  // to handle expired token
+                        e-> e.authenticationEntryPoint(
+                                ((request, response, authException) ->  writeJson(response, 401,
+                                        "Your session has expired or is invalid. Please sign in again.")))
+                ).authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/users",
                                 "/auth/users/login",
@@ -57,14 +61,37 @@ public class SecurityConfiguration {
                                 "/auth/users/reset-link",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/ws/**",
+                                "/api/availability/**",
+                                "/log"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/hotels/**").permitAll()
                         .anyRequest().authenticated()
                 );
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
+    private static void writeJson(jakarta.servlet.http.HttpServletResponse res, int status, String message)
+            throws java.io.IOException {
+        res.setStatus(status);
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+        res.getWriter().write("{\"status\":" + status + ",\"message\":\"" + message.replace("\"", "\\\"") + "\"}");
+    }
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers(
+                "/",
+                "/index.html",
+                "/static/**",
+                "/css/**",
+                "/js/**",
+                "/images/**",
+                "/favicon.ico",
+                "/uploads/**"
+        );
+    }
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authConfig) throws Exception {
