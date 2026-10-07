@@ -46,6 +46,8 @@ public class BookingService {
     private EmailService emailService;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private AuditLogService auditLogService;
 
     public User getCurrentLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -191,6 +193,13 @@ public class BookingService {
         bookingRepository.save(booking);
         notificationService.sendBookingNotification(booking);
         emailService.sendBookingConfirmationEmail(booking);
+        auditLogService.log(
+                customer.getId(),
+                "BOOKING_CONFIRMED",
+                "BOOKING",
+                booking.getId(),
+                "Customer confirmed booking " + booking.getBookingReference()
+        );
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new MessageResponse("Booking created successfully"));
 
@@ -280,7 +289,13 @@ public class BookingService {
         bookingRepository.save(booking);
         notificationService.sendBookingNotification(booking);
         emailService.sendBookingCancellationEmail(booking);
-
+        auditLogService.log(
+                user.getId(),
+                "BOOKING_CANCELLED",
+                "BOOKING",
+                booking.getId(),
+                "Customer cancelled booking " + booking.getBookingReference()
+        );
         return ResponseEntity.ok(new MessageResponse("Booking canceled successfully"));
     }
 
@@ -334,6 +349,13 @@ public class BookingService {
             booking.setStatus(Booking.Status.COMPLETED);
             bookingRepository.save(booking);
             notificationService.sendBookingNotification(booking);
+            auditLogService.log(
+                    user.getId(),
+                    "BOOKING_UPDATE",
+                    "BOOKING",
+                    booking.getId(),
+                    "Customer update booking " + booking.getBookingReference()
+            );
             return ResponseEntity.ok(new MessageResponse("Booking status updated successfully"));
         }
 }

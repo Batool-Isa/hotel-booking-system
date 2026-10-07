@@ -21,7 +21,8 @@ import java.util.Set;
         "password",
         "userProfile",
         "emailVerificationTokens",
-        "passwordResetTokens"
+        "passwordResetTokens",
+        "logs"
 })
 public class User {
     @Id
@@ -63,7 +64,9 @@ public class User {
     @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<PasswordResetToken> passwordResetTokens;
-
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private Set<AuditLog> logs ;
     public String getPassword() {
         return password;
     }
