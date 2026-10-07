@@ -36,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -130,10 +131,10 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setStatus(User.Status.UNVERIFIED);
-
-        String profileImage = uploadeImage(image);
-        profile.setProfileImageUrl(profileImage);
-
+        if (image != null && !image.isEmpty()) {
+            String profileImage = uploadeImage(image);
+            profile.setProfileImageUrl(profileImage);
+        }
         Role role = roleRepository.findByName(Role.RoleName.CUSTOMER)
                 .orElseThrow(()-> new InformationExistException("Customer role not found"));
         user.setRole(role);
@@ -150,17 +151,36 @@ public class UserService {
     }
 
     public String uploadeImage(MultipartFile image) {
+        // validate image efore uploading
+        if(image == null || image.isEmpty()){
+            throw new InvalidInformationException("Please choose an image file");
+        }
+        if (image.getSize() > 1024 * 1024) {
+            throw new InvalidInformationException("The image is too large. The maximum size is 1 MB");
+        }
+        String type = image.getContentType();
+        if (!List.of("image/jpeg", "image/png", "image/webp").contains(type)) {
+            throw new InvalidInformationException("Only JPG, PNG or WebP images are allowed");
+        }
         try {
             Path uploadPath = Paths.get(UPLOAD_DIR);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
-            String originalNameFile = image.getOriginalFilename();
+            String fileExtenstion;
+            if (type.equals("image/png")){
+                fileExtenstion=".png";
+            }else if (type.equals("image/webp")) {
+                fileExtenstion=".webp";
+            }else{
+                fileExtenstion=".jpg";
+            }
+
             //generate uniq id
             String uniqueId = UUID.randomUUID().toString().substring(10);
             // create file name
-            String imageFileName = uniqueId + "-" + originalNameFile;
+            String imageFileName = uniqueId + fileExtenstion;
             // create file path
             Path filePath = uploadPath.resolve(imageFileName);
 

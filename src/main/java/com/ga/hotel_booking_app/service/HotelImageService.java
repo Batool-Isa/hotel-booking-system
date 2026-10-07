@@ -84,13 +84,23 @@ public class HotelImageService {
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
-
+            String fileExtenstion;
             for (int i = 0; i < images.size(); i++) {
+                String type = images.get(i).getContentType();
+
+                if (type.equals("image/png")){
+                    fileExtenstion=".png";
+                }else if (type.equals("image/webp")) {
+                    fileExtenstion=".webp";
+                }else{
+                    fileExtenstion=".jpg";
+                }
+
                 MultipartFile image = images.get(i);
                 String altText = altTexts.get(i);
                 //create images naming
                 String uniqueId = UUID.randomUUID().toString().substring(0, 5);
-                String imageName = uniqueId + "-" + image.getOriginalFilename();
+                String imageName = uniqueId + fileExtenstion;
 
                 //upload images
                 Path imageFilePath = uploadPath.resolve(imageName);
