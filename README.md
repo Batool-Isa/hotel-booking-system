@@ -72,7 +72,7 @@ I am using code first appoach in implementing this project.Also this project is 
 [JIRA Board Link](https://batooltaher124.atlassian.net/jira/software/projects/KAN/boards/1?filter=&groupBy=none&atlOrigin=eyJpIjoiZjE4NWM5NzU5ZWM1NGExZDk0OTJmODJkMGZiYzc0NmEiLCJwIjoiaiJ9)
 
 ### ERD
-
+https://lucid.app/lucidchart/8b0e637d-298f-47b5-a125-42f609a4f752/edit?viewport_loc=-16631%2C-11762%2C7744%2C3050%2C0_0&invitationId=inv_38a0f9ea-e54a-403a-be8b-40e38592185e
 ![ERD.png](ERD.png)
 ### Planning
 Provide a link to your planning documentation/GitHub Project showing:
@@ -102,6 +102,7 @@ Document any unresolved issues.
 [Spring Boot - Sending Email via SMTP
 ](https://www.geeksforgeeks.org/springboot/spring-boot-sending-email-via-smtp/)
 https://www.geeksforgeeks.org/springboot/spring-boot-logging/
+## Swagger API 
 
 ## Major Challenges
 Explain the major technical problems you encountered and how you solved them.

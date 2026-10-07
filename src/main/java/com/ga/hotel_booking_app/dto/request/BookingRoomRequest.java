@@ -4,10 +4,12 @@ package com.ga.hotel_booking_app.dto.request;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Getter
+@Setter
 public class BookingRoomRequest {
 
     @NotNull(message = "Room ID is required")
