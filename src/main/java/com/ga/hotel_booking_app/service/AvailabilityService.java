@@ -14,26 +14,20 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AvailabilityService {
     @Autowired
     private HotelRepository hotelRepository;
-
-    @Autowired
-    private UserRepository userRepository;
     @Autowired
     private BookingRepository bookingRepository;
 
-    @Autowired
-    private RoomRepository roomRepository;
-    @Autowired
-    private ChildPolicyRepository childPolicyRepository;
-
     public ResponseEntity<?> searchAvailability(AvailabilityRequest request) {
         // validate user request
-        if (request.getCheckOut().isBefore(request.getCheckIn())) {
-            throw new InvalidInformationException("Invalid checkout date, checkout should be after checkin date");
+        if (!request.getCheckOut().isAfter(request.getCheckIn())) {
+            throw new InvalidInformationException("Checkout date must be after check-in date");
         }
         // get available hotels with room
 
@@ -46,7 +40,7 @@ public class AvailabilityService {
         // get only active rooms
         List<Room> activeRoomsList = hotelList.stream()
                 .flatMap(h -> h.getRooms().stream())
-                .filter(r -> r.getStatus().equals(Hotel.Status.ACTIVE)).toList();
+                .filter(r -> r.getStatus().equals(Room.Status.ACTIVE)).toList();
 
         // get only active booking
         List<Booking> bookingList = new ArrayList<>();
@@ -58,15 +52,15 @@ public class AvailabilityService {
                 .filter(b ->
                         b.getCheckOut().isAfter(request.getCheckIn())
                                 && b.getCheckIn().isBefore(request.getCheckOut())).toList();
-        // get rooms that overlapped and can't booked for this user
-        List<Room> rooms = overLappedBookings.stream()
+        // get rooms id of rooms that overlapped and can't booked for this user
+        Set<Long> unavailableRooms = overLappedBookings.stream()
                 .flatMap(b -> b.getBookingRooms().stream())
-                .map(br -> br.getRoom()).toList();
+                .map(br -> br.getRoom().getId()).collect(Collectors.toSet());
 
 
         List<AvailableHotelResponse> hotelResponseList = new ArrayList<>();
-        List<RoomResponse> roomResponseList = new ArrayList<>();
         for (Hotel hotel : hotelList) {
+            List<RoomResponse> roomResponseList = new ArrayList<>();
             AvailableHotelResponse response = new AvailableHotelResponse();
             response.setHotelId(hotel.getId());
             response.setAddress(hotel.getAddress());
@@ -76,24 +70,32 @@ public class AvailabilityService {
             List<Room> hotelActiveRooms = hotel.getRooms().stream().filter(r -> r.getStatus().equals(Room.Status.ACTIVE)).toList();
             for (Room r : hotelActiveRooms) {
                 //check if room can't be booked
-                if (rooms.contains(r)) {
+                if (unavailableRooms.contains(r.getId())) {
                     continue;
                 }
-                RoomResponse roomResponse = new RoomResponse();
-                roomResponse.setId(r.getId());
-                roomResponse.setRoomTypeName(r.getRoomType().getName());
-                roomResponse.setPricePerNight(r.getPricePerNight());
-                roomResponse.setMaxAdults(r.getMaxAdults());
-                roomResponse.setMaxChildren(r.getMaxChildren());
-                roomResponse.setMaxOccupancy(r.getMaxOccupancy());
-                roomResponse.setRoomNumber(r.getRoomNumber());
-                roomResponse.setFloorNumber(r.getFloorNumber());
+                RoomResponse roomResponse = buildRoomResponse(r);
                 roomResponseList.add(roomResponse);
             }
             response.getRooms().addAll(roomResponseList);
-            hotelResponseList.add(response);
+            // only add active hotel that has available rooms
+            if (!roomResponseList.isEmpty()) {
+                hotelResponseList.add(response);
+            }
         }
 
         return ResponseEntity.ok(hotelResponseList);
+    }
+
+    public RoomResponse buildRoomResponse(Room room){
+        RoomResponse roomResponse = new RoomResponse();
+        roomResponse.setId(room.getId());
+        roomResponse.setRoomTypeName(room.getRoomType().getName());
+        roomResponse.setPricePerNight(room.getPricePerNight());
+        roomResponse.setMaxAdults(room.getMaxAdults());
+        roomResponse.setMaxChildren(room.getMaxChildren());
+        roomResponse.setMaxOccupancy(room.getMaxOccupancy());
+        roomResponse.setRoomNumber(room.getRoomNumber());
+        roomResponse.setFloorNumber(room.getFloorNumber());
+        return roomResponse;
     }
 }
