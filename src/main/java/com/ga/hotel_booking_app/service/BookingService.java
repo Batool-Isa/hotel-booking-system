@@ -378,13 +378,13 @@ public class BookingService {
         String logDescription;
         if (user.getRole().getName().equals(Role.RoleName.HOTEL_MANAGER)) {
             logDescription = "Manager " + user.getUsername() + " update booking state from  "
-                    + currentStatus +" to "+request.getStatus()+ " for user " + booking.getUser().getId();
+                    + currentStatus + " to " + request.getStatus() + " for user " + booking.getUser().getId();
         } else if (user.getRole().getName().equals(Role.RoleName.ADMIN)) {
             logDescription = "Admin " + user.getUsername() + " update booking state from  "
-                    + currentStatus +" to "+request.getStatus()+ " for user " + booking.getUser().getId();
+                    + currentStatus + " to " + request.getStatus() + " for user " + booking.getUser().getId();
         } else {
             logDescription = "Customer " + user.getUsername() + " Update booking state from  "
-                    + currentStatus +" to "+request.getStatus();
+                    + currentStatus + " to " + request.getStatus();
         }
         auditLogService.log(
                 user,
