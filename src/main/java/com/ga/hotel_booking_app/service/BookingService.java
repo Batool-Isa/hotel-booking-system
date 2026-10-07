@@ -63,8 +63,7 @@ public class BookingService {
     @Transactional
     public ResponseEntity<?> createNewBooking(BookingRequest request) {
         // validate dates
-        boolean validDate = request.getCheckIn().isAfter(LocalDate.now())
-                && request.getCheckOut().isAfter(LocalDate.now())
+        boolean validDate = !request.getCheckIn().isBefore(LocalDate.now())
                 && request.getCheckOut().isAfter(request.getCheckIn());
         if (!validDate) {
             throw new InvalidInformationException("Invalid booking dates");
