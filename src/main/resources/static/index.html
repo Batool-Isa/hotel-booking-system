@@ -815,6 +815,7 @@
                     <div class="tabs mt">
                         <button class="tab" :class="{on:mp.tab==='overview'}" @click="manageTab('overview')"><icon name="edit" :size="16"></icon>Details</button>
                         <button class="tab" :class="{on:mp.tab==='rooms'}" @click="manageTab('rooms')"><icon name="bed" :size="16"></icon>Rooms</button>
+                        <button class="tab" :class="{on:mp.tab==='amenities'}" @click="manageTab('amenities')"><icon name="check" :size="16"></icon>Amenities</button>
                         <button class="tab" :class="{on:mp.tab==='photos'}" @click="manageTab('photos')"><icon name="image" :size="16"></icon>Photos</button>
                         <button class="tab" :class="{on:mp.tab==='policy'}" @click="manageTab('policy')"><icon name="baby" :size="16"></icon>Child policy</button>
                         <button class="tab" :class="{on:mp.tab==='bookings'}" @click="manageTab('bookings')"><icon name="calendar" :size="16"></icon>Bookings</button>
@@ -838,12 +839,20 @@
 
                     <!-- rooms -->
                     <div v-if="mp.tab==='rooms'">
-                        <div class="row between mb"><div><h3 style="margin:0">Rooms</h3><div class="small muted">Rooms guests can book at this hotel.</div></div><button class="btn btn-primary" :disabled="mp.live===false" @click="openRoomModal"><icon name="plus" :size="16"></icon>Add room</button></div>
+                        <div class="row between mb"><div><h3 style="margin:0">Rooms</h3><div class="small muted">Rooms guests can book at this hotel.</div></div><div class="row" style="gap:8px"><button class="btn btn-outline" :disabled="mp.live===false" @click="openBulk">Add several</button><button class="btn btn-primary" :disabled="mp.live===false" @click="openRoomModal()"><icon name="plus" :size="16"></icon>Add room</button></div></div>
                         <alert-box v-if="mp.roomsMsg" type="warn" :msg="mp.roomsMsg"></alert-box>
-                        <div v-else-if="!mp.rooms.length" class="card empty"><div class="big"><icon name="bed" :size="30"></icon></div><h3>No rooms yet</h3><p>Add your first room so guests can start booking.</p><button class="btn btn-primary" @click="openRoomModal">Add a room</button></div>
-                        <div v-else class="card scroll-x"><table class="t plain"><thead><tr><th>Room</th><th>Floor</th><th>Type</th><th>Adults</th><th>Children</th><th>Max guests</th><th>Price / night</th><th>Status</th></tr></thead>
-                            <tbody><tr v-for="r in mp.rooms" :key="r.id"><td><b>{{r.roomNumber}}</b></td><td>{{r.floorNumber}}</td><td>{{r.roomTypeName}}</td><td>{{r.maxAdults}}</td><td>{{r.maxChildren}}</td><td>{{r.maxOccupancy}}</td><td>{{money(r.pricePerNight)}}</td><td><span class="badge" :class="statusClass(r.status)">{{statusLabel(r.status)}}</span></td></tr></tbody></table></div>
+                        <div v-else-if="!mp.rooms.length" class="card empty"><div class="big"><icon name="bed" :size="30"></icon></div><h3>No rooms yet</h3><p>Add your first room so guests can start booking.</p><button class="btn btn-primary" @click="openRoomModal()">Add a room</button></div>
+                        <div v-else class="card scroll-x"><table class="t plain"><thead><tr><th>Room</th><th>Floor</th><th>Type</th><th>Adults</th><th>Children</th><th>Max guests</th><th>Price / night</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody><tr v-for="r in mp.rooms" :key="r.id"><td><b>{{r.roomNumber}}</b></td><td>{{r.floorNumber}}</td><td>{{r.roomTypeName}}</td><td>{{r.maxAdults}}</td><td>{{r.maxChildren}}</td><td>{{r.maxOccupancy}}</td><td>{{money(r.pricePerNight)}}</td><td><select :value="r.status" @change="setRoomStatus(r,$event.target.value)" :aria-label="'Status of room '+r.roomNumber" style="padding:6px 8px;border:1px solid #b5bcc5;border-radius:8px"><option v-for="(label,key) in ROOM_STATUS" :key="key" :value="key">{{label}}</option></select></td><td><div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn btn-outline btn-sm" @click="openRoomModal(r)"><icon name="edit" :size="14"></icon>Edit</button><button class="btn btn-outline btn-sm" @click="openRoomImages(r)"><icon name="image" :size="14"></icon>Photos</button></div></td></tr></tbody></table></div>
                         <div class="pager" v-if="mp.roomsPage>0 || mp.roomsNext"><button class="btn btn-outline btn-sm" :disabled="mp.roomsPage===0" @click="loadMRooms(mp.roomsPage-1)">Previous</button><span class="muted small">Page {{mp.roomsPage+1}}</span><button class="btn btn-outline btn-sm" :disabled="!mp.roomsNext" @click="loadMRooms(mp.roomsPage+1)">Next</button></div>
+                    </div>
+
+                    <!-- amenities -->
+                    <div v-if="mp.tab==='amenities'">
+                        <div class="row between mb"><div><h3 style="margin:0">Amenities</h3><div class="small muted">What guests get at this hotel. Some amenities can have an extra cost.</div></div><button class="btn btn-primary" @click="openAmenity(null)"><icon name="plus" :size="16"></icon>Add amenity</button></div>
+                        <div v-if="!mp.hotel.amenities || !mp.hotel.amenities.length" class="card empty"><div class="big"><icon name="check" :size="30"></icon></div><h3>No amenities yet</h3><p>Add Wi-Fi, a pool, breakfast … so guests know what to expect.</p><button class="btn btn-primary" @click="openAmenity(null)">Add an amenity</button></div>
+                        <div v-else class="card scroll-x"><table class="t plain"><thead><tr><th>Amenity</th><th>Description</th><th>Extra cost</th><th>Actions</th></tr></thead>
+                            <tbody><tr v-for="a in mp.hotel.amenities" :key="a.id"><td><b>{{amenityIcon(a.name)}} {{a.name}}</b></td><td class="small">{{a.description || '–'}}</td><td>{{a.additionalCost ? money(a.additionalCost) : 'Free'}}</td><td><div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn btn-outline btn-sm" @click="openAmenity(a)"><icon name="edit" :size="14"></icon>Edit</button><button class="btn btn-danger-o btn-sm" @click="removeAmenity(a)">Remove</button></div></td></tr></tbody></table></div>
                     </div>
 
                     <!-- photos -->
@@ -890,6 +899,7 @@
                     <button class="tab" :class="{on:ad.tab==='hotels'}" @click="adminTab('hotels')"><icon name="building" :size="16"></icon>Hotels</button>
                     <button class="tab" :class="{on:ad.tab==='users'}" @click="adminTab('users')"><icon name="users" :size="16"></icon>Users</button>
                     <button class="tab" :class="{on:ad.tab==='types'}" @click="adminTab('types')"><icon name="bed" :size="16"></icon>Room types</button>
+                    <button class="tab" :class="{on:ad.tab==='amenities'}" @click="adminTab('amenities')"><icon name="check" :size="16"></icon>Amenities</button>
                     <button class="tab" :class="{on:ad.tab==='status'}" @click="adminTab('status')"><icon name="settings" :size="16"></icon>Hotel status</button>
                     <button class="tab" :class="{on:ad.tab==='bookings'}" @click="adminTab('bookings')"><icon name="calendar" :size="16"></icon>Bookings</button>
                 </div>
@@ -930,6 +940,13 @@
                         <tbody><tr v-for="t in roomTypes" :key="t.id"><td>{{t.id}}</td><td><b>{{t.name}}</b></td><td class="small">{{t.description}}</td><td><div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn btn-outline btn-sm" @click="openType(t)"><icon name="edit" :size="14"></icon>Edit</button><button class="btn btn-danger-o btn-sm" @click="setTypeStatus(t,'INACTIVE')">Deactivate</button></div></td></tr></tbody></table></div>
                     <div class="card pad mt"><h4>Re-activate a room type</h4><p class="small muted">Deactivated types disappear from the list above. Enter the type’s ID to bring it back.</p>
                         <form class="row" style="align-items:flex-start" @submit.prevent="activateTypeById"><div style="width:200px"><f-input v-model="typeActivate.id" type="number" min="1" placeholder="Room type ID" :error="typeActivate.err"></f-input></div><button class="btn btn-outline">Activate</button></form></div>
+                </div>
+
+                <div v-if="ad.tab==='amenities'">
+                    <div class="row between mb"><div><h3 style="margin:0">Amenities</h3><div class="small muted">The list hotels choose from. An amenity that a hotel uses can’t be deleted.</div></div><button class="btn btn-primary btn-sm" @click="openCatalog(null)"><icon name="plus" :size="15"></icon>New amenity</button></div>
+                    <div v-if="!amenityCatalog.length" class="card empty"><div class="big"><icon name="check" :size="30"></icon></div><h3>No amenities yet</h3><p>Create amenities like “Wi-Fi” or “Swimming pool”.</p></div>
+                    <div v-else class="card scroll-x"><table class="t plain"><thead><tr><th>ID</th><th>Name</th><th>Description</th><th>Actions</th></tr></thead>
+                        <tbody><tr v-for="a in amenityCatalog" :key="a.id"><td>{{a.id}}</td><td><b>{{amenityIcon(a.name)}} {{a.name}}</b></td><td class="small">{{a.description || '–'}}</td><td><div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn btn-outline btn-sm" @click="openCatalog(a)"><icon name="edit" :size="14"></icon>Edit</button><button class="btn btn-danger-o btn-sm" @click="deleteCatalog(a)">Delete</button></div></td></tr></tbody></table></div>
                 </div>
 
                 <div v-if="ad.tab==='users'">
@@ -984,14 +1001,64 @@
         </div></div>
 
         <div v-if="roomModal.open" class="modal-bg" @click.self="roomModal.open=false"><div class="modal" role="dialog" aria-modal="true">
-            <div class="modal-h"><h3>Add a room</h3><button class="x-btn" @click="roomModal.open=false" aria-label="Close"><icon name="x"></icon></button></div>
+            <div class="modal-h"><h3>{{roomF.values.id?'Edit room':'Add a room'}}</h3><button class="x-btn" @click="roomModal.open=false" aria-label="Close"><icon name="x"></icon></button></div>
             <form @submit.prevent="saveRoom" novalidate><div class="modal-b">
                 <alert-box v-if="roomF.banner" type="error" :msg="roomF.banner"></alert-box>
                 <f-select v-model="roomF.values.roomTypeId" label="Room type" required placeholder="Select a room type" :options="roomTypes.map(t=>({value:t.id,label:t.name}))" :error="roomF.errors.roomTypeId" @blur="roomF.check('roomTypeId')" :hint="roomTypes.length?'':'No room types yet – an admin needs to create some first'"></f-select>
                 <div class="form-grid"><f-input v-model="roomF.values.roomNumber" label="Room number" required :error="roomF.errors.roomNumber" @blur="roomF.check('roomNumber')"></f-input><f-input v-model="roomF.values.floorNumber" label="Floor" required :error="roomF.errors.floorNumber" @blur="roomF.check('floorNumber')"></f-input></div>
                 <f-input v-model="roomF.values.pricePerNight" label="Price per night (BHD)" type="number" min="0.01" step="0.01" required :error="roomF.errors.pricePerNight" @blur="roomF.check('pricePerNight')"></f-input>
                 <div class="form-grid" style="grid-template-columns:repeat(3,1fr)"><f-input v-model="roomF.values.maxAdults" label="Max adults" type="number" min="1" required :error="roomF.errors.maxAdults" @blur="roomF.check('maxAdults')"></f-input><f-input v-model="roomF.values.maxChildren" label="Max children" type="number" min="1" required :error="roomF.errors.maxChildren" @blur="roomF.check('maxChildren')"></f-input><f-input v-model="roomF.values.maxOccupancy" label="Max guests" type="number" min="1" required :error="roomF.errors.maxOccupancy" @blur="roomF.check('maxOccupancy')"></f-input></div>
-            </div><div class="modal-f"><button type="button" class="btn btn-ghost" @click="roomModal.open=false">Cancel</button><button class="btn btn-primary" :class="{'is-loading':roomF.busy}">Add room</button></div></form>
+            </div><div class="modal-f"><button type="button" class="btn btn-ghost" @click="roomModal.open=false">Cancel</button><button class="btn btn-primary" :class="{'is-loading':roomF.busy}">{{roomF.values.id?'Save room':'Add room'}}</button></div></form>
+        </div></div>
+
+        <div v-if="bulkModal.open" class="modal-bg" @click.self="bulkModal.open=false"><div class="modal" role="dialog" aria-modal="true">
+            <div class="modal-h"><h3>Add several rooms</h3><button class="x-btn" @click="bulkModal.open=false" aria-label="Close"><icon name="x"></icon></button></div>
+            <form @submit.prevent="saveBulk" novalidate><div class="modal-b">
+                <p class="small muted">Creates rooms with consecutive numbers and the same settings. If one number is already used, nothing is added.</p>
+                <alert-box v-if="bulkF.banner" type="error" :msg="bulkF.banner"></alert-box>
+                <f-select v-model="bulkF.values.roomTypeId" label="Room type" required placeholder="Select a room type" :options="roomTypes.map(t=>({value:t.id,label:t.name}))" :error="bulkF.errors.roomTypeId" @blur="bulkF.check('roomTypeId')"></f-select>
+                <div class="form-grid" style="grid-template-columns:repeat(3,1fr)"><f-input v-model="bulkF.values.prefix" label="Prefix (optional)" placeholder="e.g. A-" :error="bulkF.errors.prefix"></f-input><f-input v-model="bulkF.values.start" label="First number" type="number" min="1" required :error="bulkF.errors.start" @blur="bulkF.check('start')"></f-input><f-input v-model="bulkF.values.count" label="How many" type="number" min="1" max="100" required :error="bulkF.errors.count" @blur="bulkF.check('count')"></f-input></div>
+                <div v-if="bulkNumbers.length" class="small muted" style="margin:-4px 0 10px">Will create: <b>{{bulkNumbers.slice(0,6).join(', ')}}</b><span v-if="bulkNumbers.length>6"> … {{bulkNumbers[bulkNumbers.length-1]}}</span> ({{plural(bulkNumbers.length,'room')}})</div>
+                <div class="form-grid"><f-input v-model="bulkF.values.floorNumber" label="Floor" required :error="bulkF.errors.floorNumber" @blur="bulkF.check('floorNumber')"></f-input><f-input v-model="bulkF.values.pricePerNight" label="Price per night (BHD)" type="number" min="0.01" step="0.01" required :error="bulkF.errors.pricePerNight" @blur="bulkF.check('pricePerNight')"></f-input></div>
+                <div class="form-grid" style="grid-template-columns:repeat(3,1fr)"><f-input v-model="bulkF.values.maxAdults" label="Max adults" type="number" min="1" required :error="bulkF.errors.maxAdults" @blur="bulkF.check('maxAdults')"></f-input><f-input v-model="bulkF.values.maxChildren" label="Max children" type="number" min="1" required :error="bulkF.errors.maxChildren" @blur="bulkF.check('maxChildren')"></f-input><f-input v-model="bulkF.values.maxOccupancy" label="Max guests" type="number" min="1" required :error="bulkF.errors.maxOccupancy" @blur="bulkF.check('maxOccupancy')"></f-input></div>
+            </div><div class="modal-f"><button type="button" class="btn btn-ghost" @click="bulkModal.open=false">Cancel</button><button class="btn btn-primary" :class="{'is-loading':bulkF.busy}">Add {{plural(bulkNumbers.length,'room')}}</button></div></form>
+        </div></div>
+
+        <div v-if="rimg.open" class="modal-bg" @click.self="closeRoomImages"><div class="modal" role="dialog" aria-modal="true" style="max-width:640px">
+            <div class="modal-h"><h3>Photos – room {{rimg.room && rimg.room.roomNumber}}</h3><button class="x-btn" @click="closeRoomImages" aria-label="Close"><icon name="x"></icon></button></div>
+            <div class="modal-b">
+                <alert-box v-if="rimg.err" type="error" :msg="rimg.err"></alert-box>
+                <label class="dz" style="display:block"><icon name="image" :size="28"></icon><div><b>Click to choose photos</b></div><div class="xs">JPG, PNG or WebP · up to 1 MB each · 10 at a time · 20 per room</div><input type="file" accept="image/jpeg,image/png,image/webp" multiple class="hide" @change="pickRoomImages"></label>
+                <div v-if="rimg.items.length" class="row mt" style="gap:10px"><div v-for="(it,i) in rimg.items" :key="i" style="position:relative"><img class="thumb" :src="it.preview" alt=""><button type="button" class="btn btn-ghost btn-sm" style="position:absolute;top:-8px;right:-8px;background:#fff" @click="dropRoomImage(i)" aria-label="Remove"><icon name="x" :size="12"></icon></button></div></div>
+                <button v-if="rimg.items.length" class="btn btn-primary mt" :class="{'is-loading':rimg.busy}" @click="uploadRoomImages"><icon name="upload" :size="16"></icon>Upload {{plural(rimg.items.length,'photo')}}</button>
+                <h4 class="mt2">Current photos</h4>
+                <div v-if="rimg.loading" class="skel" style="height:80px"></div>
+                <div v-else-if="!rimg.images.length" class="muted small">No photos for this room yet.</div>
+                <div class="grid g3"><div v-for="img in rimg.images" :key="img.id"><div class="pimg"><hotel-img :src="img.imageUrl" :name="'Room '+rimg.room.roomNumber" alt="Room photo" @fail="rimg.fails++"></hotel-img><button class="btn btn-danger btn-sm del" @click="deleteRoomImage(img)" aria-label="Delete photo"><icon name="trash" :size="14"></icon></button></div></div></div>
+            </div>
+            <div class="modal-f"><button class="btn btn-primary" @click="closeRoomImages">Done</button></div>
+        </div></div>
+
+        <div v-if="amenModal.open" class="modal-bg" @click.self="amenModal.open=false"><div class="modal" role="dialog" aria-modal="true">
+            <div class="modal-h"><h3>{{amenModal.editing?'Edit '+amenModal.editing.name:'Add an amenity'}}</h3><button class="x-btn" @click="amenModal.open=false" aria-label="Close"><icon name="x"></icon></button></div>
+            <form @submit.prevent="saveAmenity" novalidate><div class="modal-b">
+                <alert-box v-if="amenF.banner" type="error" :msg="amenF.banner"></alert-box>
+                <template v-if="!amenModal.editing">
+                    <f-select v-model="amenF.values.amenityId" label="Choose from the list" placeholder="Select an amenity" :options="availableAmenities.map(a=>({value:a.id,label:a.name}))" :error="amenF.errors.amenityId" @blur="amenF.check('amenityId')"></f-select>
+                    <f-input v-model="amenF.values.newName" label="…or create a new one" placeholder="e.g. Airport shuttle" :error="amenF.errors.newName" hint="If you type a name here it is used instead of the list"></f-input>
+                </template>
+                <f-input v-model="amenF.values.description" label="Description (optional)" placeholder="e.g. Rooftop pool, open 7am–10pm" :error="amenF.errors.description"></f-input>
+                <f-input v-model="amenF.values.additionalCost" label="Extra cost (BHD, optional)" type="number" min="0" step="0.01" :error="amenF.errors.additionalCost" hint="Leave empty if it is free"></f-input>
+            </div><div class="modal-f"><button type="button" class="btn btn-ghost" @click="amenModal.open=false">Cancel</button><button class="btn btn-primary" :class="{'is-loading':amenF.busy}">Save</button></div></form>
+        </div></div>
+
+        <div v-if="catModal.open" class="modal-bg" @click.self="catModal.open=false"><div class="modal" role="dialog" aria-modal="true">
+            <div class="modal-h"><h3>{{catF.values.id?'Edit amenity':'New amenity'}}</h3><button class="x-btn" @click="catModal.open=false" aria-label="Close"><icon name="x"></icon></button></div>
+            <form @submit.prevent="saveCatalog" novalidate><div class="modal-b">
+                <alert-box v-if="catF.banner" type="error" :msg="catF.banner"></alert-box>
+                <f-input v-model="catF.values.name" label="Name" required :error="catF.errors.name" @blur="catF.check('name')"></f-input>
+                <f-input v-model="catF.values.description" label="Description (optional)" :error="catF.errors.description"></f-input>
+            </div><div class="modal-f"><button type="button" class="btn btn-ghost" @click="catModal.open=false">Cancel</button><button class="btn btn-primary" :class="{'is-loading':catF.busy}">Save</button></div></form>
         </div></div>
 
         <div v-if="typeModal.open" class="modal-bg" @click.self="typeModal.open=false"><div class="modal" role="dialog" aria-modal="true">
@@ -1873,10 +1940,11 @@
                 const same = mp.hotel && String(mp.hotel.id)===String(id);
                 if(!same) Object.assign(mp,{ hotel:null, live:null, rooms:[], roomsMsg:'', images:[], policy:null, policyMissing:false, imgFails:0 });
                 mp.hotel = await api('GET',`/api/hotels/${id}`,{ auth:false });
-                mp.tab = ['overview','rooms','photos','policy','bookings'].includes(tab) ? tab : 'overview';
+                mp.tab = ['overview','rooms','amenities','photos','policy','bookings'].includes(tab) ? tab : 'overview';
                 if(mp.tab==='overview') initHotelForm(mp.hotel);
                 mp.live = await probeLive(id);
                 if(mp.tab==='rooms') await loadMRooms(0);
+                if(mp.tab==='amenities') await loadAmenityCatalog();
                 if(mp.tab==='photos') await loadMImages();
                 if(mp.tab==='policy') await loadMPolicy();
             }
@@ -1897,19 +1965,142 @@
             }
             function manageTab(t){ go(`/manage/hotel/${mp.hotel.id}?tab=${t}`); }
 
-            const roomF = useForm({ roomTypeId:'', roomNumber:'', floorNumber:'', pricePerNight:'', maxAdults:2, maxChildren:1, maxOccupancy:3 }, {
+            const roomF = useForm({ id:null, roomTypeId:'', roomNumber:'', floorNumber:'', pricePerNight:'', maxAdults:2, maxChildren:1, maxOccupancy:3 }, {
                 roomTypeId:[R.req('Room type')], roomNumber:[R.req('Room number'),R.max(20,'Room number')], floorNumber:[R.req('Floor number'),R.max(10,'Floor number')],
                 pricePerNight:[R.num('Price per night',{min:0.01})], maxAdults:[R.num('Max adults',{min:1,int:true})],
                 maxChildren:[R.num('Max children',{min:1,int:true})], maxOccupancy:[R.num('Max occupancy',{min:1,int:true})] });
             const roomModal = reactive({ open:false });
-            async function openRoomModal(){ roomF.reset(); roomModal.open=true; if(!roomTypes.value.length) await loadRoomTypes(); }
+            async function openRoomModal(r){
+                roomF.reset(r && r.id ? { id:r.id, roomTypeId:r.roomTypeId, roomNumber:r.roomNumber, floorNumber:r.floorNumber, pricePerNight:r.pricePerNight, maxAdults:r.maxAdults, maxChildren:r.maxChildren, maxOccupancy:r.maxOccupancy } : {});
+                roomModal.open=true; if(!roomTypes.value.length) await loadRoomTypes();
+            }
             async function saveRoom(){
                 roomF.banner=''; if(!roomF.validateAll()) return; roomF.busy=true;
                 const v=roomF.values;
+                const body={ roomTypeId:Number(v.roomTypeId), roomNumber:String(v.roomNumber).trim(), floorNumber:String(v.floorNumber).trim(), pricePerNight:Number(v.pricePerNight), maxAdults:Number(v.maxAdults), maxChildren:Number(v.maxChildren), maxOccupancy:Number(v.maxOccupancy) };
                 try{
-                    const r = await api('POST',`/api/hotels/${mp.hotel.id}/rooms`,{ body:{ roomTypeId:Number(v.roomTypeId), roomNumber:v.roomNumber.trim(), floorNumber:String(v.floorNumber).trim(), pricePerNight:Number(v.pricePerNight), maxAdults:Number(v.maxAdults), maxChildren:Number(v.maxChildren), maxOccupancy:Number(v.maxOccupancy) } });
-                    toast((r&&r.message)||'Room added.'); roomModal.open=false; await loadMRooms(0);
-                }catch(e){ roomF.banner=e.message; } finally{ roomF.busy=false; }
+                    const r = v.id ? await api('PUT',`/api/hotels/${mp.hotel.id}/rooms/${v.id}`,{ body }) : await api('POST',`/api/hotels/${mp.hotel.id}/rooms`,{ body });
+                    toast((r&&r.message)||(v.id?'Room updated.':'Room added.')); roomModal.open=false; await loadMRooms(v.id?mp.roomsPage:0);
+                }catch(e){
+                    if(e.status===409){ roomF.errors.roomNumber='This hotel already has a room with this number'; roomF.banner=e.message&&e.message!=='Conflict'?e.message:''; }
+                    else roomF.banner=e.message;
+                } finally{ roomF.busy=false; }
+            }
+            const ROOM_STATUS = { ACTIVE:'Active', INACTIVE:'Inactive', UNDER_MAINTENANCE:'Under maintenance' };
+            async function setRoomStatus(r, status){
+                if(status===r.status) return;
+                if(status!=='ACTIVE' && !await ask({ title:`Set room ${r.roomNumber} to “${ROOM_STATUS[status]}”?`, message:'Guests won’t be able to book this room while it is not active.', confirmText:'Change status', danger:true })){ await loadMRooms(mp.roomsPage); return; }
+                try{ await api('PATCH',`/api/hotels/${mp.hotel.id}/rooms/${r.id}/status`,{ body:{ status } }); toast(`Room ${r.roomNumber} is now ${ROOM_STATUS[status].toLowerCase()}.`); }
+                catch(e){ toast(e.message,'error'); }
+                await loadMRooms(mp.roomsPage);
+            }
+
+            /* add many rooms at once: 101, 102, 103 ... */
+            const bulkF = useForm({ roomTypeId:'', prefix:'', start:101, count:5, floorNumber:'1', pricePerNight:'', maxAdults:2, maxChildren:1, maxOccupancy:3 }, {
+                roomTypeId:[R.req('Room type')], prefix:[R.max(10,'Prefix')], start:[R.num('First room number',{min:1,int:true})], count:[R.num('Number of rooms',{min:1,max:100,int:true})],
+                floorNumber:[R.req('Floor number'),R.max(10,'Floor number')], pricePerNight:[R.num('Price per night',{min:0.01})],
+                maxAdults:[R.num('Max adults',{min:1,int:true})], maxChildren:[R.num('Max children',{min:1,int:true})], maxOccupancy:[R.num('Max occupancy',{min:1,int:true})] });
+            const bulkModal = reactive({ open:false });
+            async function openBulk(){ bulkF.reset(); bulkModal.open=true; if(!roomTypes.value.length) await loadRoomTypes(); }
+            const bulkNumbers = Vue.computed(() => { const v=bulkF.values, n=Number(v.count), s=Number(v.start); if(!(n>=1&&n<=100)||!Number.isInteger(s)) return []; return Array.from({length:n},(_,i)=>String(v.prefix||'').trim()+(s+i)); });
+            async function saveBulk(){
+                bulkF.banner=''; if(!bulkF.validateAll()) return; bulkF.busy=true;
+                const v=bulkF.values;
+                try{
+                    const rooms = bulkNumbers.value.map(n => ({ roomTypeId:Number(v.roomTypeId), roomNumber:n, floorNumber:String(v.floorNumber).trim(), pricePerNight:Number(v.pricePerNight), maxAdults:Number(v.maxAdults), maxChildren:Number(v.maxChildren), maxOccupancy:Number(v.maxOccupancy) }));
+                    const r = await api('POST',`/api/hotels/${mp.hotel.id}/rooms/bulk`,{ body:{ rooms } });
+                    toast((r&&r.message)||'Rooms added.'); bulkModal.open=false; await loadMRooms(0);
+                }catch(e){ bulkF.banner = e.status===409 ? (e.message&&e.message!=='Conflict'?e.message:'One of these room numbers already exists. Nothing was added.') : e.message; }
+                finally{ bulkF.busy=false; }
+            }
+
+            /* photos of one room */
+            const rimg = reactive({ open:false, room:null, images:[], items:[], busy:false, err:'', loading:false, fails:0 });
+            async function loadRoomImages(){
+                rimg.loading=true;
+                try{ const l = await api('GET',`/api/hotels/${mp.hotel.id}/rooms/${rimg.room.id}/images`,{ auth:false }); rimg.images = Array.isArray(l)?l:[]; rimg.fails=0; }
+                catch(e){ rimg.err=e.message; } finally{ rimg.loading=false; }
+            }
+            async function openRoomImages(r){ Object.assign(rimg,{ open:true, room:r, images:[], items:[], err:'', busy:false }); await loadRoomImages(); }
+            function closeRoomImages(){ rimg.items.forEach(it=>URL.revokeObjectURL(it.preview)); rimg.items=[]; rimg.open=false; }
+            function pickRoomImages(e){
+                rimg.err='';
+                for(const f of Array.from(e.target.files||[])){
+                    if(!/^image\/(jpeg|jpg|png|webp)$/.test(f.type)){ rimg.err=`“${f.name}” must be a JPG, PNG or WebP image.`; continue; }
+                    if(f.size>1024*1024){ rimg.err=`“${f.name}” is ${(f.size/1048576).toFixed(1)} MB – the server accepts up to 1 MB per file.`; continue; }
+                    if(rimg.images.length+rimg.items.length>=20){ rimg.err='A room can have at most 20 photos.'; break; }
+                    if(rimg.items.length>=10){ rimg.err='You can upload 10 photos at a time.'; break; }
+                    rimg.items.push({ file:f, preview:URL.createObjectURL(f) });
+                }
+                e.target.value='';
+            }
+            function dropRoomImage(i){ URL.revokeObjectURL(rimg.items[i].preview); rimg.items.splice(i,1); }
+            async function uploadRoomImages(){
+                if(!rimg.items.length){ rimg.err='Choose at least one photo.'; return; }
+                rimg.busy=true; rimg.err='';
+                try{
+                    const fd = new FormData(); rimg.items.forEach(it => fd.append('images', it.file));
+                    const r = await api('POST',`/api/hotels/${mp.hotel.id}/rooms/${rimg.room.id}/images`,{ form:fd, timeout:60000 });
+                    rimg.items.forEach(it=>URL.revokeObjectURL(it.preview)); rimg.items=[];
+                    toast((r&&r.message)||'Photos uploaded.'); await loadRoomImages();
+                }catch(e){ rimg.err=e.message; } finally{ rimg.busy=false; }
+            }
+            async function deleteRoomImage(img){
+                if(!await ask({ title:'Delete this photo?', message:'The photo will be removed from this room.', confirmText:'Delete photo', danger:true })) return;
+                try{ const r = await api('DELETE',`/api/hotels/${mp.hotel.id}/rooms/${rimg.room.id}/images/${img.id}`); toast((r&&r.message)||'Photo deleted.'); await loadRoomImages(); }catch(e){ toast(e.message,'error'); }
+            }
+
+            /* ---------------- amenities ---------------- */
+            const amenityCatalog = ref([]);
+            async function loadAmenityCatalog(){ try{ const l = await api('GET','/api/amenities',{ auth:false }); amenityCatalog.value = Array.isArray(l)?l:[]; }catch(e){ toast(e.message,'error'); } }
+            async function reloadMpHotel(){ mp.hotel = await api('GET',`/api/hotels/${mp.hotel.id}`,{ auth:false }); }
+            const availableAmenities = Vue.computed(() => { const have = new Set(((mp.hotel&&mp.hotel.amenities)||[]).map(a=>a.id)); return amenityCatalog.value.filter(a=>!have.has(a.id)); });
+            const amenF = useForm({ amenityId:'', newName:'', description:'', additionalCost:'' }, {
+                amenityId:[(v,d) => blank(v) && blank(d.newName) ? 'Choose an amenity or type a new one' : ''],
+                newName:[R.max(60,'Amenity name')], description:[R.max(255,'Description')],
+                additionalCost:[(v) => !blank(v) && (isNaN(Number(v)) || Number(v)<0) ? 'Extra cost must be 0 or more' : ''] });
+            const amenModal = reactive({ open:false, editing:null });
+            async function openAmenity(a){
+                amenModal.editing = a || null;
+                amenF.reset(a ? { amenityId:a.id, description:a.description||'', additionalCost:a.additionalCost==null?'':a.additionalCost } : {});
+                amenModal.open=true; if(!amenityCatalog.value.length) await loadAmenityCatalog();
+            }
+            async function saveAmenity(){
+                amenF.banner=''; if(!amenF.validateAll()) return; amenF.busy=true;
+                const v=amenF.values;
+                const body = { description:(v.description||'').trim()||null, additionalCost: blank(v.additionalCost)?null:Number(v.additionalCost) };
+                try{
+                    if(amenModal.editing){
+                        await api('PUT',`/api/hotels/${mp.hotel.id}/amenities/${amenModal.editing.id}`,{ body:{ amenityId:amenModal.editing.id, ...body } });
+                    } else {
+                        let id = Number(v.amenityId);
+                        if(!blank(v.newName)){ const c = await api('POST','/api/amenities',{ body:{ name:v.newName.trim() } }); id = c.id; await loadAmenityCatalog(); }
+                        await api('POST',`/api/hotels/${mp.hotel.id}/amenities`,{ body:{ amenityId:id, ...body } });
+                    }
+                    toast('Amenity saved.'); amenModal.open=false; await reloadMpHotel();
+                }catch(e){
+                    if(e.status===409) amenF.banner = e.message && e.message!=='Conflict' ? e.message : 'That amenity already exists.';
+                    else amenF.banner=e.message;
+                } finally{ amenF.busy=false; }
+            }
+            async function removeAmenity(a){
+                if(!await ask({ title:`Remove “${a.name}”?`, message:'It will no longer be shown on this hotel’s page. It stays in the amenity list for other hotels.', confirmText:'Remove', danger:true })) return;
+                try{ const r = await api('DELETE',`/api/hotels/${mp.hotel.id}/amenities/${a.id}`); toast((r&&r.message)||'Amenity removed.'); await reloadMpHotel(); }catch(e){ toast(e.message,'error'); }
+            }
+
+            /* admin: the amenity catalog */
+            const catF = useForm({ id:null, name:'', description:'' }, { name:[R.req('Amenity name'),R.max(60,'Amenity name')], description:[R.max(255,'Description')] });
+            const catModal = reactive({ open:false });
+            function openCatalog(a){ catF.reset(a ? { id:a.id, name:a.name, description:a.description||'' } : {}); catModal.open=true; }
+            async function saveCatalog(){
+                catF.banner=''; if(!catF.validateAll()) return; catF.busy=true;
+                const v=catF.values;
+                try{ await api(v.id?'PUT':'POST', v.id?`/api/amenities/${v.id}`:'/api/amenities', { body:{ name:v.name.trim(), description:(v.description||'').trim()||null } }); toast('Amenity saved.'); catModal.open=false; await loadAmenityCatalog(); }
+                catch(e){ if(e.status===409) catF.errors.name='An amenity with this name already exists'; else catF.banner=e.message; } finally{ catF.busy=false; }
+            }
+            async function deleteCatalog(a){
+                if(!await ask({ title:`Delete “${a.name}”?`, message:'This only works if no hotel is using it.', confirmText:'Delete', danger:true })) return;
+                try{ const r = await api('DELETE',`/api/amenities/${a.id}`); toast((r&&r.message)||'Amenity deleted.'); await loadAmenityCatalog(); }catch(e){ toast(e.message,'error'); }
             }
 
             const imgUp = reactive({ items:[], busy:false, err:'' });
@@ -1959,7 +2150,7 @@
             const ad = reactive({ tab:'overview', users:[], uPage:0, uPages:0, uTotal:0, uBusy:null, uq:{ search:'', status:'', role:'', sort:'createdAt,desc' }, pending:[], pPage:0, pNext:false, hotels:[], hPage:0, hNext:false, q:{ search:'', city:'', country:'' }, counts:{ pending:null, hotels:null, types:null, users:null }, loading:false, error:'' });
             const cnt = (n,max) => n>=max ? max+'+' : String(n);
             async function loadAdmin(tab){
-                ad.tab = ['overview','pending','hotels','users','status','types','bookings'].includes(tab) ? tab : 'overview'; ad.error='';
+                ad.tab = ['overview','pending','hotels','users','status','types','amenities','bookings'].includes(tab) ? tab : 'overview'; ad.error='';
                 try{
                     if(ad.tab==='overview'){
                         const [p,h,t,u] = await Promise.all([ api('GET','/api/hotels/pending',{ query:{ size:50 } }), api('GET','/api/hotels',{ auth:false, query:{ size:50 } }), api('GET','/api/rooms-types'), api('GET','/api/admin/users',{ query:{ size:1 } }).catch(() => null) ]);
@@ -1970,6 +2161,7 @@
                     if(ad.tab==='hotels') await loadAdminHotels(0);
                     if(ad.tab==='users') await loadAdminUsers(0);
                     if(ad.tab==='types') await loadRoomTypes();
+                    if(ad.tab==='amenities') await loadAmenityCatalog();
                 }catch(e){ ad.error=e.message; }
             }
             /** Loads one page of users using the server-side filters (search, status, role) and sorting. */
@@ -2098,7 +2290,8 @@
                 mb, mbShown, loadBookings, bd, openBooking, cancelBooking,
                 lk, lookupBooking, completeBooking, cancelFromLookup,
                 hotelF, hotelEditId, saveHotel, useMyLocation,
-                mh, loadManagerHotels, mp, manageTab, roomTypes, loadMRooms, roomF, roomModal, openRoomModal, saveRoom,
+                mh, loadManagerHotels, mp, manageTab, roomTypes, loadMRooms, roomF, roomModal, openRoomModal, saveRoom, ROOM_STATUS, setRoomStatus, bulkF, bulkModal, openBulk, bulkNumbers, saveBulk, rimg, openRoomImages, closeRoomImages, pickRoomImages, dropRoomImage, uploadRoomImages, deleteRoomImage,
+                amenityCatalog, loadAmenityCatalog, availableAmenities, amenF, amenModal, openAmenity, saveAmenity, removeAmenity, catF, catModal, openCatalog, saveCatalog, deleteCatalog,
                 imgUp, pickHotelImages, dropImage, uploadHotelImages, deleteHotelImage, policyF, savePolicy,
                 ad, adminTab, loadAdminUsers, resetUserFilters, setUserStatus, isSelf, ROLE_LABEL, loadPending, loadAdminHotels, setHotelStatus, statusF, runStatusTool, assignF, assignModal, openAssign, doAssign,
                 typeF, typeModal, openType, saveType, setTypeStatus, typeActivate, activateTypeById, loadRoomTypes,

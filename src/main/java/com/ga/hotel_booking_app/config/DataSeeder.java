@@ -6,15 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
+
 
 @Configuration
-@Profile("dev")
 @RequiredArgsConstructor
 public class DataSeeder {
     private final RoleRepository roleRepository;
@@ -22,450 +21,408 @@ public class DataSeeder {
     private final PasswordEncoder passwordEncoder;
     private final AmenityRepository amenityRepository;
     private final HotelRepository hotelRepository;
-    private final HotelImageRepository hotelImageRepository;
     private final HotelAmenityRepository hotelAmenityRepository;
     private final RoomTypeRepository roomTypeRepository;
     private final RoomRepository roomRepository;
     private final ChildPolicyRepository childPolicyRepository;
     private final BookingRepository bookingRepository;
-    private final BookingRoomRepository bookingRoomRepository;
-    private final BookingGuestRepository bookingGuestRepository;
 
     @Bean
     CommandLineRunner seedData() {
         return args -> {
             seedRoles();
-            seedAdmin();
-            seedHotelManagers();
-            seedCustomers();
+            seedStaffUsers();
             seedAmenities();
             seedRoomTypes();
+            seedCustomers();
             seedHotels();
-            seedManagerHotelAssignments();
-            seedChildPolicies();
-            seedRooms();
-            seedHotelAmenities();
-            seedHotelImages();
             seedBookings();
         };
     }
 
     private void seedRoles() {
-        createRoleIfNotExists(Role.RoleName.CUSTOMER);
-        createRoleIfNotExists(Role.RoleName.HOTEL_MANAGER);
-        createRoleIfNotExists(Role.RoleName.ADMIN);
-        createRoleIfNotExists(Role.RoleName.STAFF);
-    }
-
-    private void createRoleIfNotExists(Role.RoleName roleName) {
-        if (roleRepository.findByName(roleName).isEmpty()) {
-            Role role = new Role();
-            role.setName(roleName);
-            roleRepository.save(role);
+        for (Role.RoleName name : Role.RoleName.values()) {
+            if (roleRepository.findByName(name).isEmpty()) {
+                roleRepository.save(new Role(null, name));
+            }
         }
     }
 
-    private void seedAdmin() {
-        if (userRepository.existsByEmail("admin@vibestay.com")) {
-            return;
-        }
-        Role adminRole = roleRepository.findByName(Role.RoleName.ADMIN).orElseThrow();
-        UserProfile profile = new UserProfile();
-        profile.setFirstName("VibeStay");
-        profile.setLastName("Admin");
-        profile.setPhone("+97330000000");
-        User admin = new User();
-        admin.setUsername("admin");
-        admin.setEmail("admin@vibestay.com");
-        admin.setPassword(passwordEncoder.encode("Admin123!"));
-        admin.setEmailVerified(true);
-        admin.setStatus(User.Status.ACTIVE);
-        admin.setRole(adminRole);
-        admin.setUserProfile(profile);
-        userRepository.save(admin);
-    }
+    private void seedStaffUsers() {
+        createUser("admin", "admin@vibestay.com", "Admin123!", Role.RoleName.ADMIN, "VibeStay", "Admin", "+97330000000");
+        createUser("staff1", "staff1@vibestay.com", "Staff123!", Role.RoleName.STAFF, "Mariam", "Yousif", "+97330000001");
 
-    private void seedHotelManagers() {
-        Role managerRole = roleRepository.findByName(Role.RoleName.HOTEL_MANAGER).orElseThrow();
-        createManager("manager1", "manager1@vibestay.com", "Ahmed", "Al Khalifa", "+97331111111", managerRole);
-        createManager("manager2", "manager2@vibestay.com", "Sara", "Hassan", "+97332222222", managerRole);
-        createManager("manager3", "manager3@vibestay.com", "Omar", "Ali", "+97333333333", managerRole);
-        createManager("manager4", "manager4@vibestay.com", "Mariam", "Yousef", "+97334444444", managerRole);
-        createManager("manager5", "manager5@vibestay.com", "Daniel", "Smith", "+971500000005", managerRole);
-    }
-
-    private void createManager(String username, String email, String firstName, String lastName, String phone, Role role) {
-        if (userRepository.existsByEmail(email)) {
-            return;
+        String[][] managers = {
+                {"Hotel", "Manager One", "+97331111111"},
+                {"Hotel", "Manager Two", "+97332222222"},
+                {"Khalid", "Al Mansoori", "+97331000003"},
+                {"Noura", "Al Hashimi", "+97331000004"},
+                {"Yusuf", "Karimi", "+97331000005"},
+                {"Layla", "Haddad", "+97331000006"}
+        };
+        for (int i = 0; i < managers.length; i++) {
+            int n = i + 1;
+            createUser("manager" + n, "manager" + n + "@vibestay.com", "Manager123!",
+                    Role.RoleName.HOTEL_MANAGER, managers[i][0], managers[i][1], managers[i][2]);
         }
-        UserProfile profile = new UserProfile();
-        profile.setFirstName(firstName);
-        profile.setLastName(lastName);
-        profile.setPhone(phone);
-        User manager = new User();
-        manager.setUsername(username);
-        manager.setEmail(email);
-        manager.setPassword(passwordEncoder.encode("Manager123!"));
-        manager.setEmailVerified(true);
-        manager.setStatus(User.Status.ACTIVE);
-        manager.setRole(role);
-        manager.setUserProfile(profile);
-        userRepository.save(manager);
     }
 
     private void seedCustomers() {
-        Role customerRole = roleRepository.findByName(Role.RoleName.CUSTOMER).orElseThrow();
-        createCustomer("customer1", "customer1@vibestay.com", "Layla", "Ahmed", "+97335000001", customerRole);
-        createCustomer("customer2", "customer2@vibestay.com", "Mohammed", "Hassan", "+97335000002", customerRole);
-        createCustomer("customer3", "customer3@vibestay.com", "Fatima", "Ali", "+97335000003", customerRole);
-        createCustomer("customer4", "customer4@vibestay.com", "Yousef", "Salman", "+97335000004", customerRole);
-        createCustomer("customer5", "customer5@vibestay.com", "Noor", "Khalid", "+97335000005", customerRole);
-        createCustomer("customer6", "customer6@vibestay.com", "Hamad", "Jassim", "+97335000006", customerRole);
-        createCustomer("customer7", "customer7@vibestay.com", "Aisha", "Nasser", "+97335000007", customerRole);
-        createCustomer("customer8", "customer8@vibestay.com", "Daniel", "Wilson", "+97335000008", customerRole);
+        String[][] customers = {
+                {"Sara", "Ahmed"}, {"Omar", "Khalid"}, {"Fatima", "Al Zayani"}, {"Hassan", "Jaffar"},
+                {"Maryam", "Salman"}, {"Ali", "Hussain"}, {"Zainab", "Mahmood"}, {"Ahmed", "Fakhro"},
+                {"Reem", "Nasser"}, {"Yousef", "Darwish"}, {"Huda", "Abdulla"}, {"Tariq", "Mansoor"},
+                {"Aisha", "Rashid"}, {"Jasim", "Saleh"}, {"Dana", "Mubarak"}, {"Karim", "Haddad"}
+        };
+        for (int i = 0; i < customers.length; i++) {
+            int n = i + 1;
+            createUser("customer" + n, "customer" + n + "@vibestay.com", "Customer123!", Role.RoleName.CUSTOMER,
+                    customers[i][0], customers[i][1], String.format("+9733400%04d", n));
+        }
     }
 
-    private void createCustomer(String username, String email, String firstName, String lastName, String phone, Role role) {
-        if (userRepository.existsByEmail(email)) {
+    private final Map<String, String> encodedPasswords = new HashMap<>();
+
+    private void createUser(String username, String email, String rawPassword, Role.RoleName roleName,
+                            String first, String last, String phone) {
+        if (userRepository.existsByEmail(email) || userRepository.existsByUsername(username)) {
             return;
         }
+        Role role = roleRepository.findByName(roleName).orElseThrow();
+
         UserProfile profile = new UserProfile();
-        profile.setFirstName(firstName);
-        profile.setLastName(lastName);
+        profile.setFirstName(first);
+        profile.setLastName(last);
         profile.setPhone(phone);
-        User customer = new User();
-        customer.setUsername(username);
-        customer.setEmail(email);
-        customer.setPassword(passwordEncoder.encode("Customer123!"));
-        customer.setEmailVerified(true);
-        customer.setStatus(User.Status.ACTIVE);
-        customer.setRole(role);
-        customer.setUserProfile(profile);
-        userRepository.save(customer);
+
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
+        // BCrypt is slow, so each distinct password is encoded once and reused
+        user.setPassword(encodedPasswords.computeIfAbsent(rawPassword, passwordEncoder::encode));
+        user.setEmailVerified(true);
+        user.setStatus(User.Status.ACTIVE);
+        user.setRole(role);
+        user.setUserProfile(profile);
+        userRepository.save(user);
     }
 
+    private static final String[] AMENITIES = {
+            "Wi-Fi", "Swimming Pool", "Gym", "Parking", "Restaurant", "Spa", "Breakfast", "Beach Access",
+            "Room Service", "Air Conditioning", "Airport Shuttle", "Laundry", "Kids Club", "Pet Friendly",
+            "Business Center", "Bar"
+    };
+
+    /** Short text and extra cost shown when an amenity is linked to a hotel. */
+    private static final Map<String, String> AMENITY_TEXT = Map.ofEntries(
+            Map.entry("Wi-Fi", "Free high-speed Wi-Fi in all rooms"),
+            Map.entry("Swimming Pool", "Outdoor pool, open 7am - 10pm"),
+            Map.entry("Gym", "24-hour fitness room"),
+            Map.entry("Parking", "Secure on-site parking"),
+            Map.entry("Restaurant", "All-day dining"),
+            Map.entry("Spa", "Massage and wellness treatments"),
+            Map.entry("Breakfast", "Buffet breakfast, 6:30am - 10:30am"),
+            Map.entry("Beach Access", "Private beach area"),
+            Map.entry("Room Service", "Available 24 hours"),
+            Map.entry("Air Conditioning", "Individual climate control"),
+            Map.entry("Airport Shuttle", "Pick-up and drop-off on request"),
+            Map.entry("Laundry", "Same-day laundry service"),
+            Map.entry("Kids Club", "Supervised activities for children"),
+            Map.entry("Pet Friendly", "Small pets welcome"),
+            Map.entry("Business Center", "Meeting rooms and printing"),
+            Map.entry("Bar", "Lounge bar, evenings"));
+
+    private static final Map<String, String> AMENITY_COST = Map.of(
+            "Spa", "12.00", "Breakfast", "4.50", "Airport Shuttle", "8.00", "Laundry", "3.00",
+            "Pet Friendly", "6.00", "Kids Club", "5.00");
+
     private void seedAmenities() {
-        String[] amenities = {
-                "Wi-Fi",
-                "Swimming Pool",
-                "Gym",
-                "Parking",
-                "Restaurant",
-                "Spa",
-                "Breakfast",
-                "Beach Access",
-                "Room Service",
-                "Air Conditioning",
-                "Airport Shuttle",
-                "24-Hour Front Desk"
-        };
-        for (String name : amenities) {
+        for (String name : AMENITIES) {
             if (amenityRepository.findByName(name).isEmpty()) {
                 Amenity amenity = new Amenity();
                 amenity.setName(name);
+                amenity.setDescription(AMENITY_TEXT.get(name));
                 amenityRepository.save(amenity);
             }
         }
     }
 
+    private static final String[][] ROOM_TYPES = {
+            {"Standard Room", "Comfortable room with all the basics", "35.00", "2", "1", "3"},
+            {"Twin Room", "Two single beds, ideal for friends or colleagues", "40.00", "2", "1", "3"},
+            {"Deluxe Room", "Larger room with a better view and extra comfort", "55.00", "2", "2", "4"},
+            {"Executive Suite", "Suite with a separate lounge area and work desk", "80.00", "3", "2", "4"},
+            {"Family Suite", "Spacious suite for families with children", "90.00", "4", "3", "6"},
+            {"Presidential Suite", "Top floor suite with panoramic views", "180.00", "4", "2", "6"}
+    };
+
     private void seedRoomTypes() {
-        createRoomType("Standard", "Comfortable room suitable for short stays.");
-        createRoomType("Deluxe", "Spacious room with upgraded facilities.");
-        createRoomType("Suite", "Luxury suite with a separate living area.");
-        createRoomType("Family", "Large room designed for families.");
-        createRoomType("Executive", "Premium room designed for business and extended stays.");
+        for (String[] t : ROOM_TYPES) {
+            if (!roomTypeRepository.existsByName(t[0])) {
+                RoomType type = new RoomType();
+                type.setName(t[0]);
+                type.setDescription(t[1]);
+                type.setStatus(RoomType.Status.ACTIVE);
+                roomTypeRepository.save(type);
+            }
+        }
     }
 
-    private void createRoomType(String name, String description) {
-        if (roomTypeRepository.existsByName(name)) {
-            return;
-        }
-        RoomType roomType = new RoomType();
-        roomType.setName(name);
-        roomType.setDescription(description);
-        roomTypeRepository.save(roomType);
+
+    private record HotelSeed(String name, String description, String address, String city, String country,
+                             String phone, String lat, String lng, Hotel.Status status, List<String> managers,
+                             int infantMaxAge, int childMaxAge, boolean infantsCount, double priceFactor,
+                             List<String> amenities) {
+    }
+
+    private static List<HotelSeed> hotelSeeds() {
+        return List.of(
+                new HotelSeed("VibeStay Manama Grand", "A modern city hotel with sea views in the heart of Manama.",
+                        "Road 1705, Diplomatic Area", "Manama", "Bahrain", "+97317000001", "26.2361", "50.5831",
+                        Hotel.Status.ACTIVE, List.of("manager1@vibestay.com"), 2, 12, false, 1.0,
+                        List.of("Wi-Fi", "Swimming Pool", "Gym", "Restaurant", "Air Conditioning", "Parking", "Business Center")),
+                new HotelSeed("VibeStay Beach Resort", "A relaxed beachfront resort for families and couples.",
+                        "Amwaj Islands", "Muharraq", "Bahrain", "+97317000002", "26.2872", "50.6600",
+                        Hotel.Status.ACTIVE, List.of("manager2@vibestay.com"), 2, 12, false, 1.3,
+                        List.of("Wi-Fi", "Swimming Pool", "Beach Access", "Breakfast", "Spa", "Parking", "Kids Club", "Bar")),
+                new HotelSeed("VibeStay Desert Lodge", "A quiet lodge near the desert, waiting for approval.",
+                        "Sakhir Road", "Sakhir", "Bahrain", "+97317000003", "26.0325", "50.5106",
+                        Hotel.Status.PENDING_APPROVAL, List.of("manager1@vibestay.com"), 2, 12, false, 0.8,
+                        List.of("Wi-Fi", "Parking")),
+                new HotelSeed("VibeStay Riffa Heights", "Hilltop hotel near the Royal Golf Club with calm gardens.",
+                        "Riffa Views", "Riffa", "Bahrain", "+97317000004", "26.1300", "50.5550",
+                        Hotel.Status.ACTIVE, List.of("manager3@vibestay.com"), 3, 11, true, 0.9,
+                        List.of("Wi-Fi", "Swimming Pool", "Gym", "Restaurant", "Parking", "Laundry")),
+                new HotelSeed("VibeStay Dubai Marina", "High-rise stay a short walk from the Marina promenade.",
+                        "Marina Walk, Dubai Marina", "Dubai", "United Arab Emirates", "+97144000005", "25.0800", "55.1400",
+                        Hotel.Status.ACTIVE, List.of("manager4@vibestay.com"), 2, 12, false, 2.2,
+                        List.of("Wi-Fi", "Swimming Pool", "Gym", "Spa", "Restaurant", "Bar", "Airport Shuttle", "Room Service")),
+                new HotelSeed("VibeStay Abu Dhabi Corniche", "Elegant rooms on the Corniche with views of the Gulf.",
+                        "Corniche Road West", "Abu Dhabi", "United Arab Emirates", "+97126000006", "24.4764", "54.3300",
+                        Hotel.Status.ACTIVE, List.of("manager4@vibestay.com"), 2, 12, false, 1.9,
+                        List.of("Wi-Fi", "Swimming Pool", "Beach Access", "Breakfast", "Gym", "Parking")),
+                new HotelSeed("VibeStay Doha Pearl", "Waterfront hotel next to Souq Waqif and the Museum of Islamic Art.",
+                        "Corniche Street", "Doha", "Qatar", "+97444000007", "25.2900", "51.5300",
+                        Hotel.Status.ACTIVE, List.of("manager5@vibestay.com"), 2, 12, true, 1.7,
+                        List.of("Wi-Fi", "Swimming Pool", "Restaurant", "Spa", "Airport Shuttle", "Business Center")),
+                new HotelSeed("VibeStay Riyadh Tower", "Business hotel in the financial district with meeting rooms.",
+                        "King Fahd Road, Olaya", "Riyadh", "Saudi Arabia", "+96611000008", "24.6900", "46.6850",
+                        Hotel.Status.ACTIVE, List.of("manager5@vibestay.com"), 2, 12, false, 1.5,
+                        List.of("Wi-Fi", "Gym", "Restaurant", "Business Center", "Parking", "Air Conditioning", "Laundry")),
+                new HotelSeed("VibeStay Muscat Bay", "Boutique hotel between the mountains and the sea in Muscat.",
+                        "Qurum Beach Road", "Muscat", "Oman", "+96824000009", "23.6100", "58.4800",
+                        Hotel.Status.ACTIVE, List.of("manager6@vibestay.com"), 2, 12, false, 1.2,
+                        List.of("Wi-Fi", "Beach Access", "Swimming Pool", "Breakfast", "Pet Friendly", "Restaurant")),
+                new HotelSeed("VibeStay Kuwait Gate", "Central hotel close to Kuwait Towers and the Avenues mall.",
+                        "Gulf Road", "Kuwait City", "Kuwait", "+96522000010", "29.3759", "47.9774",
+                        Hotel.Status.PENDING_APPROVAL, List.of("manager6@vibestay.com"), 2, 12, false, 1.4,
+                        List.of("Wi-Fi", "Gym", "Restaurant")),
+                new HotelSeed("VibeStay Old Town Inn", "Closed for renovation, kept here to test inactive hotels.",
+                        "Bab Al Bahrain Avenue", "Manama", "Bahrain", "+97317000011", "26.2400", "50.5800",
+                        Hotel.Status.INACTIVE, List.of("manager2@vibestay.com"), 2, 12, false, 0.7,
+                        List.of("Wi-Fi", "Air Conditioning")));
     }
 
     private void seedHotels() {
-        if (hotelRepository.count() > 0) {
-            return;
+        Map<String, RoomType> types = new HashMap<>();
+        for (RoomType t : roomTypeRepository.findAll()) {
+            types.put(t.getName(), t);
         }
-        createHotel("VibeStay Grand Manama", "A modern luxury hotel in the heart of Manama.", "Government Avenue", "Manama", "Bahrain", "26.2235", "50.5876", "+97317000001");
-        createHotel("VibeStay Seef Resort", "A relaxing resort close to Bahrain's Seef district.", "Seef District", "Manama", "Bahrain", "26.2330", "50.5350", "+97317000002");
-        createHotel("VibeStay Amwaj", "A waterfront hotel overlooking Amwaj Islands.", "Amwaj Islands", "Muharraq", "Bahrain", "26.2876", "50.6578", "+97317000003");
-        createHotel("VibeStay Juffair", "A contemporary city hotel in Juffair.", "Juffair", "Manama", "Bahrain", "26.2100", "50.6080", "+97317000004");
-        createHotel("VibeStay Dubai Marina", "A stylish waterfront hotel in Dubai Marina.", "Dubai Marina", "Dubai", "UAE", "25.0800", "55.1400", "+97140000001");
-        createHotel("VibeStay Downtown Dubai", "A premium hotel near Downtown Dubai.", "Downtown Dubai", "Dubai", "UAE", "25.1972", "55.2744", "+97140000002");
-        createHotel("VibeStay Doha Pearl", "A modern waterfront hotel in The Pearl.", "The Pearl", "Doha", "Qatar", "25.3700", "51.5500", "+97440000001");
-        createHotel("VibeStay Istanbul", "A comfortable city hotel close to Istanbul's historic center.", "Sultanahmet", "Istanbul", "Türkiye", "41.0082", "28.9784", "+902120000001");
-        createHotel("VibeStay London", "A modern hotel in central London.", "Westminster", "London", "UK", "51.4975", "-0.1357", "+442000000001");
-        createHotel("VibeStay Paris", "A boutique stay in central Paris.", "1st Arrondissement", "Paris", "France", "48.8606", "2.3376", "+33100000001");
-    }
-
-    private void createHotel(String name, String description, String address, String city, String country, String latitude, String longitude, String phone) {
-        Hotel hotel = new Hotel();
-        hotel.setName(name);
-        hotel.setDescription(description);
-        hotel.setAddress(address);
-        hotel.setCity(city);
-        hotel.setCountry(country);
-        hotel.setLatitude(new BigDecimal(latitude));
-        hotel.setLongitude(new BigDecimal(longitude));
-        hotel.setPhone(phone);
-        hotel.setStatus(Hotel.Status.ACTIVE);
-        hotelRepository.save(hotel);
-    }
-
-    @Transactional
-    private void seedManagerHotelAssignments() {
-        assignManager("manager1@vibestay.com", "VibeStay Grand Manama");
-        assignManager("manager1@vibestay.com", "VibeStay Seef Resort");
-        assignManager("manager2@vibestay.com", "VibeStay Amwaj");
-        assignManager("manager2@vibestay.com", "VibeStay Juffair");
-        assignManager("manager3@vibestay.com", "VibeStay Dubai Marina");
-        assignManager("manager3@vibestay.com", "VibeStay Downtown Dubai");
-        assignManager("manager4@vibestay.com", "VibeStay Doha Pearl");
-        assignManager("manager5@vibestay.com", "VibeStay Istanbul");
-        assignManager("manager5@vibestay.com", "VibeStay London");
-        assignManager("manager5@vibestay.com", "VibeStay Paris");
-    }
-
-    private void assignManager(String managerEmail, String hotelName) {
-        Hotel hotel = hotelRepository.findByName(hotelName);
-        User manager = userRepository.findUserByEmail(managerEmail);
-        if (hotel == null) {
-            System.err.println("Error seeding assignment: Hotel not found -> " + hotelName);
-            return;
-        }
-        if (manager == null) {
-            System.err.println("Error seeding assignment: User/Manager not found -> " + managerEmail);
-            return;
-        }
-        if (hotel.getManagers() == null) {
-            hotel.setManagers(new java.util.HashSet<>());
-        }
-        hotel.getManagers().add(manager);
-        hotelRepository.save(hotel);
-    }
-
-    private void seedChildPolicies() {
-        if (childPolicyRepository.count() > 0) {
-            return;
-        }
-        List<Hotel> hotels = hotelRepository.findAll();
-        for (Hotel hotel : hotels) {
-            createChildPolicy(hotel, 2, 12, false);
-        }
-    }
-
-    private void createChildPolicy(Hotel hotel, int infantMaxAge, int childMaxAge, boolean infantsCountTowardOccupancy) {
-        ChildPolicy policy = new ChildPolicy();
-        policy.setHotel(hotel);
-        policy.setInfantMaxAge(infantMaxAge);
-        policy.setChildMaxAge(childMaxAge);
-        policy.setInfantsCountTowardOccupancy(infantsCountTowardOccupancy);
-        childPolicyRepository.save(policy);
-    }
-
-    private void seedRooms() {
-        if (roomRepository.count() > 0) {
-            return;
-        }
-        RoomType standard = roomTypeRepository.findByName("Standard");
-        RoomType deluxe = roomTypeRepository.findByName("Deluxe");
-        RoomType suite = roomTypeRepository.findByName("Suite");
-        RoomType family = roomTypeRepository.findByName("Family");
-        RoomType executive = roomTypeRepository.findByName("Executive");
-        List<Hotel> hotels = hotelRepository.findAll();
-        for (Hotel hotel : hotels) {
-            BigDecimal standardPrice = getBasePrice(hotel, 1);
-            BigDecimal deluxePrice = getBasePrice(hotel, 2);
-            BigDecimal suitePrice = getBasePrice(hotel, 3);
-            BigDecimal familyPrice = getBasePrice(hotel, 4);
-            BigDecimal executivePrice = getBasePrice(hotel, 5);
-            createRoom(hotel, standard, "101", 1, standardPrice, 2, 1, 3);
-            createRoom(hotel, deluxe, "102", 1, deluxePrice, 2, 2, 4);
-            createRoom(hotel, suite, "201", 2, suitePrice, 2, 2, 4);
-            createRoom(hotel, family, "202", 2, familyPrice, 2, 3, 5);
-            createRoom(hotel, executive, "301", 3, executivePrice, 2, 1, 3);
-        }
-    }
-
-    private BigDecimal getBasePrice(Hotel hotel, int roomType) {
-        boolean bahrain = hotel.getCountry().equalsIgnoreCase("Bahrain");
-        boolean uae = hotel.getCountry().equalsIgnoreCase("UAE");
-        BigDecimal base;
-        if (bahrain) {
-            base = new BigDecimal("35.00");
-        } else if (uae) {
-            base = new BigDecimal("90.00");
-        } else {
-            base = new BigDecimal("70.00");
-        }
-        return switch (roomType) {
-            case 1 -> base;
-            case 2 -> base.multiply(new BigDecimal("1.35"));
-            case 3 -> base.multiply(new BigDecimal("2.00"));
-            case 4 -> base.multiply(new BigDecimal("1.55"));
-            case 5 -> base.multiply(new BigDecimal("1.70"));
-            default -> base;
-        };
-    }
-
-    private void createRoom(Hotel hotel, RoomType roomType, String roomNumber, Integer floorNumber, BigDecimal price, Integer maxAdults, Integer maxChildren, Integer maxOccupancy) {
-        Room room = new Room();
-        room.setHotel(hotel);
-        room.setRoomType(roomType);
-        room.setRoomNumber(roomNumber);
-        room.setFloorNumber(String.valueOf(floorNumber));
-        room.setPricePerNight(price);
-        room.setMaxAdults(maxAdults);
-        room.setMaxChildren(maxChildren);
-        room.setMaxOccupancy(maxOccupancy);
-        room.setStatus(Room.Status.ACTIVE);
-        roomRepository.save(room);
-    }
-
-    private void seedHotelAmenities() {
-        if (hotelAmenityRepository.count() > 0) {
-            return;
-        }
-        List<Hotel> hotels = hotelRepository.findAll();
-        for (Hotel hotel : hotels) {
-            addAmenity(hotel, "Wi-Fi");
-            addAmenity(hotel, "Air Conditioning");
-            addAmenity(hotel, "24-Hour Front Desk");
-            addAmenity(hotel, "Room Service");
-            String country = hotel.getCountry();
-            if (country.equalsIgnoreCase("Bahrain")) {
-                addAmenity(hotel, "Swimming Pool");
-                addAmenity(hotel, "Parking");
-            } else if (country.equalsIgnoreCase("UAE")) {
-                addAmenity(hotel, "Swimming Pool");
-                addAmenity(hotel, "Gym");
-                addAmenity(hotel, "Restaurant");
-                addAmenity(hotel, "Spa");
-            } else {
-                addAmenity(hotel, "Breakfast");
-                addAmenity(hotel, "Restaurant");
-                addAmenity(hotel, "Gym");
+        for (HotelSeed seed : hotelSeeds()) {
+            if (!hotelRepository.existsByName(seed.name())) {
+                createHotel(seed, types);
             }
         }
     }
 
-    private void addAmenity(Hotel hotel, String amenityName) {
-        Amenity amenity = amenityRepository.findByName(amenityName).orElseThrow();
-        HotelAmenity hotelAmenity = new HotelAmenity();
-        hotelAmenity.setHotel(hotel);
-        hotelAmenity.setAmenity(amenity);
-        hotelAmenityRepository.save(hotelAmenity);
+    private void createHotel(HotelSeed seed, Map<String, RoomType> types) {
+        Hotel hotel = new Hotel();
+        hotel.setName(seed.name());
+        hotel.setDescription(seed.description());
+        hotel.setAddress(seed.address());
+        hotel.setCity(seed.city());
+        hotel.setCountry(seed.country());
+        hotel.setPhone(seed.phone());
+        hotel.setLatitude(new BigDecimal(seed.lat()));
+        hotel.setLongitude(new BigDecimal(seed.lng()));
+        hotel.setStatus(seed.status());
+        for (String email : seed.managers()) {
+            User manager = userRepository.findUserByEmail(email);
+            if (manager != null) {
+                hotel.getManagers().add(manager);
+            }
+        }
+        hotel = hotelRepository.save(hotel);
+
+        ChildPolicy policy = new ChildPolicy();
+        policy.setInfantMaxAge(seed.infantMaxAge());
+        policy.setChildMaxAge(seed.childMaxAge());
+        policy.setInfantsCountTowardOccupancy(seed.infantsCount());
+        policy.setHotel(hotel);
+        childPolicyRepository.save(policy);
+
+        for (String amenityName : seed.amenities()) {
+            Amenity amenity = amenityRepository.findByName(amenityName).orElse(null);
+            if (amenity == null) {
+                continue;
+            }
+            HotelAmenity link = new HotelAmenity();
+            link.setHotel(hotel);
+            link.setAmenity(amenity);
+            link.setDescription(AMENITY_TEXT.get(amenityName));
+            String cost = AMENITY_COST.get(amenityName);
+            link.setAdditionalCost(cost == null ? null : new BigDecimal(cost));
+            hotelAmenityRepository.save(link);
+        }
+
+        createRooms(hotel, seed.priceFactor(), types);
     }
 
-    private void seedHotelImages() {
-        if (hotelImageRepository.count() > 0) {
-            return;
-        }
-        List<Hotel> hotels = hotelRepository.findAll();
-        for (Hotel hotel : hotels) {
-            createHotelImage(hotel, getHotelImage(hotel, 1), hotel.getName() + " exterior", true);
-            createHotelImage(hotel, getHotelImage(hotel, 2), hotel.getName() + " room", false);
-            createHotelImage(hotel, getHotelImage(hotel, 3), hotel.getName() + " pool", false);
-            createHotelImage(hotel, getHotelImage(hotel, 4), hotel.getName() + " interior", false);
-        }
-    }
 
-    private String getHotelImage(Hotel hotel, int imageNumber) {
-        String[] images = {
-                "https://images.unsplash.com/photo-1566073771259-6a8506099945",
-                "https://images.unsplash.com/photo-1566665797739-1674de7a421a",
-                "https://images.unsplash.com/photo-1540541338287-41700207dee6",
-                "https://images.unsplash.com/photo-1564501049412-61c2a3083791"
+    private void createRooms(Hotel hotel, double factor, Map<String, RoomType> types) {
+        String[][] layout = {
+                {"101", "1", "Standard Room"}, {"102", "1", "Standard Room"}, {"103", "1", "Standard Room"},
+                {"104", "1", "Twin Room"},
+                {"201", "2", "Deluxe Room"}, {"202", "2", "Deluxe Room"}, {"203", "2", "Twin Room"},
+                {"301", "3", "Family Suite"}, {"302", "3", "Executive Suite"}, {"303", "3", "Family Suite"},
+                {"401", "4", "Presidential Suite"}
         };
-        return images[(imageNumber - 1) % images.length];
+        for (String[] r : layout) {
+            String[] t = Arrays.stream(ROOM_TYPES).filter(x -> x[0].equals(r[2])).findFirst().orElseThrow();
+            Room room = new Room();
+            room.setRoomNumber(r[0]);
+            room.setFloorNumber(r[1]);
+            room.setStatus(Room.Status.ACTIVE);
+            room.setPricePerNight(new BigDecimal(t[2]).multiply(BigDecimal.valueOf(factor))
+                    .setScale(2, java.math.RoundingMode.HALF_UP));
+            room.setMaxAdults(Integer.parseInt(t[3]));
+            room.setMaxChildren(Integer.parseInt(t[4]));
+            room.setMaxOccupancy(Integer.parseInt(t[5]));
+            room.setHotel(hotel);
+            room.setRoomType(types.get(r[2]));
+            roomRepository.save(room);
+        }
+        // one room under maintenance so that status is visible too
+        Room maintenance = roomRepository.findByHotelId(hotel.getId()).stream()
+                .filter(r -> r.getRoomNumber().equals("104")).findFirst().orElse(null);
+        if (maintenance != null && hotel.getStatus() == Hotel.Status.ACTIVE
+                && hotel.getName().equals("VibeStay Beach Resort")) {
+            maintenance.setStatus(Room.Status.UNDER_MAINTENANCE);
+            roomRepository.save(maintenance);
+        }
     }
 
-    private void createHotelImage(Hotel hotel, String imageUrl, String altText, boolean isPrimary) {
-        if (hotelImageRepository.existsByImageURL(imageUrl)) {
-            return;
-        }
-        HotelImage image = new HotelImage();
-        image.setHotel(hotel);
-        image.setImageURL(imageUrl);
-        image.setAltText(altText);
-        image.setPrimary(isPrimary);
-        hotelImageRepository.save(image);
+
+    private record BookingSeed(String hotel, String room, int customer, int startDay, int nights,
+                               int adults, int children, Booking.Status status, String request) {
+    }
+
+    private static List<BookingSeed> bookingSeeds() {
+        String m = "VibeStay Manama Grand", b = "VibeStay Beach Resort", r = "VibeStay Riffa Heights",
+                d = "VibeStay Dubai Marina", a = "VibeStay Abu Dhabi Corniche", q = "VibeStay Doha Pearl",
+                y = "VibeStay Riyadh Tower", u = "VibeStay Muscat Bay";
+        Booking.Status C = Booking.Status.CONFIRMED, P = Booking.Status.PENDING,
+                X = Booking.Status.CANCELLED, D = Booking.Status.COMPLETED;
+        return List.of(
+                // the very first sample booking (kept the same as before)
+                new BookingSeed(m, "201", 1, 14, 2, 2, 1, C, "Sample booking created by the data seeder"),
+                // upcoming
+                new BookingSeed(m, "301", 2, 7, 3, 3, 2, C, "Extra bed for the children please"),
+                new BookingSeed(m, "101", 3, 3, 2, 2, 0, C, null),
+                new BookingSeed(m, "302", 4, 20, 4, 2, 0, P, "Late check-in around midnight"),
+                new BookingSeed(b, "201", 5, 10, 5, 2, 2, C, "Sea-view room if possible"),
+                new BookingSeed(b, "301", 6, 30, 7, 4, 2, C, "Celebrating a family birthday"),
+                new BookingSeed(b, "102", 7, 5, 2, 2, 0, C, null),
+                new BookingSeed(r, "202", 8, 12, 3, 2, 1, C, null),
+                new BookingSeed(d, "401", 9, 25, 3, 2, 0, C, "Anniversary - flowers in the room"),
+                new BookingSeed(d, "201", 10, 9, 4, 2, 1, C, null),
+                new BookingSeed(d, "103", 11, 2, 2, 1, 0, P, "Quiet room, I work from the hotel"),
+                new BookingSeed(a, "302", 12, 15, 5, 3, 1, C, null),
+                new BookingSeed(q, "203", 13, 18, 3, 2, 0, C, "Airport pick-up needed"),
+                new BookingSeed(y, "202", 14, 6, 2, 2, 0, C, "Invoice for the company"),
+                new BookingSeed(u, "301", 15, 40, 6, 4, 2, C, null),
+                // finished stays
+                new BookingSeed(m, "201", 1, -30, 3, 2, 0, D, null),
+                new BookingSeed(m, "101", 5, -21, 2, 2, 0, D, null),
+                new BookingSeed(b, "301", 2, -45, 4, 4, 2, D, "Early check-in"),
+                new BookingSeed(d, "203", 3, -18, 5, 2, 0, D, null),
+                new BookingSeed(a, "101", 8, -12, 3, 2, 1, D, null),
+                new BookingSeed(q, "301", 4, -60, 4, 3, 2, D, null),
+                new BookingSeed(u, "201", 16, -9, 2, 2, 0, D, null),
+                // cancelled
+                new BookingSeed(m, "301", 6, 7, 3, 2, 0, X, "Cancelled - plans changed"),
+                new BookingSeed(b, "201", 9, 10, 2, 2, 0, X, "Cancelled - found a different date"),
+                new BookingSeed(d, "401", 12, 25, 2, 2, 0, X, "Cancelled by guest"),
+                new BookingSeed(r, "301", 11, -5, 3, 4, 1, X, "Cancelled before arrival")
+        );
     }
 
     private void seedBookings() {
-        if (bookingRepository.count() > 0) {
-            return;
+        Map<String, Hotel> hotels = new HashMap<>();
+        for (Hotel h : hotelRepository.findAll()) {
+            hotels.put(h.getName(), h);
         }
-        List<User> customers = userRepository.findAll()
-                .stream()
-                .filter(user -> user.getRole().getName() == Role.RoleName.CUSTOMER)
-                .toList();
-        List<Hotel> hotels = hotelRepository.findAll();
-        if (customers.isEmpty() || hotels.isEmpty()) {
-            return;
-        }
-        LocalDate startDate = LocalDate.of(2026, 7, 1);
-        int bookingNumber = 1;
-        for (int i = 0; i < 30; i++) {
-            Hotel hotel = hotels.get(i % hotels.size());
-            List<Room> hotelRooms = roomRepository.findByHotel(hotel);
-            if (hotelRooms.isEmpty()) {
-                continue;
-            }
-            Room room = hotelRooms.get(i % hotelRooms.size());
-            User customer = customers.get(i % customers.size());
-            LocalDate checkIn = startDate.plusDays(i * 4L);
-            LocalDate checkOut = checkIn.plusDays(2);
-            Booking.Status status;
-            if (i % 6 == 0) {
-                status = Booking.Status.CANCELLED;
-            } else if (i % 4 == 0) {
-                status = Booking.Status.COMPLETED;
-            } else {
-                status = Booking.Status.CONFIRMED;
-            }
-            createBooking(bookingNumber, customer, hotel, room, checkIn, checkOut, status);
-            bookingNumber++;
+        List<BookingSeed> seeds = bookingSeeds();
+        for (int i = 0; i < seeds.size(); i++) {
+            createBooking(String.format("SEED-%04d", i + 1), seeds.get(i), hotels);
         }
     }
 
-    private void createBooking(int bookingNumber, User customer, Hotel hotel, Room room, LocalDate checkIn, LocalDate checkOut, Booking.Status status) {
-        long nights = java.time.temporal.ChronoUnit.DAYS.between(checkIn, checkOut);
-        BigDecimal total = room.getPricePerNight().multiply(BigDecimal.valueOf(nights));
+    private void createBooking(String reference, BookingSeed seed, Map<String, Hotel> hotels) {
+        if (bookingRepository.existsByBookingReference(reference)) {
+            return;
+        }
+        Hotel hotel = hotels.get(seed.hotel());
+        User customer = userRepository.findUserByEmail("customer" + seed.customer() + "@vibestay.com");
+        if (hotel == null || customer == null) {
+            return;
+        }
+        Room room = roomRepository.findByHotelId(hotel.getId()).stream()
+                .filter(r -> r.getRoomNumber().equals(seed.room()))
+                .findFirst().orElse(null);
+        if (room == null) {
+            return;
+        }
+
+        LocalDate checkIn = LocalDate.now().plusDays(seed.startDay());
+        LocalDate checkOut = checkIn.plusDays(seed.nights());
+
         Booking booking = new Booking();
-        booking.setBookingReference("VS" + String.format("%04d", bookingNumber));
-        booking.setUser(customer);
-        booking.setHotel(hotel);
+        booking.setBookingReference(reference);
         booking.setCheckIn(checkIn);
         booking.setCheckOut(checkOut);
-        booking.setStatus(status);
-        booking.setAdults(2);
-        booking.setChildren(bookingNumber % 3 == 0 ? 1 : 0);
-        booking.setTotalAmount(total);
-        booking.setSpecialRequest(bookingNumber % 5 == 0 ? "Late check-in requested" : null);
-        Booking savedBooking = bookingRepository.save(booking);
+        booking.setAdults(seed.adults());
+        booking.setChildren(seed.children());
+        booking.setTotalAmount(room.getPricePerNight().multiply(BigDecimal.valueOf(seed.nights())));
+        booking.setStatus(seed.status());
+        booking.setSpecialRequest(seed.request());
+        booking.setHotel(hotel);
+        booking.setUser(customer);
+
         BookingRoom bookingRoom = new BookingRoom();
-        bookingRoom.setBooking(savedBooking);
+        bookingRoom.setBooking(booking);
         bookingRoom.setRoom(room);
         bookingRoom.setPricePerNight(room.getPricePerNight());
-        BookingRoom savedBookingRoom = bookingRoomRepository.save(bookingRoom);
-        createBookingGuest(savedBookingRoom, "Guest " + bookingNumber, 28, BookingGuest.GuestType.ADULT);
-        createBookingGuest(savedBookingRoom, "Guest " + bookingNumber + " Partner", 30, BookingGuest.GuestType.ADULT);
-        if (bookingNumber % 3 == 0) {
-            createBookingGuest(savedBookingRoom, "Child " + bookingNumber, 8, BookingGuest.GuestType.CHILD);
+
+        String lastName = customer.getUserProfile() != null ? customer.getUserProfile().getLastName() : "Guest";
+        for (int a = 0; a < seed.adults(); a++) {
+            bookingRoom.getGuests().add(guest(bookingRoom, (a == 0 ? customer.getUserProfile().getFirstName() : "Guest " + (a + 1)) + " " + lastName,
+                    30 + a * 3, BookingGuest.GuestType.ADULT));
         }
+        for (int c = 0; c < seed.children(); c++) {
+            bookingRoom.getGuests().add(guest(bookingRoom, "Child " + (c + 1) + " " + lastName,
+                    5 + c * 3, BookingGuest.GuestType.CHILD));
+        }
+        booking.getBookingRooms().add(bookingRoom);
+        bookingRepository.save(booking);
     }
 
-    private void createBookingGuest(BookingRoom bookingRoom, String name, int age, BookingGuest.GuestType guestType) {
+    private BookingGuest guest(BookingRoom bookingRoom, String name, int age, BookingGuest.GuestType type) {
         BookingGuest guest = new BookingGuest();
-        guest.setBookingRoom(bookingRoom);
         guest.setName(name);
         guest.setAge(age);
-        guest.setGuestType(guestType);
-        bookingGuestRepository.save(guest);
+        guest.setGuestType(type);
+        guest.setBookingRoom(bookingRoom);
+        return guest;
     }
 }

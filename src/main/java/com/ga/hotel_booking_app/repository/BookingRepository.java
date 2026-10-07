@@ -20,7 +20,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Page<Booking> findByUserId(Long userId, Pageable pageable);
     List<Booking> findByHotelId(Long hotelId);
     List<Booking> findByHotelIdAndStatus(Long hotelId, Booking.Status status);
-
+    boolean existsByBookingReference(String refrence);
     @Query("""
                 SELECT b
                 FROM Booking b
@@ -36,4 +36,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("checkIn") LocalDate checkIn,
             @Param("checkOut") LocalDate checkOut
     );
+    @Query("""
+                SELECT COUNT(b) > 0
+                FROM Booking b
+                JOIN b.bookingRooms br
+                WHERE br.room.id = :roomId
+                AND b.status IN (com.ga.hotel_booking_app.model.Booking.Status.PENDING,
+                                 com.ga.hotel_booking_app.model.Booking.Status.CONFIRMED)
+                AND b.checkOut > :today
+            """)
+    boolean existsUpcomingBookingForRoom(@Param("roomId") Long roomId, @Param("today") LocalDate today);
 }
