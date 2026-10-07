@@ -59,6 +59,7 @@ public class SecurityConfiguration {
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/ws/**",
+                                "/api/availability/**",
                                 "/log"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/hotels/**").permitAll()

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -20,5 +21,5 @@ AvailableHotelResponse {
     private String address;
     private String profileImage;
     private Double averageRating;
-    private List<RoomResponse> rooms;
+    private List<RoomResponse> rooms = new ArrayList<>();
 }
