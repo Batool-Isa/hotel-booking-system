@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface RoomTypeRepository extends JpaRepository<RoomType, Long> {
     boolean existsByName(String name);
+    RoomType findByName(String name);
 
     List<RoomType> findByStatus(RoomType.Status status);
 

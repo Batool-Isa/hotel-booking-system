@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/hotels/{hotelId}/rooms")
@@ -37,9 +38,9 @@ private RoomService roomService;
     @GetMapping
     @PreAuthorize("hasAnyRole('HOTEL_MANAGER','ADMIN')")
     @Operation(summary = "Get hotels room", description = "Fetches all hotel room")
-    public ResponseEntity<?> getHotelRooms(@PathVariable("hotelId") Long id){
+    public ResponseEntity<?> getHotelRooms(@PathVariable("hotelId") Long id, Pageable pageable){
         System.out.println("Room controller calling ---> get hotel rooms");
-        return roomService.getHotelRooms(id);
+        return roomService.getHotelRooms(id, pageable);
     }
 //    @GetMapping
 //    @PreAuthorize("hasAnyRole('HOTEL_MANAGER','ADMIN')")

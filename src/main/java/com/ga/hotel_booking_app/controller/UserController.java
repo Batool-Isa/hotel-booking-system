@@ -31,7 +31,7 @@ public class UserController {
     )
     @Operation(summary = "Register a new user", description = "Create a new user account and send a verification email")
     public ResponseEntity<?> register(@Valid @ModelAttribute RegisterRequest request,
-                                      @RequestParam("image") MultipartFile image) {
+                                      @RequestParam(value = "image", required = false) MultipartFile image) {
         System.out.println("User Controller calling ---> register");
         return userService.register(request, image);
     }
@@ -43,6 +43,12 @@ public class UserController {
         return userService.loginUser(loginRequest);
     }
 
+    @PostMapping("/logout")
+    @Operation(summary = "Logout user", description = "Logs out the user and records audit log")
+    public ResponseEntity<?> logoutUser() {
+        System.out.println("User Controller calling ---> logout");
+        return userService.logoutUser();
+    }
     @GetMapping("/verify-email")
     @Operation(summary = "Verify email to activate user account", description = "Check if token is valid and update user status")
     public String verifyEmail(@RequestParam(name = "token") String token) {

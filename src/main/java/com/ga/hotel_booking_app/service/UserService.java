@@ -16,6 +16,8 @@ import com.ga.hotel_booking_app.model.User;
 import com.ga.hotel_booking_app.repository.UserRepository;
 import com.ga.hotel_booking_app.security.MyUserDetails;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -34,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -51,7 +54,9 @@ public class UserService {
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final EmailService emailService;
     private final RoleRepository roleRepository;
-
+    @Autowired
+    private AuditLogService auditLogService;
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     /**
      * creates user service and injects all required dependencies
      */
@@ -126,10 +131,10 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setStatus(User.Status.UNVERIFIED);
-
-        String profileImage = uploadeImage(image);
-        profile.setProfileImageUrl(profileImage);
-
+        if (image != null && !image.isEmpty()) {
+            String profileImage = uploadeImage(image);
+            profile.setProfileImageUrl(profileImage);
+        }
         Role role = roleRepository.findByName(Role.RoleName.CUSTOMER)
                 .orElseThrow(()-> new InformationExistException("Customer role not found"));
         user.setRole(role);
@@ -137,23 +142,45 @@ public class UserService {
         User savedUser = userRepository.save(user);
         EmailVerificationToken token = createEmailVerificationToken(savedUser);
         emailService.sendVerificationEmail(token);
+        auditLogService.log(savedUser, "REGISTER", "User", savedUser.getId(),
+                "User "+savedUser.getUsername()+" registered successfully"
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse(
                 "Registered successfully, please verify your email"
         ));
     }
 
     public String uploadeImage(MultipartFile image) {
+        // validate image efore uploading
+        if(image == null || image.isEmpty()){
+            throw new InvalidInformationException("Please choose an image file");
+        }
+        if (image.getSize() > 1024 * 1024) {
+            throw new InvalidInformationException("The image is too large. The maximum size is 1 MB");
+        }
+        String type = image.getContentType();
+        if (!List.of("image/jpeg", "image/png", "image/webp").contains(type)) {
+            throw new InvalidInformationException("Only JPG, PNG or WebP images are allowed");
+        }
         try {
             Path uploadPath = Paths.get(UPLOAD_DIR);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
-            String originalNameFile = image.getOriginalFilename();
+            String fileExtenstion;
+            if (type.equals("image/png")){
+                fileExtenstion=".png";
+            }else if (type.equals("image/webp")) {
+                fileExtenstion=".webp";
+            }else{
+                fileExtenstion=".jpg";
+            }
+
             //generate uniq id
             String uniqueId = UUID.randomUUID().toString().substring(10);
             // create file name
-            String imageFileName = uniqueId + "-" + originalNameFile;
+            String imageFileName = uniqueId + fileExtenstion;
             // create file path
             Path filePath = uploadPath.resolve(imageFileName);
 
@@ -204,6 +231,13 @@ public class UserService {
 
             }
             final String JWT = jwtUtils.generateJwtToken(myUserDetails);
+            auditLogService.log(
+                    user,
+                    "Login",
+                    "User",
+                    user.getId(),
+                    "User "+user.getUsername()+" logged in successfully"
+            );
             return ResponseEntity.ok(new MessageResponse(JWT));
         } catch (BadCredentialsException e) {
             throw new InvalidCredentialsException("Invalid email or password");
@@ -231,6 +265,13 @@ public class UserService {
         verificationToken.setUsedAt(LocalDateTime.now());
         userRepository.save(user);
         emailVerificationTokenRepository.save(verificationToken);
+        auditLogService.log(
+                user,
+                "EMAIL VERIFICATION",
+                "User",
+                user.getId(),
+                "User "+user.getUsername()+" email verified successfully"
+        );
         return "Email Verified Successfully";
 
     }
@@ -258,6 +299,10 @@ public class UserService {
         profile.setPhone(request.getPhone());
         user.setUserProfile(profile);
         userRepository.save(user);
+        auditLogService.log(
+                user, "UPDATE PROFILE", "User", user.getId(),
+                "User "+user.getUsername()+" updated his/her profile successfully"
+        );
         return ResponseEntity.ok(new MessageResponse("Profile updated successfully"));
     }
 
@@ -268,6 +313,20 @@ public class UserService {
         profile.setProfileImageUrl(profileImage);
         user.setUserProfile(profile);
         userRepository.save(user);
+        auditLogService.log(
+                user, "UPDATE IMAGE PROFILE", "User", user.getId(),
+                "User "+user.getUsername()+" updated his/her image profile successfully"
+        );
         return ResponseEntity.ok(new MessageResponse("Image Profile updated successfully"));
+    }
+
+    public ResponseEntity<?> logoutUser() {
+        User user = getCurrentLoggedInUser();
+        SecurityContextHolder.clearContext();
+        auditLogService.log(
+                user, "USER LOGOUT", "User", user.getId(),
+                "User "+user.getId() +" logged out successfully"
+        );
+        return ResponseEntity.ok(new MessageResponse("User logged in successfully"));
     }
 }

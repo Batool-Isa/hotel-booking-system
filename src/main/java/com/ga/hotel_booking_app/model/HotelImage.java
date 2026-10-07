@@ -19,7 +19,7 @@ public class HotelImage {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String imageURL;
     @Column
     private String altText ;

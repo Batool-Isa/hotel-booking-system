@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface HotelImageRepository extends JpaRepository<HotelImage, Long> {
 List<HotelImage> findByHotelId(Long id);
-
+ boolean existsByImageURL(String imageUrl);
 }

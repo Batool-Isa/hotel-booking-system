@@ -9,6 +9,8 @@ import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;
 import com.ga.hotel_booking_app.model.RoomType;
 import com.ga.hotel_booking_app.repository.RoomTypeRepository;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,10 @@ import java.util.List;
 public class RoomTypeService {
     @Autowired
     private RoomTypeRepository roomTypeRepository;
+    @Autowired
+    private AuditLogService auditLogService;
+    private static final Logger logger =
+            LoggerFactory.getLogger(UserService.class);
 
     public ResponseEntity<?> getRoomTypes() {
         //List<RoomType> list = roomTypeRepository.findAll();

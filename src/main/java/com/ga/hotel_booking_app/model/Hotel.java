@@ -54,7 +54,7 @@ public class Hotel {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "hotel_managers",
             joinColumns = @JoinColumn(name = "hotel_id"),
@@ -70,4 +70,6 @@ public class Hotel {
 
     @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
     private Set<Room> rooms = new HashSet<>();
+    @OneToOne(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private ChildPolicy childPolicy;
 }

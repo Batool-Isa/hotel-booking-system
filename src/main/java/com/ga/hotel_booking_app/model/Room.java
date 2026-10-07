@@ -37,8 +37,12 @@ public class Room {
     }
     @Column
     private BigDecimal pricePerNight;
-    @Column
-    private int capacity;
+    @Column(nullable = false)
+    private Integer maxAdults;
+    @Column(nullable = false)
+    private Integer maxChildren;
+    @Column(nullable = false)
+    private Integer maxOccupancy;
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
