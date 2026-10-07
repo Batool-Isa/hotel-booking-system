@@ -19,13 +19,9 @@ import java.util.concurrent.ConcurrentHashMap;
         public class RateLimitFilter extends OncePerRequestFilter {
 
             private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
-
             private Bucket createBucket(int capacity, Duration refillDuration) {
-
                 Refill refill = Refill.intervally(capacity, refillDuration);
-
                 Bandwidth limit = Bandwidth.classic(capacity, refill);
-
                 return Bucket.builder().addLimit(limit).build();
             }
 
@@ -43,11 +39,8 @@ import java.util.concurrent.ConcurrentHashMap;
                     throws ServletException, IOException {
 
                 String path = request.getRequestURI();
-
                 String ipAddress = request.getRemoteAddr();
-
                 Bucket bucket = null;
-
                 if (path.equals("/auth/users/login") && request.getMethod().equals("POST")) {
 
                     bucket = getBucket(
@@ -75,7 +68,7 @@ import java.util.concurrent.ConcurrentHashMap;
                     response.setStatus(429);
                     response.setContentType("application/json");
                     response.getWriter().write("""
-                    { "message": "Too many requests. Please try again later. }
+                    { "message": "Too many requests. Please try again later. "}
                     """);
                     return;
                 }
