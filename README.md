@@ -101,6 +101,7 @@ Document any unresolved issues.
 ## Rescource Used
 [Spring Boot - Sending Email via SMTP
 ](https://www.geeksforgeeks.org/springboot/spring-boot-sending-email-via-smtp/)
+https://www.geeksforgeeks.org/springboot/spring-boot-logging/
 
 ## Major Challenges
 Explain the major technical problems you encountered and how you solved them.
