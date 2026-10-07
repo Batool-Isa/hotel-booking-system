@@ -78,6 +78,22 @@ public class BookingService {
 
         // get hotel's child policy
         ChildPolicy childPolicy = hotel.getChildPolicy();
+        if (childPolicy == null) {
+            throw new InvalidInformationException(
+                    "This hotel has not set its child policy yet, so it can\'t accept bookings right now");
+        }
+
+
+        Set<Long> roomIds = new TreeSet<>();
+        for (BookingRoomRequest r : bookingRoomRequests) {
+            if (!roomIds.add(r.getRoomId())) {
+                throw new InvalidInformationException("Room with id " + r.getRoomId() + " was selected twice");
+            }
+        }
+        for (Long roomId : roomIds) {
+            roomRepository.findByIdForUpdate(roomId)
+                    .orElseThrow(() -> new InformationNotFoundException("Room with id " + roomId + " not found"));
+        }
 
 
         //check capacity of each room

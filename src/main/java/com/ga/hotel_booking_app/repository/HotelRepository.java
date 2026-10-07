@@ -18,6 +18,7 @@ boolean existsByName(String name);
     List<Hotel> findByManagers_Id(Long managerId);
     Page<Hotel> findByManagers_Id(Long managerId, Pageable pageable);
     List<Hotel> findByNameContainingIgnoreCaseAndStatus(String name, Hotel.Status status);
+  Hotel findByName(String name);
 
     @Query("SELECT h FROM Hotel h WHERE h.status = 'ACTIVE' " +
             "AND (CAST(:search AS string) IS NULL OR LOWER(h.name) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))) " +

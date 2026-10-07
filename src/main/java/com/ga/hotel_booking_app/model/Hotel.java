@@ -54,7 +54,7 @@ public class Hotel {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "hotel_managers",
             joinColumns = @JoinColumn(name = "hotel_id"),

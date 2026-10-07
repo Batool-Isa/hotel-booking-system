@@ -33,7 +33,7 @@ public class SecurityConfiguration {
 
     /**
      *
-     * Do BCrypt password hashing to store the password securly  in databse
+     * Do BCrypt password hashing to store the password securely  in databse
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -47,7 +47,11 @@ public class SecurityConfiguration {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .authorizeHttpRequests(auth -> auth
+                .exceptionHandling(  // to handle expired token
+                        e-> e.authenticationEntryPoint(
+                                ((request, response, authException) ->  writeJson(response, 401,
+                                        "Your session has expired or is invalid. Please sign in again.")))
+                ).authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/users",
                                 "/auth/users/login",
@@ -67,6 +71,13 @@ public class SecurityConfiguration {
                 );
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+    private static void writeJson(jakarta.servlet.http.HttpServletResponse res, int status, String message)
+            throws java.io.IOException {
+        res.setStatus(status);
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+        res.getWriter().write("{\"status\":" + status + ",\"message\":\"" + message.replace("\"", "\\\"") + "\"}");
     }
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {

@@ -17,6 +17,7 @@ The application also focuses on preventing invalid bookings, such as booking a r
 ## Main Features
 
 ### User and Authentication
+
 - User registration and login
 - JWT authentication
 - Email verification
@@ -29,6 +30,7 @@ The application also focuses on preventing invalid bookings, such as booking a r
 - Soft delete and inactive user handling
 
 ### Hotel Management
+
 - Hotel creation and management
 - Hotel manager assignment
 - Hotel approval workflow
@@ -41,6 +43,7 @@ The application also focuses on preventing invalid bookings, such as booking a r
 - Hotel location using latitude and longitude
 
 ### Room Management
+
 - Room management
 - Room types
 - Room capacity management
@@ -50,6 +53,7 @@ The application also focuses on preventing invalid bookings, such as booking a r
 - Room status management
 
 ### Booking Management
+
 - Hotel room booking
 - Multiple rooms in one booking
 - Guest information
@@ -64,6 +68,7 @@ The application also focuses on preventing invalid bookings, such as booking a r
 - View my bookings
 
 ### Notifications and Email
+
 - Booking confirmation emails
 - Booking status email notifications
 - HTML booking emails
@@ -71,6 +76,7 @@ The application also focuses on preventing invalid bookings, such as booking a r
 - Hotel location included in booking emails
 
 ### Security and API
+
 - Spring Security
 - JWT authentication
 - Role-based authorization
@@ -103,11 +109,11 @@ The application follows a layered architecture:
 
 ```text
 Controller
-    ↓
+   ↓
 Service
-    ↓
+   ↓
 Repository
-    ↓
+   ↓
 Database
 ```
 
@@ -134,6 +140,7 @@ The database structure was designed using Lucidchart.
 The project was planned and tracked using Jira.
 
 The planning included:
+
 - Deliverables
 - Timeline
 - Scope
@@ -150,6 +157,70 @@ When running the application locally, Swagger UI is available at:
 ```text
 http://localhost:8000/swagger-ui/index.html
 ```
+
+## API Endpoint Reference
+
+The following table provides a quick reference to the main REST endpoints implemented in VibeStay. Swagger/OpenAPI remains the detailed interactive API documentation.
+
+### Authentication and User Management
+
+| Request Type | URL | Functionality | Access |
+|---|---|---|---|
+| POST | `/auth/users/register` | Register a new user and upload a profile picture | Public |
+| POST | `/auth/users/login` | Authenticate user and generate JWT | Public |
+| GET | `/api/auth/verify-email?token={token}` | Verify user email | Public |
+| POST | `/auth/users/forgot-password` | Request password recovery | Public |
+| GET/POST | `/auth/users/reset-link?token={token}` | Access password reset flow using reset token | Public |
+| POST | `/auth/users/change-password` | Change authenticated user's password | Private |
+| GET | `/auth/users/profile` | Get the currently authenticated user's profile | Private |
+| PUT | `/auth/users/profile` | Update the currently authenticated user's profile | Private |
+| PATCH | `/auth/users/profile-image` | Update the authenticated user's profile picture | Private |
+
+### Hotels
+
+| Request Type | URL | Functionality | Access |
+|---|---|---|---|
+| GET | `/api/hotels` | Get active hotels with search/filtering and pagination | Public |
+| GET | `/api/hotels/{id}` | Get hotel details | Public |
+| POST | `/api/hotels` | Create a hotel | Hotel Manager / Admin |
+| PUT | `/api/hotels/{id}` | Update hotel information | Assigned Hotel Manager / Admin |
+| PATCH | `/api/hotels/{id}/status` | Update hotel status / approval status | Admin / authorized manager |
+| GET | `/api/hotels/pending` | Get hotels waiting for approval | Admin |
+| GET | `/api/hotels/my-hotels` | Get hotels assigned to the authenticated hotel manager | Hotel Manager |
+
+### Availability
+
+| Request Type | URL | Functionality | Access |
+|---|---|---|---|
+| POST | `/api/availability/search` | Search hotels and rooms available for selected dates and guests | Public |
+
+### Rooms
+
+| Request Type | URL | Functionality | Access |
+|---|---|---|---|
+| GET | `/api/rooms/hotel/{hotelId}` | Get rooms belonging to a hotel | Public / authenticated |
+| POST | `/api/rooms` | Create a room | Hotel Manager / Admin |
+| PUT | `/api/rooms/{id}` | Update room information | Assigned Hotel Manager / Admin |
+| PATCH | `/api/rooms/{id}/status` | Update room status | Hotel Manager / Admin |
+
+### Bookings
+
+| Request Type | URL | Functionality | Access |
+|---|---|---|---|
+| POST | `/api/bookings` | Create a hotel booking | Customer |
+| GET | `/api/bookings/my-bookings` | Get the authenticated user's bookings with pagination | Customer |
+| GET | `/api/bookings/{id}` | Get booking details | Authorized user |
+| PATCH | `/api/bookings/{id}/cancel` | Cancel a booking | Customer / Hotel Manager / Admin |
+| PATCH | `/api/bookings/{id}/status` | Update booking status, such as completing a booking | Hotel Manager / Admin |
+
+### Real-Time Notifications
+
+| Request Type | URL | Functionality | Access |
+|---|---|---|---|
+| WebSocket | `ws://localhost:8000/ws` | WebSocket connection for real-time booking notifications | Authenticated application client |
+| STOMP | `/topic/bookings` | Receive booking events such as confirmation and cancellation | WebSocket client |
+
+> **Note:** WebSocket destinations are not REST endpoints, but they are included here because they are part of the application's API/integration surface.
 
 ## Installation
 
@@ -184,6 +255,7 @@ GOOGLE_MAPS_API_KEY
 ### 4. Seed the Database
 
 The application includes seed data for required initial data such as:
+
 - Roles
 - Admin user
 - Hotel managers
@@ -230,6 +302,7 @@ A small browser-based STOMP client was used to test and demonstrate the WebSocke
 VibeStay sends booking-related email notifications.
 
 The booking email includes:
+
 - Booking reference
 - Hotel information
 - Check-in and check-out dates
@@ -269,15 +342,15 @@ The relationship is structured as:
 
 ```text
 User
-  ↓
+ ↓
 Booking
-  ↓
+ ↓
 BookingRoom
-  ↓
+ ↓
 Room
 
 BookingRoom
-  ↓
+ ↓
 BookingGuest
 ```
 
@@ -288,6 +361,7 @@ This allowed me to keep guest information connected to the specific room they ar
 Guests are classified based on the hotel's child policy.
 
 The system handles:
+
 - Adults
 - Children
 - Infants
@@ -297,6 +371,7 @@ The policy also determines whether infants count towards room occupancy.
 ### Role-Based Authorization
 
 VibeStay has different roles with different permissions:
+
 - CUSTOMER
 - HOTEL_MANAGER
 - ADMIN
@@ -333,6 +408,7 @@ The Google Maps Static API was also integrated into the email so the hotel locat
 ## Future Improvements
 
 If I had more time, I would like to extend VibeStay with:
+
 - A frontend application for customers and hotel managers
 - Online payment integration
 - AI-powered hotel recommendations or an AI booking assistant
