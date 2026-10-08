@@ -66,7 +66,7 @@ public class SecurityConfiguration {
                                 "/api/availability/**",
                                 "/log"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/hotels/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/hotels/**","/api/amenities").permitAll()
                         .anyRequest().authenticated()
                 );
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

@@ -12,4 +12,6 @@ public class BookingNotification {
     private String bookingReference;
     private String message;
     private String status;
+    private Long hotelId;
+    private String hotelName;
 }

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationService {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NotificationService.class);
+
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
@@ -24,14 +26,25 @@ public class NotificationService {
         BookingNotification notification = new BookingNotification(
                 booking.getBookingReference(),
                 message,
-                booking.getStatus().name()
+                booking.getStatus().name(),
+                booking.getHotel().getId(),
+                booking.getHotel().getName()
         );
         System.out.println("Sending WebSocket notification: "
                 + booking.getBookingReference());
-        simpMessagingTemplate.convertAndSend(
-                "/topic/bookings",
+        // customer who owns the booking
+        simpMessagingTemplate.convertAndSendToUser(
+                booking.getUser().getEmail(),
+                "/queue/bookings",
                 notification
         );
+        // manager who assign to hotel
+        simpMessagingTemplate.convertAndSend(
+                "/topic/hotels/" + booking.getHotel().getId() + "/bookings", notification);
+
+        simpMessagingTemplate.convertAndSend("/topic/admin/bookings", notification);
+        log.info("WebSocket notification sent for booking {}", booking.getBookingReference());
+
     }
 
 
