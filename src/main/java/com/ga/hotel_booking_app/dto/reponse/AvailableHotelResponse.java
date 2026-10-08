@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,5 +22,7 @@ AvailableHotelResponse {
     private String address;
     private String profileImage;
     private Double averageRating;
+    private BigDecimal latitude;
+    private BigDecimal longitude;
     private List<RoomResponse> rooms = new ArrayList<>();
 }

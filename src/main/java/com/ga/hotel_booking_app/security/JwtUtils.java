@@ -6,7 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,4 +63,15 @@ Logger logger = Logger.getLogger(JwtUtils.class.getName());
         }
         return false;
     }
+
+    private static final Map<String, Long> REVOKED = new ConcurrentHashMap<>();
+
+    public void revokeToken(String token) {
+        long now = System.currentTimeMillis();
+        REVOKED.values().removeIf(exp -> exp < now);
+        Date exp = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getExpiration();
+        REVOKED.put(token, exp.getTime());
+    }
+
+
 }

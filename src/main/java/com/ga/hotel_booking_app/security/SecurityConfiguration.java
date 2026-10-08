@@ -64,7 +64,8 @@ public class SecurityConfiguration {
                                 "/v3/api-docs/**",
                                 "/ws/**",
                                 "/api/availability/**",
-                                "/log"
+                                "/log",
+                                "/error"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/hotels/**","/api/amenities").permitAll()
                         .anyRequest().authenticated()

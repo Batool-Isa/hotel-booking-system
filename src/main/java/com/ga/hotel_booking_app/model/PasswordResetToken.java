@@ -22,6 +22,7 @@ public class PasswordResetToken {
     private Long id;
     @Column(unique = true, nullable = false)
     private String token;
+    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
     @Column

@@ -30,18 +30,12 @@ public class NotificationService {
                 booking.getHotel().getId(),
                 booking.getHotel().getName()
         );
-        System.out.println("Sending WebSocket notification: "
-                + booking.getBookingReference());
-        // customer who owns the booking
         simpMessagingTemplate.convertAndSendToUser(
-                booking.getUser().getEmail(),
-                "/queue/bookings",
-                notification
-        );
-        // manager who assign to hotel
+                booking.getUser().getEmail(), "/queue/bookings", notification);
+        simpMessagingTemplate.convertAndSend(
+                "/topic/users/" + booking.getUser().getEmail() + "/bookings", notification);
         simpMessagingTemplate.convertAndSend(
                 "/topic/hotels/" + booking.getHotel().getId() + "/bookings", notification);
-
         simpMessagingTemplate.convertAndSend("/topic/admin/bookings", notification);
         log.info("WebSocket notification sent for booking {}", booking.getBookingReference());
 

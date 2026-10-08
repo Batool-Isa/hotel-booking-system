@@ -15,6 +15,7 @@ import com.ga.hotel_booking_app.security.JwtUtils;
 import com.ga.hotel_booking_app.model.User;
 import com.ga.hotel_booking_app.repository.UserRepository;
 import com.ga.hotel_booking_app.security.MyUserDetails;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,6 +112,11 @@ public class UserService {
      */
     public ResponseEntity<?> register(RegisterRequest request, MultipartFile image) {
         System.out.println("User service calling ----> register");
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new InformationExistException(
+                    "Username " + request.getUsername() + " is already taken!"
+            );
+        }
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new InformationExistException(
                     "User with email " + request.getEmail() + " already exists!"
@@ -320,9 +326,12 @@ public class UserService {
         return ResponseEntity.ok(new MessageResponse("Image Profile updated successfully"));
     }
 
-    public ResponseEntity<?> logoutUser() {
+    public ResponseEntity<?> logoutUser(HttpServletRequest request) {
         User user = getCurrentLoggedInUser();
-        SecurityContextHolder.clearContext();
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            jwtUtils.revokeToken(header.substring(7));
+        }
         auditLogService.log(
                 user, "USER LOGOUT", "User", user.getId(),
                 "User "+user.getId() +" logged out successfully"

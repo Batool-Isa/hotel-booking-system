@@ -9,6 +9,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -17,6 +18,26 @@ import com.ga.hotel_booking_app.model.BookingGuest;
 import com.ga.hotel_booking_app.model.BookingRoom;
 import org.springframework.web.util.HtmlUtils;
 
+import javax.imageio.ImageIO;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Path2D;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import java.io.File;
@@ -29,8 +50,7 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String sender;
 
-    @Value("${google.maps.api-key}")
-    private String googleMapsApiKey;
+    private static final java.util.Map<String, byte[]> MAP_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
 
     public String sendSimpleMail(EmailDetails details) {
         try {
@@ -87,172 +107,102 @@ public class EmailService {
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>{{TITLE}}</title>
+                    <title>VibeStay - {{TITLE}}</title>
                 </head>
-                
-                <body style="
-                    margin: 0;
-                    padding: 0;
-                    background-color: #f5f7fb;
-                    font-family: Arial, Helvetica, sans-serif;
-                    color: #333333;
-                ">
-                
-                    <div style="
-                        width: 100%%;
-                        padding: 40px 0;
-                    ">
-                
-                        <div style="
-                            max-width: 600px;
-                            margin: 0 auto;
-                            background-color: #ffffff;
-                            border-radius: 12px;
-                            overflow: hidden;
-                            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-                        ">
-                
-                            <!-- Header -->
-                            <div style="
-                                background-color: #6c63ff;
-                                padding: 32px 20px;
-                                text-align: center;
-                                color: #ffffff;
-                            ">
-                                <h1 style="margin: 0;">
+
+                <body style="margin: 0; padding: 0; background-color: #f2f4f8; font-family: Arial, Helvetica, sans-serif; color: #2d2d3a;">
+
+                    <div style="width: 100%; padding: 35px 0;">
+
+                        <div style="max-width: 620px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden;">
+
+                            <div style="background-color: #172554; padding: 28px 30px;">
+                                <div style="font-size: 25px; font-weight: bold; color: #ffffff;">
                                     VibeStay
-                                </h1>
-                
-                                <p style="
-                                    margin: 8px 0 0;
-                                    font-size: 14px;
-                                ">
+                                </div>
+                                <div style="margin-top: 5px; font-size: 13px; color: #cbd5e1;">
                                     Your stay starts here
-                                </p>
+                                </div>
                             </div>
-                
-                            <!-- Content -->
-                            <div style="padding: 40px 35px;">
-                
-                                <h2 style="
-                                    margin: 0 0 20px;
-                                    font-size: 24px;
-                                    color: #222222;
-                                ">
+
+                            <div style="padding: 35px 32px;">
+
+                                <h1 style="margin: 0 0 12px 0; font-size: 28px; color: #172554;">
                                     {{TITLE}}
-                                </h2>
-                
-                                <p style="
-                                    margin: 0 0 20px;
-                                    font-size: 15px;
-                                    line-height: 1.7;
-                                    color: #555555;
-                                ">
+                                </h1>
+
+                                <div style="height: 1px; background-color: #e5e7eb; margin-bottom: 24px;"></div>
+
+                                <p style="margin: 0 0 8px 0; font-size: 15px; color: #333333;">
                                     Hello,
                                 </p>
-                
-                                <p style="
-                                    margin: 0 0 30px;
-                                    font-size: 15px;
-                                    line-height: 1.7;
-                                    color: #555555;
-                                ">
+
+                                <p style="margin: 0 0 25px 0; font-size: 14px; line-height: 1.6; color: #666666;">
                                     {{MESSAGE}}
                                 </p>
-                
-                                <!-- Button -->
-                                <div style="
-                                    text-align: center;
-                                    margin: 30px 0;
-                                ">
+
+                                <div style="text-align: center; margin: 28px 0;">
                                     <a href="{{LINK}}"
-                                       style="
-                                           display: inline-block;
-                                           padding: 14px 32px;
-                                           background-color: #6c63ff;
-                                           color: #ffffff;
-                                           text-decoration: none;
-                                           border-radius: 8px;
-                                           font-size: 15px;
-                                           font-weight: bold;
-                                       ">
+                                       style="display: inline-block; padding: 12px 25px; background-color: #172554; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: bold;">
                                         {{BUTTON}}
                                     </a>
                                 </div>
-                
-                                <!-- Expiry -->
-                                <div style="
-                                    margin: 30px 0;
-                                    padding: 16px 18px;
-                                    background-color: #f4f3ff;
-                                    border-left: 4px solid #6c63ff;
-                                    border-radius: 6px;
-                                ">
-                                    <p style="
-                                        margin: 0;
-                                        font-size: 14px;
-                                        line-height: 1.6;
-                                        color: #555555;
-                                    ">
-                                        <strong style="color: #333333;">
-                                            Important:
-                                        </strong>
+
+                                <div style="background-color: #f7f8fc; padding: 20px; border-radius: 8px; margin-bottom: 28px;">
+                                    <div style="font-size: 13px; font-weight: bold; color: #172554; margin-bottom: 10px;">
+                                        IMPORTANT
+                                    </div>
+                                    <div style="font-size: 14px; line-height: 1.6; color: #666666;">
                                         {{EXPIRY}}
-                                    </p>
+                                    </div>
                                 </div>
-                
-                                <!-- Security -->
-                                <p style="
-                                    margin: 25px 0 0;
-                                    font-size: 13px;
-                                    line-height: 1.7;
-                                    color: #777777;
-                                ">
-                                    If you did not request this, you can safely
-                                    ignore this email.
-                                </p>
-                
+
+                                <div style="font-size: 12px; line-height: 1.6; color: #999999; margin-bottom: 8px;">
+                                    If the button does not work, copy and paste this link into your browser:
+                                </div>
+                                <div style="font-size: 12px; line-height: 1.6; color: #172554; word-break: break-all;">
+                                    {{LINK}}
+                                </div>
+
+                                <div style="margin-top: 30px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+                                    <div style="font-size: 14px; font-weight: bold; color: #333333; margin-bottom: 8px;">
+                                        Didn't request this?
+                                    </div>
+                                    <div style="font-size: 13px; line-height: 1.6; color: #777777;">
+                                        If you did not request this, you can safely ignore this email.
+                                    </div>
+                                </div>
+
                             </div>
-                
-                            <!-- Footer -->
-                            <div style="
-                                background-color: #f5f7fb;
-                                padding: 20px;
-                                text-align: center;
-                            ">
-                                <p style="
-                                    margin: 0;
-                                    font-size: 12px;
-                                    color: #888888;
-                                ">
-                                    © 2026 VibeStay. All rights reserved.
-                                </p>
-                
-                                <p style="
-                                    margin: 6px 0 0;
-                                    font-size: 12px;
-                                    color: #aaaaaa;
-                                ">
+
+                            <div style="background-color: #f2f4f8; padding: 25px; text-align: center;">
+                                <div style="font-size: 17px; font-weight: bold; color: #172554;">
+                                    VibeStay
+                                </div>
+                                <div style="margin-top: 6px; font-size: 12px; color: #999999;">
                                     Your stay starts here.
-                                </p>
+                                </div>
+                                <div style="margin-top: 12px; font-size: 11px; color: #aaaaaa;">
+                                    © 2026 VibeStay. All rights reserved.
+                                </div>
                             </div>
-                
+
                         </div>
+
                     </div>
-                
+
                 </body>
                 </html>
                 """
-                .replace("{{TITLE}}", title)
-                .replace("{{MESSAGE}}", message)
-                .replace("{{BUTTON}}", buttonText)
-                .replace("{{LINK}}", link)
-                .replace("{{EXPIRY}}", expiryMessage);
+                .replace("{{TITLE}}", HtmlUtils.htmlEscape(title))
+                .replace("{{MESSAGE}}", HtmlUtils.htmlEscape(message).replace("\n", "<br>"))
+                .replace("{{BUTTON}}", HtmlUtils.htmlEscape(buttonText))
+                .replace("{{LINK}}", HtmlUtils.htmlEscape(link))
+                .replace("{{EXPIRY}}", HtmlUtils.htmlEscape(expiryMessage));
     }
 
     public void sendResetLink(PasswordResetToken token, User user) {
-        String link = "http://localhost:8000/auth/users/reset-link?token=" + token.getToken();
-
+        String link = "http://localhost:8000/#/reset-password?token=" + token.getToken();
 
         String body = buildActionEmailBody(
                 "Reset Your VibeStay Password",
@@ -266,7 +216,7 @@ public class EmailService {
 
 
         EmailDetails emailDetails = new EmailDetails();
-        emailDetails.setSubject("Reset");
+        emailDetails.setSubject("Reset your VibeStay password");
         emailDetails.setMsgBody(body);
         emailDetails.setRecipient(user.getEmail());
         sendSimpleMail(emailDetails);
@@ -299,6 +249,14 @@ public class EmailService {
             Booking booking,
             String title,
             String message) {
+        return buildBookingEmailBody(booking, title, message, false);
+    }
+
+    public String buildBookingEmailBody(
+            Booking booking,
+            String title,
+            String message,
+            boolean hasMap) {
 
         String customerName = booking.getUser().getUsername();
         String hotelName = booking.getHotel().getName();
@@ -314,9 +272,6 @@ public class EmailService {
         );
 
 
-        String mapUrl = buildMapUrl(booking);
-
-        System.out.println("MAP URL: " + mapUrl);
         String directionsUrl = buildDirectionsUrl(booking);
 
         long nights = ChronoUnit.DAYS.between(
@@ -610,29 +565,7 @@ public class EmailService {
                             </div>
 
 
-                            <!-- MAP -->
-                            <a href="{{DIRECTIONS_URL}}"
-                               style="
-                                   display: block;
-                                   text-decoration: none;
-                               ">
-
-                                <img
-                                    src="{{MAP_URL}}"
-                                    alt="Map showing hotel location"
-                                    width="100%"
-                                    style="
-                                        display: block;
-                                        width: 100%;
-                                        max-width: 556px;
-                                        height: 240px;
-                                        object-fit: cover;
-                                        border-radius: 8px;
-                                        border: 1px solid #e5e7eb;
-                                    "
-                                >
-
-                            </a>
+                            {{MAP_BLOCK}}
 
 
                             <!-- DIRECTIONS BUTTON -->
@@ -869,8 +802,8 @@ public class EmailService {
                         HtmlUtils.htmlEscape(fullAddress)
                 )
                 .replace(
-                        "{{MAP_URL}}",
-                        mapUrl
+                        "{{MAP_BLOCK}}",
+                        hasMap ? buildMapBlock(directionsUrl) : ""
                 )
                 .replace(
                         "{{DIRECTIONS_URL}}",
@@ -1053,22 +986,48 @@ public class EmailService {
         return String.format("%.2f", amount);
     }
 
-    private String buildMapUrl(Booking booking) {
+    private String buildMapBlock(String directionsUrl) {
+        return "<a href=\"" + directionsUrl + "\" style=\"display: block; text-decoration: none;\">"
+                + "<img src=\"cid:hotelmap\" alt=\"Map showing hotel location\" width=\"556\" "
+                + "style=\"display: block; width: 100%; max-width: 556px; height: auto; "
+                + "border-radius: 8px; border: 1px solid #e5e7eb;\">"
+                + "</a>";
+    }
+
+    private byte[] loadHotelMap(Booking booking) {
         BigDecimal latitude = booking.getHotel().getLatitude();
         BigDecimal longitude = booking.getHotel().getLongitude();
         if (latitude == null || longitude == null) {
-            return "";
+            return null;
         }
+        String key = latitude.toPlainString() + "," + longitude.toPlainString();
+        byte[] cached = MAP_CACHE.get(key);
+        if (cached != null) {
+            return cached;
+        }
+        byte[] png = MapImageBuilder.build(latitude.doubleValue(), longitude.doubleValue());
+        if (png != null) {
+            MAP_CACHE.put(key, png);
+        }
+        return png;
+    }
 
-        return "https://maps.googleapis.com/maps/api/staticmap"
-                + "?center=" + latitude + "," + longitude
-                + "&zoom=15"
-                + "&size=600x300"
-                + "&scale=2"
-                + "&maptype=roadmap"
-                + "&markers=color:red%7C"
-                + latitude + "," + longitude
-                + "&key=" + googleMapsApiKey;
+    private String sendMailWithInlineImage(EmailDetails details, String contentId, byte[] image) {
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+            helper.setFrom(sender);
+            helper.setTo(details.getRecipient());
+            helper.setSubject(details.getSubject());
+            helper.setText(details.getMsgBody(), true);
+            if (image != null) {
+                helper.addInline(contentId, new ByteArrayResource(image), "image/png");
+            }
+            javaMailSender.send(mimeMessage);
+            return "Mail Sent Successfully";
+        } catch (Exception e) {
+            return "Error while sending mail";
+        }
     }
 
     private String buildDirectionsUrl(Booking booking) {
@@ -1086,22 +1045,147 @@ public class EmailService {
                 + "&travelmode=driving";
     }
     public void sendBookingConfirmationEmail(Booking booking) {
-        String body = buildBookingEmailBody(booking, "Booking Confirmed", "Your VibeStay booking has been successfully confirmed.");
+        byte[] map = loadHotelMap(booking);
+        String body = buildBookingEmailBody(booking, "Booking Confirmed", "Your VibeStay booking has been successfully confirmed.", map != null);
         EmailDetails emailDetails = new EmailDetails();
         emailDetails.setSubject("VibeStay Booking Confirmed - " + booking.getBookingReference());
         emailDetails.setMsgBody(body);
         emailDetails.setRecipient(booking.getUser().getEmail());
-        sendSimpleMail(emailDetails);
+        sendMailWithInlineImage(emailDetails, "hotelmap", map);
     }
     public void sendBookingCancellationEmail(Booking booking) {
+        byte[] map = loadHotelMap(booking);
         String body = buildBookingEmailBody(
-                booking, "Booking Cancelled", "Your VibeStay booking has been cancelled.");
+                booking, "Booking Cancelled", "Your VibeStay booking has been cancelled.", map != null);
 
         EmailDetails emailDetails = new EmailDetails();
         emailDetails.setSubject("VibeStay Booking Cancelled - " + booking.getBookingReference());
         emailDetails.setMsgBody(body);
         emailDetails.setRecipient(booking.getUser().getEmail());
 
-        sendSimpleMail(emailDetails);
+        sendMailWithInlineImage(emailDetails, "hotelmap", map);
+    }
+
+    private static class MapImageBuilder {
+
+        interface TileLoader {
+            BufferedImage load(int zoom, int x, int y);
+        }
+
+        private static final int TILE = 256;
+        private static final int ZOOM = 15;
+        private static final int WIDTH = 800;
+        private static final int HEIGHT = 400;
+
+        public static byte[] build(double lat, double lng) {
+            return build(lat, lng, MapImageBuilder::downloadTile);
+        }
+
+        static byte[] build(double lat, double lng, TileLoader loader) {
+            ExecutorService pool = Executors.newFixedThreadPool(6);
+            try {
+                int n = 1 << ZOOM;
+                double latRad = Math.toRadians(lat);
+                double worldX = (lng + 180.0) / 360.0 * n * TILE;
+                double worldY = (1.0 - Math.log(Math.tan(latRad) + 1.0 / Math.cos(latRad)) / Math.PI) / 2.0 * n * TILE;
+
+                double left = worldX - WIDTH / 2.0;
+                double top = worldY - HEIGHT / 2.0;
+                int tx0 = (int) Math.floor(left / TILE);
+                int tx1 = (int) Math.floor((left + WIDTH - 1) / TILE);
+                int ty0 = (int) Math.floor(top / TILE);
+                int ty1 = (int) Math.floor((top + HEIGHT - 1) / TILE);
+
+                List<int[]> coords = new ArrayList<>();
+                List<Future<BufferedImage>> futures = new ArrayList<>();
+                for (int ty = ty0; ty <= ty1; ty++) {
+                    for (int tx = tx0; tx <= tx1; tx++) {
+                        final int x = Math.floorMod(tx, n);
+                        final int y = Math.max(0, Math.min(n - 1, ty));
+                        coords.add(new int[]{tx, ty});
+                        futures.add(pool.submit(() -> loader.load(ZOOM, x, y)));
+                    }
+                }
+
+                BufferedImage canvas = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = canvas.createGraphics();
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g.setColor(new Color(0xE5E7EB));
+                g.fillRect(0, 0, WIDTH, HEIGHT);
+
+                for (int i = 0; i < futures.size(); i++) {
+                    BufferedImage tile = futures.get(i).get(4, TimeUnit.SECONDS);
+                    if (tile == null) {
+                        return null;
+                    }
+                    int px = (int) Math.round(coords.get(i)[0] * TILE - left);
+                    int py = (int) Math.round(coords.get(i)[1] * TILE - top);
+                    g.drawImage(tile, px, py, null);
+                }
+
+                drawMarker(g, WIDTH / 2, HEIGHT / 2);
+                drawAttribution(g);
+                g.dispose();
+
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                ImageIO.write(canvas, "png", out);
+                return out.toByteArray();
+            } catch (Exception e) {
+                return null;
+            } finally {
+                pool.shutdownNow();
+            }
+        }
+
+        private static void drawMarker(Graphics2D g, int cx, int cy) {
+            double r = 15;
+            double headY = cy - 30;
+            Path2D tail = new Path2D.Double();
+            tail.moveTo(cx - r * 0.85, headY + r * 0.5);
+            tail.lineTo(cx, cy);
+            tail.lineTo(cx + r * 0.85, headY + r * 0.5);
+            tail.closePath();
+            Area pin = new Area(new Ellipse2D.Double(cx - r, headY - r, r * 2, r * 2));
+            pin.add(new Area(tail));
+
+            g.setColor(new Color(0, 0, 0, 50));
+            g.fill(new Ellipse2D.Double(cx - 9, cy - 4, 18, 8));
+            g.setColor(new Color(0xE11D48));
+            g.fill(pin);
+            g.setColor(Color.WHITE);
+            g.setStroke(new BasicStroke(3f));
+            g.draw(pin);
+            g.setColor(Color.WHITE);
+            g.fill(new Ellipse2D.Double(cx - 6, headY - 6, 12, 12));
+        }
+
+        private static void drawAttribution(Graphics2D g) {
+            String text = "© OpenStreetMap contributors";
+            g.setFont(new Font("SansSerif", Font.PLAIN, 12));
+            FontMetrics fm = g.getFontMetrics();
+            int w = fm.stringWidth(text) + 12;
+            g.setColor(new Color(255, 255, 255, 200));
+            g.fillRect(WIDTH - w, HEIGHT - 20, w, 20);
+            g.setColor(new Color(0x333333));
+            g.drawString(text, WIDTH - w + 6, HEIGHT - 6);
+        }
+
+        private static BufferedImage downloadTile(int zoom, int x, int y) {
+            try {
+                URL url = new URL("https://tile.openstreetmap.org/" + zoom + "/" + x + "/" + y + ".png");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(2500);
+                conn.setReadTimeout(2500);
+                conn.setRequestProperty("User-Agent", "VibeStay/1.0 (hotel booking student project)");
+                if (conn.getResponseCode() != 200) {
+                    return null;
+                }
+                try (var in = conn.getInputStream()) {
+                    return ImageIO.read(in);
+                }
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

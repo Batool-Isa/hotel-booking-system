@@ -67,6 +67,8 @@ public class AvailabilityService {
             response.setCity(hotel.getCity());
             response.setCountry(hotel.getCountry());
             response.setHotelName(hotel.getName());
+            response.setLatitude(hotel.getLatitude());
+            response.setLongitude(hotel.getLongitude());
             List<Room> hotelActiveRooms = hotel.getRooms().stream().filter(r -> r.getStatus().equals(Room.Status.ACTIVE)).toList();
             for (Room r : hotelActiveRooms) {
                 //check if room can't be booked

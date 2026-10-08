@@ -6,6 +6,7 @@ import com.ga.hotel_booking_app.service.PasswordResetService;
 import com.ga.hotel_booking_app.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -45,9 +46,9 @@ public class UserController {
 
     @PostMapping("/logout")
     @Operation(summary = "Logout user", description = "Logs out the user and records audit log")
-    public ResponseEntity<?> logoutUser() {
+    public ResponseEntity<?> logoutUser(HttpServletRequest request) {
         System.out.println("User Controller calling ---> logout");
-        return userService.logoutUser();
+        return userService.logoutUser(request);
     }
     @GetMapping("/verify-email")
     @Operation(summary = "Verify email to activate user account", description = "Check if token is valid and update user status")

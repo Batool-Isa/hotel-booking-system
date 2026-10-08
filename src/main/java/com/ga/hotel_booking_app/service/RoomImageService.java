@@ -19,9 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class RoomImageService {
@@ -36,8 +38,7 @@ public class RoomImageService {
     private RoomImageRepository roomImageRepository;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private FileStorageService fileStorageService;
+
     @Autowired
     private AuditLogService auditLogService;
 
@@ -77,7 +78,6 @@ public class RoomImageService {
         }
         return ResponseEntity.ok(list);
     }
-
     public ResponseEntity<?> uploadImages(Long hotelId, Long roomId, List<MultipartFile> images) {
         Room room = findRoomOfHotel(hotelId, roomId);
         User user = getCurrentLoggedInUser();
@@ -89,16 +89,34 @@ public class RoomImageService {
         if (roomImageRepository.countByRoomId(roomId) + images.size() > MAX_IMAGES_PER_ROOM) {
             throw new InvalidInformationException("A room can have at most " + MAX_IMAGES_PER_ROOM + " images");
         }
-        // every file is checked before any is saved (type, size, real image content)
-        List<String> saved = fileStorageService.saveImages(images, UPLOAD_DIR + "/" + hotelId + "/" + roomId);
-        for (String path : saved) {
-            RoomImage image = new RoomImage();
-            image.setImageURL(path);
-            image.setRoom(room);
-            roomImageRepository.save(image);
+        try {
+            // room folder: uploads/rooms/{hotelId}/{roomId}, created if it does not exist
+            Path uploadPath = Paths.get(UPLOAD_DIR + "/" + hotelId + "/" + roomId);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+            for (MultipartFile image : images) {
+                if (image.isEmpty()) {
+                    throw new InvalidInformationException("One of the files is empty");
+                }
+                String uniqueId = UUID.randomUUID().toString().substring(0, 5);
+                String imageName = uniqueId + "-" + Paths.get(image.getOriginalFilename()).getFileName();
+
+                Path imageFilePath = uploadPath.resolve(imageName);
+                image.transferTo(imageFilePath);
+
+                RoomImage roomImage = new RoomImage();
+                roomImage.setImageURL(imageFilePath.toString());
+                roomImage.setRoom(room);
+                roomImageRepository.save(roomImage);
+            }
+        } catch (InvalidInformationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to upload images", e);
         }
         auditLogService.log(user, "ROOM_IMAGES_UPLOADED", "ROOM", roomId,
-                "User " + user.getId() + " uploaded " + saved.size() + " image(s) to room " + roomId);
+                "User " + user.getId() + " uploaded " + images.size() + " image(s) to room " + roomId);
         return ResponseEntity.ok(new MessageResponse("Images uploaded successfully"));
     }
 

@@ -1,152 +1,121 @@
 # VibeStay
 
-## Project Description
+VibeStay is a hotel booking platform. Guests search for hotels, check which rooms are free on their dates, and book one or more rooms. Hotel managers run their own hotels, and admins approve hotels and look after users.
 
-VibeStay is a hotel reservation and management platform that allows users to discover hotels, check room availability, make bookings, and manage their reservations.
+I built it as a real booking application, not just a set of CRUD endpoints. Most of the work went into the booking flow: room availability, guest ages, capacity limits, roles and live notifications.
 
-The system also gives hotel managers and administrators tools to manage hotels, rooms, and bookings.
+## What it does
 
-I built VibeStay as a practical hotel booking application rather than just a collection of CRUD endpoints. The main focus is on the booking flow, room availability, user roles, validation, and the business rules around making and managing reservations.
+**Guests**
+- Register, verify their email, log in, reset or change a password
+- Search hotels by city and dates, filter by price and room type
+- See hotels on a map (list and map view)
+- Book several rooms in one booking, with the name and age of every guest
+- Cancel a booking and see their own bookings
+- Get a booking email with the hotel address, a map and directions
 
-## Application Purpose
+**Hotel managers**
+- Create hotels (an admin approves them) and manage only their own hotels
+- Manage rooms, room status, photos, amenities and the child policy
+- See new bookings live, without refreshing the page
 
-The purpose of VibeStay is to provide a simple platform for managing hotel reservations while handling room availability, bookings, hotel management, and user management.
+**Admins**
+- Approve, reject, activate or deactivate hotels
+- Assign managers to hotels
+- Manage users (activate, deactivate) and room types
 
-The application also focuses on preventing invalid bookings, such as booking a room that is already reserved for overlapping dates or exceeding the room's allowed capacity.
+**Behind the scenes**
+- JWT login, role based access, password hashing, input validation
+- Rate limit on login, audit log, one error format for every API error
+- Pagination, sorting, search and filtering
+- Swagger documentation
+- Real time notifications with WebSocket and STOMP
 
-## Main Features
+## Built with
 
-### User and Authentication
-- User registration and login
-- JWT authentication
-- Email verification
-- Forgot password
-- Reset password
-- Change password
-- User profiles
-- Profile picture upload
-- Role-based access control
-- Soft delete and inactive user handling
+Java 17, Spring Boot, Spring Security, JWT, PostgreSQL, Maven, Swagger/OpenAPI, WebSocket/STOMP, a Vue front end, Leaflet with OpenStreetMap, Git and GitHub.
 
-### Hotel Management
-- Hotel creation and management
-- Hotel manager assignment
-- Hotel approval workflow
-- Hotel status management
-- Hotel images
-- Hotel amenities
-- Child policies
-- Hotel search and filtering
-- Pagination and sorting
-- Hotel location using latitude and longitude
-
-### Room Management
-- Room management
-- Room types
-- Room capacity management
-- Adult and child occupancy limits
-- Room availability
-- Multiple rooms in one booking
-- Room status management
-
-### Booking Management
-- Hotel room booking
-- Multiple rooms in one booking
-- Guest information
-- Guest age classification
-- Booking reference generation
-- Booking availability validation
-- Booking capacity validation
-- Booking total calculation
-- Booking cancellation
-- Booking status management
-- View booking details
-- View my bookings
-
-### Notifications and Email
-- Booking confirmation emails
-- Booking status email notifications
-- HTML booking emails
-- Real-time booking notifications using WebSockets/STOMP
-- Hotel location included in booking emails
-
-### Security and API
-- Spring Security
-- JWT authentication
-- Role-based authorization
-- Password hashing
-- Input validation
-- Global exception handling
-- Rate limiting for sensitive authentication endpoints
-- Audit logging
-- Swagger/OpenAPI documentation
-- Pagination and sorting
-- Search and filtering
-- DTO-based API requests and responses
-
-## Technologies
-
-- Java
-- Spring Boot
-- Spring Security
-- JWT
-- PostgreSQL
-- Maven
-- Swagger/OpenAPI
-- WebSockets
-- STOMP
-- Git/GitHub
-
-## Architecture
-
-The application follows a layered architecture:
-
-```text
-Controller
-    ↓
-Service
-    ↓
-Repository
-    ↓
-Database
-```
-
-I am using a code-first approach for implementing the application and database entities.
-
-The project follows an MVC structure and uses DTOs to separate API requests and responses from database entities.
-
-## User Stories
-
-Project planning and user stories were managed using Jira.
-
-[Jira Board](https://batooltaher124.atlassian.net/jira/software/projects/KAN/boards/1)
-
-## ERD
-
-The database structure was first designed in Lucidchart and then updated to match the final entities (rooms, room images, amenities, audit logs and tokens).
-
-[View ERD on Lucidchart](https://lucid.app/lucidchart/8b0e637d-298f-47b5-a125-42f609a4f752/edit)
-
-![ERD](Model databases.png)
-
-The diagram source is in `docs/erd.mmd` (Mermaid), so it can be edited and rendered again.
+The code follows a layered structure: Controller, Service, Repository, Database. DTOs keep the API separate from the database entities, and the database is created from the entities (code first).
 
 ## Planning
 
-The project was planned and tracked using Jira.
+I planned the project in Jira before writing code, then built it in small steps.
 
-The planning included:
-- Deliverables
-- Timeline
-- Scope
-- Progress
-- User stories
-- Development tasks
+[Jira board](https://batooltaher124.atlassian.net/jira/software/projects/KAN/boards/1)
 
-## API Endpoints
+| Phase | What I did |
+|---|---|
+| 1. Scope | Decided the roles, the main features and what to leave for later |
+| 2. Design | Wrote the user stories and drew the ERD |
+| 3. Foundation | Users, login, JWT, roles, validation and error handling |
+| 4. Hotels and rooms | Hotels, approval, rooms, room types, amenities, images, child policy |
+| 5. Booking | Availability search, multi room booking, guests, cancellation |
+| 6. Extras | Emails, WebSocket notifications, audit log, rate limit |
+| 7. Front end and testing | Vue front end, map, demo data and a smoke test |
+| 8. Final polish | Fixes, documentation and the demo |
 
-Base URL: `http://localhost:8000`. "Public" means no token is needed. Everything else needs `Authorization: Bearer <token>`.
-Lists accept `page`, `size` and `sort` (for example `?page=0&size=10&sort=name,asc`).
+User stories, tasks and progress were tracked on the Jira board.
+
+## ERD
+
+The first design was drawn in Lucidchart and then updated to match the final entities.
+
+[View on Lucidchart](https://lucid.app/lucidchart/8b0e637d-298f-47b5-a125-42f609a4f752/edit)
+
+![ERD](ERD.png)
+
+The editable source is `docs/erd.mmd` (Mermaid).
+
+## Getting started
+
+**1. Clone**
+
+```bash
+git clone https://github.com/Batool-Isa/hotel-booking-system.git
+cd hotel-booking-system
+```
+
+**2. Create a PostgreSQL database** and note its name and login.
+
+**3. Set the environment variables.** No secrets are stored in the repository (see `.env.example`).
+
+| Variable | Purpose |
+|---|---|
+| `SPRING_PROFILES_ACTIVE` | `dev` (default), `test` or `prod` |
+| `DATABASE_URL` | for example `jdbc:postgresql://localhost:5432/hotel-booking-app` |
+| `DATABASE_USERNAME`, `DATABASE_PASSWORD` | PostgreSQL login |
+| `JWT_SECRET` | Base64 key, at least 32 bytes (`openssl rand -base64 48`) |
+| `JWT_EXPIRATION_MS` | token lifetime, default 86400000 (24 hours) |
+| `EMAIL_USERNAME`, `EMAIL_PASSWORD` | SMTP account (a Gmail app password) |
+
+The `test` profile uses an in-memory H2 database and needs no secrets.
+
+**4. Run**
+
+```bash
+./mvnw spring-boot:run
+```
+
+The app starts on `http://localhost:8000`. Swagger is at `http://localhost:8000/swagger-ui/index.html`.
+
+**5. Demo data.** The first time the app starts on an empty database, it adds demo data. If the database already has any users or hotels, it adds nothing. For a fresh start, drop and recreate the database.
+
+| Demo data | Details |
+|---|---|
+| Admin | `admin@vibestay.com` / `Admin123!` |
+| Managers | `manager1` to `manager6@vibestay.com` / `Manager123!` |
+| Customers | `customer1` to `customer16@vibestay.com` / `Customer123!` |
+| Hotels | 11 hotels in Bahrain, UAE, Qatar, Saudi Arabia, Oman and Kuwait (8 active, 2 pending, 1 inactive) |
+| Rooms | 11 rooms per hotel, across 6 room types |
+| Bookings | 26 sample bookings (upcoming, completed and cancelled) |
+
+These passwords are fake and for development only.
+
+## API documentation
+
+Base URL: `http://localhost:8000`. The full interactive documentation is in Swagger at `http://localhost:8000/swagger-ui/index.html`, where you can log in, authorize with a token and try every endpoint.
+
+"Public" means no token is needed. Everything else needs the header `Authorization: Bearer <token>`. Lists accept `page`, `size` and `sort`, for example `?page=0&size=10&sort=name,asc`.
 
 ### Authentication and profile (`/auth/users`)
 
@@ -158,7 +127,7 @@ Lists accept `page`, `size` and `sort` (for example `?page=0&size=10&sort=name,a
 | POST | `/auth/users/forgot-password` | Public | Send a password reset link |
 | POST | `/auth/users/reset-link` | Public | Set a new password with the link token |
 | POST | `/auth/users/change-password` | Logged in | Change my password |
-| GET / PUT | `/auth/users/profile` | Logged in | View / update my profile |
+| GET, PUT | `/auth/users/profile` | Logged in | View or update my profile |
 | PUT | `/auth/users` | Logged in | Change my profile photo |
 
 ### Hotels (`/api/hotels`)
@@ -167,15 +136,15 @@ Lists accept `page`, `size` and `sort` (for example `?page=0&size=10&sort=name,a
 |---|---|---|---|
 | GET | `/api/hotels` | Public | Search live hotels (`search`, `name`, `city`, `country`) |
 | GET | `/api/hotels/{id}` | Public | Hotel details with images, amenities and policy |
-| POST | `/api/hotels` | Admin, Manager | Create a hotel (managers' hotels wait for approval) |
+| POST | `/api/hotels` | Admin, Manager | Create a hotel (a manager's hotel waits for approval) |
 | PUT | `/api/hotels/{id}` | Admin, Manager | Update a hotel (managers: only their own) |
 | GET | `/api/hotels/my-hotels` | Manager | Hotels I manage |
 | GET | `/api/hotels/pending` | Admin | Hotels waiting for approval |
 | PATCH | `/api/hotels/{id}/status` | Admin | Approve, reject, activate or deactivate |
 | POST | `/api/hotels/{hotelId}/managers/{managerId}` | Admin | Assign a manager to a hotel |
-| GET / POST / DELETE | `/api/hotels/{hotelId}/images[/{imageId}]` | Public / Admin, Manager | List, upload and delete hotel photos |
+| GET, POST, DELETE | `/api/hotels/{hotelId}/images[/{imageId}]` | Public to read, Admin and Manager to change | List, upload and delete hotel photos |
 | GET | `/api/hotels/{hotelId}/child-policy` | Public | View the child policy |
-| POST / PUT | `/api/hotels/{hotelId}/child-policy` | Admin, Manager | Create / update the child policy |
+| POST, PUT | `/api/hotels/{hotelId}/child-policy` | Admin, Manager | Create or update the child policy |
 
 ### Rooms and room types
 
@@ -184,12 +153,12 @@ Lists accept `page`, `size` and `sort` (for example `?page=0&size=10&sort=name,a
 | POST | `/api/hotels/{hotelId}/rooms` | Admin, Manager | Add a room |
 | POST | `/api/hotels/{hotelId}/rooms/bulk` | Admin, Manager | Add up to 100 rooms at once (all or nothing) |
 | GET | `/api/hotels/{hotelId}/rooms` | Admin, Manager | List rooms |
-| GET / PUT | `/api/hotels/{hotelId}/rooms/{roomId}` | Admin, Manager | View / update one room |
+| GET, PUT | `/api/hotels/{hotelId}/rooms/{roomId}` | Admin, Manager | View or update one room |
 | PATCH | `/api/hotels/{hotelId}/rooms/{roomId}/status` | Admin, Manager | ACTIVE, INACTIVE or UNDER_MAINTENANCE (blocked if the room has upcoming bookings) |
 | GET | `/api/hotels/{hotelId}/rooms/{roomId}/images` | Public | Room photos |
-| POST / DELETE | `/api/hotels/{hotelId}/rooms/{roomId}/images[/{imageId}]` | Admin, Manager | Upload / delete room photos |
-| GET | `/api/rooms-types`, `/api/rooms-types/{id}` | Admin, Manager | Room types |
-| POST / PUT / PATCH | `/api/rooms-types[/{id}[/status]]` | Admin | Create, update, activate or deactivate room types |
+| POST, DELETE | `/api/hotels/{hotelId}/rooms/{roomId}/images[/{imageId}]` | Admin, Manager | Upload or delete room photos |
+| GET | `/api/rooms-types`, `/api/rooms-types/{id}` | Admin, Manager | View room types |
+| POST, PUT, PATCH | `/api/rooms-types[/{id}[/status]]` | Admin | Create, update, activate or deactivate room types |
 
 ### Amenities
 
@@ -197,9 +166,9 @@ Lists accept `page`, `size` and `sort` (for example `?page=0&size=10&sort=name,a
 |---|---|---|---|
 | GET | `/api/amenities` | Public | The amenity catalog |
 | POST | `/api/amenities` | Admin, Manager | Add an amenity to the catalog |
-| PUT / DELETE | `/api/amenities/{id}` | Admin | Rename / delete (not allowed while a hotel uses it) |
+| PUT, DELETE | `/api/amenities/{id}` | Admin | Rename or delete (not allowed while a hotel uses it) |
 | POST | `/api/hotels/{hotelId}/amenities` | Admin, Manager | Add an amenity to a hotel (description, extra cost) |
-| PUT / DELETE | `/api/hotels/{hotelId}/amenities/{amenityId}` | Admin, Manager | Change / remove it |
+| PUT, DELETE | `/api/hotels/{hotelId}/amenities/{amenityId}` | Admin, Manager | Change or remove it |
 
 ### Availability and bookings
 
@@ -218,246 +187,125 @@ Lists accept `page`, `size` and `sort` (for example `?page=0&size=10&sort=name,a
 |---|---|---|---|
 | GET | `/api/admin/users` | Admin | Users with filters `status`, `role`, `search`, paging and sorting |
 | GET | `/api/admin/users/{id}` | Admin | One user |
-| PATCH | `/api/admin/users/{id}/status` | Admin | Activate / deactivate a user |
+| PATCH | `/api/admin/users/{id}/status` | Admin | Activate or deactivate a user |
 | DELETE | `/api/admin/users/{id}` | Admin | Deactivate a user (soft delete, data is kept) |
 
-Errors always use the same JSON shape: `timestamp`, `status`, `error`, `message`, `path` (and an `errors` map for validation problems).
+### Example: make a booking
 
-## API Documentation
+First find free rooms:
 
-Swagger/OpenAPI is used to document and test the REST API.
-
-When running the application locally, Swagger UI is available at:
-
-```text
-http://localhost:8000/swagger-ui/index.html
+```http
+POST /api/availability/search
+{ "checkIn": "2026-11-10", "checkOut": "2026-11-13", "adults": 2, "children": 1, "city": "Manama" }
 ```
 
-## Installation
+Then book them (needs a customer token):
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/Batool-Isa/hotel-booking-system.git
-cd hotel-booking-system
+```http
+POST /api/bookings
+{
+  "hotelId": 1,
+  "checkIn": "2026-11-10",
+  "checkOut": "2026-11-13",
+  "specialRequest": "Late check-in please",
+  "rooms": [
+    { "roomId": 5,
+      "guests": [ { "name": "Sara Ahmed", "age": 32 }, { "name": "Omar Ahmed", "age": 6 } ] }
+  ]
+}
 ```
 
-### 2. Configure PostgreSQL
+The reply contains the booking reference, and a confirmation email is sent.
 
-Create a PostgreSQL database for the application and configure the database connection.
+### Errors
 
-### 3. Configure Environment Variables and Profiles
+Every error uses the same JSON shape, with an `errors` map for validation problems:
 
-Secrets are never stored in the repository. Set them as environment variables (see `.env.example`):
+```json
+{ "timestamp": "2026-10-08T05:48:09", "status": 409, "error": "ALREADY_EXISTS", "message": "User with email ... already exists!", "path": "/auth/users", "errors": null }
+```
 
-| Variable | Purpose |
-| --- | --- |
-| `SPRING_PROFILES_ACTIVE` | `dev` (default), `test` or `prod` |
-| `DATABASE_URL` | JDBC url, e.g. `jdbc:postgresql://localhost:5432/hotel-booking-app` |
-| `DATABASE_USERNAME` / `DATABASE_PASSWORD` | PostgreSQL credentials |
-| `JWT_SECRET` | Base64 signing key, at least 32 bytes (`openssl rand -base64 48`) |
-| `JWT_EXPIRATION_MS` | Token lifetime, default 86400000 (24 h) |
-| `EMAIL_USERNAME` / `EMAIL_PASSWORD` | SMTP account (Gmail app password) |
-| `GOOGLE_MAPS_API_KEY` | Optional, for the static map in emails |
-
-Spring profiles:
-
-| Profile | Database | Notes |
-| --- | --- | --- |
-| `dev` | local PostgreSQL | SQL logging on, DEBUG logs |
-| `test` | in-memory H2 | used by the automated tests, needs no secrets |
-| `prod` | PostgreSQL from env vars | SQL logging off, quiet logs |
-
-Stack traces are never returned in API responses in any profile.
-
-### 4. Seed the Database
-
-On start, the application fills an empty database with demo data. It checks before every insert, so restarting never creates duplicates. To get a completely fresh set, drop and recreate the database.
-
-| What | Demo data |
+| Status | Meaning |
 |---|---|
-| Roles | ADMIN, CUSTOMER, HOTEL_MANAGER, STAFF |
-| Users | `admin@vibestay.com` (`Admin123!`), `staff1@vibestay.com` (`Staff123!`), `manager1` to `manager6@vibestay.com` (`Manager123!`), `customer1` to `customer16@vibestay.com` (`Customer123!`) |
-| Hotels | 11 hotels in Bahrain, UAE, Qatar, Saudi Arabia, Oman and Kuwait: 8 ACTIVE, 2 PENDING_APPROVAL, 1 INACTIVE |
-| Per hotel | a manager, a child policy, 2 to 8 amenities with descriptions and extra costs, and 11 rooms |
-| Room types | Standard, Twin, Deluxe, Executive Suite, Family Suite, Presidential Suite |
-| Amenities | 16 (Wi-Fi, Pool, Gym, Spa, Breakfast, Airport Shuttle, Kids Club ...) |
-| Bookings | 26 bookings (`SEED-0001` ...) with guests: upcoming, completed and cancelled |
+| 400 | Validation failed or a business rule was broken (for example a room that is already booked) |
+| 401 | Missing or invalid token |
+| 403 | Logged in, but not allowed to do this |
+| 404 | Not found |
+| 409 | Already exists (for example the same email or room number) |
+| 429 | Too many login attempts, wait a minute |
 
-These passwords are fake demo values for development only. Change them before any real deployment.
+## Real time notifications
 
-### 5. Start the Application
+VibeStay uses WebSocket with STOMP at `ws://localhost:8000/ws`.
 
-The application can be started using IntelliJ or Maven:
+A browser cannot send an `Authorization` header when it opens a WebSocket, so the JWT goes in the STOMP `CONNECT` frame. The server checks the token and that the account is active, and refuses the connection otherwise. Every subscription is checked too, and clients cannot publish.
 
-```bash
-./mvnw spring-boot:run
-```
-
-### 6. Access the API
-
-The application runs locally on:
-
-```text
-http://localhost:8000
-```
-
-### 7. Access Swagger
-
-```text
-http://localhost:8000/swagger-ui/index.html
-```
-
-## WebSocket
-
-VibeStay uses WebSockets with STOMP for real-time booking notifications.
-
-```text
-ws://localhost:8000/ws
-```
-
-**Security.** A browser cannot send an `Authorization` header while opening a WebSocket, so the JWT is sent in the STOMP `CONNECT` frame (`Authorization: Bearer <token>`). The server checks the token and that the account is active; without a valid token the connection is refused. Every `SUBSCRIBE` is checked, and clients cannot publish messages.
-
-**Who receives what.**
-
-| Destination | Who can subscribe | What they get |
+| Destination | Who can subscribe | What they receive |
 |---|---|---|
-| `/user/queue/bookings` | any logged-in user | their own booking events (private) |
-| `/topic/hotels/{hotelId}/bookings` | the managers of that hotel, and admins | events of that hotel |
-| `/topic/admin/bookings` | admins | all booking events |
-
-A message looks like:
+| `/topic/users/{your email}/bookings` | any logged in user | their own booking events |
+| `/topic/hotels/{hotelId}/bookings` | managers of that hotel, and admins | events for that hotel |
+| `/topic/admin/bookings` | admins | every booking event |
 
 ```json
 { "bookingReference": "VB1A2B", "message": "Booking confirmed successfully", "status": "CONFIRMED", "hotelId": 1, "hotelName": "VibeStay Manama Grand" }
 ```
 
-Events are sent when a booking is confirmed, cancelled or completed. `websocket-test.html` is a small client: paste a JWT from `/auth/users/login`, connect, and watch the events arrive without refreshing.
+Events are sent when a booking is confirmed or cancelled.
 
-## Email Notifications
+### Using it
 
-VibeStay sends booking-related email notifications.
+**In the app.** Log in and a bell icon appears in the header. When a booking is made or cancelled, a pop-up message shows, the bell collects it in a live list, and the My bookings page refreshes without a page reload. Customers are told about their own bookings, managers about their hotels, and admins about everything.
 
-The booking email includes:
-- Booking reference
-- Hotel information
-- Check-in and check-out dates
-- Guest information
-- Room information
-- Booking status
-- Number of nights
-- Total amount
-- Hotel location
-- Google Maps location
+**From the command line.** `docs/ws_listen.py` connects with a login, subscribes, and prints every event it receives. It needs Python 3 and `pip install websockets`.
 
-The email is generated as HTML to make the booking information easier to read.
-
-## Major Challenges
-
-### Booking Availability
-
-One of the main challenges was handling room availability.
-
-Before creating a booking, the application checks whether the selected room already has an overlapping booking.
-
-The overlap rule is:
-
-```text
-existing check-in < requested check-out
-AND
-existing check-out > requested check-in
+```
+py docs/ws_listen.py EMAIL PASSWORD DESTINATION
 ```
 
-This prevents conflicting reservations while still allowing a new guest to check in on the same day another guest checks out.
-
-### Booking and Guest Relationships
-
-A booking can contain multiple rooms, and each booked room can contain multiple guests.
-
-The relationship is structured as:
-
-```text
-User
-  ↓
-Booking
-  ↓
-BookingRoom
-  ↓
-Room
-
-BookingRoom
-  ↓
-BookingGuest
+```
+py docs/ws_listen.py customer1@vibestay.com Customer123! /topic/users/customer1@vibestay.com/bookings
+py docs/ws_listen.py manager1@vibestay.com Manager123! /topic/hotels/1/bookings
+py docs/ws_listen.py admin@vibestay.com Admin123! /topic/admin/bookings
 ```
 
-This allowed me to keep guest information connected to the specific room they are staying in.
+Leave the window open, then make or cancel a booking in the app. The event shows up in the window straight away. Subscribing to a destination you are not allowed to use, such as another customer's topic or a hotel you do not manage, returns an `ERROR` frame.
 
-### Guest Age Classification
+**Any STOMP client.** Open `ws://localhost:8000/ws`, send a `CONNECT` frame with the header `Authorization: Bearer <token>`, then `SUBSCRIBE` to a destination above. Every STOMP frame ends with a NUL character, which is why a plain text WebSocket tool such as Postman is hard to use here.
 
-Guests are classified based on the hotel's child policy.
+## Emails
 
-The system handles:
-- Adults
-- Children
-- Infants
+The app sends verification, password reset and booking emails. They share one design. The booking email shows the reference, hotel, dates, guests, rooms, nights and total, plus a map of the hotel and a "Get directions" button. The map picture is built on the server from OpenStreetMap tiles, so no API key is needed. If the map cannot be made, the email is still sent without it.
 
-The policy also determines whether infants count towards room occupancy.
+## Main challenges
 
-### Role-Based Authorization
+**Room availability.** Before a booking is created, the app checks for an overlapping booking on the same room. A room is taken when `existing check-in < requested check-out` and `existing check-out > requested check-in`. A new guest can still check in on the day another guest leaves.
 
-VibeStay has different roles with different permissions:
-- CUSTOMER
-- HOTEL_MANAGER
-- ADMIN
-- STAFF (role exists and is seeded, reserved for future features)
+**Bookings with many rooms and guests.** One booking can hold several rooms, and each room holds its own guests (`Booking`, `BookingRoom`, `BookingGuest`). Guest information stays attached to the room they sleep in.
 
-For example, customers can manage their own bookings, hotel managers can manage hotels assigned to them, and administrators can perform system-level management actions.
+**Guest ages.** Each hotel has a child policy that sets the ages for infants, children and adults, and whether infants count towards room occupancy.
 
-### Real-Time Notifications
+**Roles.** Customers manage their own bookings, managers manage the hotels assigned to them, and admins manage the system. A `STAFF` role exists for future use.
 
-WebSocket/STOMP was one of the features I had to spend time debugging and testing.
+**Secure WebSocket.** At first every booking event went to one shared topic that anyone could join. I changed it so the token is checked when the socket connects, guests get a private queue, and managers can only listen to their own hotels.
 
-The application sends a real-time notification when booking events occur, such as a booking being confirmed or cancelled.
+**Emails with a map.** Google's static map needs billing, so I replaced it with a map picture built from OpenStreetMap tiles.
 
-At first every booking event went to one shared topic that anyone could join. I changed it so the JWT is checked when the socket connects, guests get their own private queue, and managers can only listen to hotels they manage.
+## Unsolved problems
 
-I also created a small browser-based test client to demonstrate that the notification can be received without refreshing the page.
+- Two people booking the same room at the exact same moment need stronger locking.
+- Booking emails are sent while the booking is being created, so a slow mail server can slow the request down.
 
-### Email and HTML Formatting
+## Resources
 
-Another challenge was building a structured HTML email containing booking information.
+- [Spring Boot: sending email via SMTP](https://www.geeksforgeeks.org/springboot/spring-boot-sending-email-via-smtp/)
+- [Spring Boot logging](https://www.geeksforgeeks.org/springboot/spring-boot-logging/)
 
-The email dynamically displays booking details, hotel information, rooms, guests, total price, and the hotel's location.
+## Future improvements
 
-The Google Maps Static API was also integrated into the email so the hotel location can be displayed as a map.
-
-## Unsolved Problems
-
-- Google Maps Static API requires billing to be enabled on the Google Cloud project before the map image can be displayed.
-- More advanced concurrency handling for simultaneous booking attempts can be added in a future iteration.
-
-## Resources Used
-
-- [Spring Boot - Sending Email via SMTP](https://www.geeksforgeeks.org/springboot/spring-boot-sending-email-via-smtp/)
-- [Spring Boot Logging](https://www.geeksforgeeks.org/springboot/spring-boot-logging/)
-
-## Future Improvements
-
-If I had more time, I would like to extend VibeStay with:
-- A frontend application for customers and hotel managers
-- Online payment integration
-- AI-powered hotel recommendations or an AI booking assistant
-- Improved Google Maps and location-based hotel search
-- More advanced booking concurrency handling
-- User-specific real-time notifications
+- Online payments
 - Reviews and ratings
-- Hotel and booking analytics
-- A more complete admin dashboard
-- Advanced hotel and room search
-- Mobile application support
-
-## Project Status
-
-VibeStay is currently being developed as a Spring Boot hotel reservation and management application.
-
-The core authentication, hotel, room, booking, notification, email, and real-time functionality has been implemented. Additional improvements and frontend features can be added as the project continues.
+- AI hotel recommendations or a booking assistant
+- Search by location on the map
+- Analytics and a fuller admin dashboard
+- Sending emails in the background
+- A mobile app

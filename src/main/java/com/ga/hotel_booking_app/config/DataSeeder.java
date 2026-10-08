@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
-
 @Configuration
 @RequiredArgsConstructor
 public class DataSeeder {
@@ -30,6 +29,9 @@ public class DataSeeder {
     @Bean
     CommandLineRunner seedData() {
         return args -> {
+            if (userRepository.count() > 0 || hotelRepository.count() > 0) {
+                return;
+            }
             seedRoles();
             seedStaffUsers();
             seedAmenities();
@@ -50,7 +52,6 @@ public class DataSeeder {
 
     private void seedStaffUsers() {
         createUser("admin", "admin@vibestay.com", "Admin123!", Role.RoleName.ADMIN, "VibeStay", "Admin", "+97330000000");
-        createUser("staff1", "staff1@vibestay.com", "Staff123!", Role.RoleName.STAFF, "Mariam", "Yousif", "+97330000001");
 
         String[][] managers = {
                 {"Hotel", "Manager One", "+97331111111"},
@@ -67,17 +68,18 @@ public class DataSeeder {
         }
     }
 
+    private static final String[][] CUSTOMERS = {
+            {"Sara", "Ahmed"}, {"Omar", "Khalid"}, {"Fatima", "Al Zayani"}, {"Hassan", "Jaffar"},
+            {"Maryam", "Salman"}, {"Ali", "Hussain"}, {"Zainab", "Mahmood"}, {"Ahmed", "Fakhro"},
+            {"Reem", "Nasser"}, {"Yousef", "Darwish"}, {"Huda", "Abdulla"}, {"Tariq", "Mansoor"},
+            {"Aisha", "Rashid"}, {"Jasim", "Saleh"}, {"Dana", "Mubarak"}, {"Karim", "Haddad"}
+    };
+
     private void seedCustomers() {
-        String[][] customers = {
-                {"Sara", "Ahmed"}, {"Omar", "Khalid"}, {"Fatima", "Al Zayani"}, {"Hassan", "Jaffar"},
-                {"Maryam", "Salman"}, {"Ali", "Hussain"}, {"Zainab", "Mahmood"}, {"Ahmed", "Fakhro"},
-                {"Reem", "Nasser"}, {"Yousef", "Darwish"}, {"Huda", "Abdulla"}, {"Tariq", "Mansoor"},
-                {"Aisha", "Rashid"}, {"Jasim", "Saleh"}, {"Dana", "Mubarak"}, {"Karim", "Haddad"}
-        };
-        for (int i = 0; i < customers.length; i++) {
+        for (int i = 0; i < CUSTOMERS.length; i++) {
             int n = i + 1;
             createUser("customer" + n, "customer" + n + "@vibestay.com", "Customer123!", Role.RoleName.CUSTOMER,
-                    customers[i][0], customers[i][1], String.format("+9733400%04d", n));
+                    CUSTOMERS[i][0], CUSTOMERS[i][1], String.format("+9733400%04d", n));
         }
     }
 
@@ -98,7 +100,6 @@ public class DataSeeder {
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
-        // BCrypt is slow, so each distinct password is encoded once and reused
         user.setPassword(encodedPasswords.computeIfAbsent(rawPassword, passwordEncoder::encode));
         user.setEmailVerified(true);
         user.setStatus(User.Status.ACTIVE);
@@ -113,7 +114,6 @@ public class DataSeeder {
             "Business Center", "Bar"
     };
 
-    /** Short text and extra cost shown when an amenity is linked to a hotel. */
     private static final Map<String, String> AMENITY_TEXT = Map.ofEntries(
             Map.entry("Wi-Fi", "Free high-speed Wi-Fi in all rooms"),
             Map.entry("Swimming Pool", "Outdoor pool, open 7am - 10pm"),
@@ -167,7 +167,6 @@ public class DataSeeder {
             }
         }
     }
-
 
     private record HotelSeed(String name, String description, String address, String city, String country,
                              String phone, String lat, String lng, Hotel.Status status, List<String> managers,
@@ -278,7 +277,6 @@ public class DataSeeder {
         createRooms(hotel, seed.priceFactor(), types);
     }
 
-
     private void createRooms(Hotel hotel, double factor, Map<String, RoomType> types) {
         String[][] layout = {
                 {"101", "1", "Standard Room"}, {"102", "1", "Standard Room"}, {"103", "1", "Standard Room"},
@@ -302,7 +300,6 @@ public class DataSeeder {
             room.setRoomType(types.get(r[2]));
             roomRepository.save(room);
         }
-        // one room under maintenance so that status is visible too
         Room maintenance = roomRepository.findByHotelId(hotel.getId()).stream()
                 .filter(r -> r.getRoomNumber().equals("104")).findFirst().orElse(null);
         if (maintenance != null && hotel.getStatus() == Hotel.Status.ACTIVE
@@ -311,7 +308,6 @@ public class DataSeeder {
             roomRepository.save(maintenance);
         }
     }
-
 
     private record BookingSeed(String hotel, String room, int customer, int startDay, int nights,
                                int adults, int children, Booking.Status status, String request) {
@@ -324,9 +320,7 @@ public class DataSeeder {
         Booking.Status C = Booking.Status.CONFIRMED, P = Booking.Status.PENDING,
                 X = Booking.Status.CANCELLED, D = Booking.Status.COMPLETED;
         return List.of(
-                // the very first sample booking (kept the same as before)
                 new BookingSeed(m, "201", 1, 14, 2, 2, 1, C, "Sample booking created by the data seeder"),
-                // upcoming
                 new BookingSeed(m, "301", 2, 7, 3, 3, 2, C, "Extra bed for the children please"),
                 new BookingSeed(m, "101", 3, 3, 2, 2, 0, C, null),
                 new BookingSeed(m, "302", 4, 20, 4, 2, 0, P, "Late check-in around midnight"),
@@ -341,7 +335,6 @@ public class DataSeeder {
                 new BookingSeed(q, "203", 13, 18, 3, 2, 0, C, "Airport pick-up needed"),
                 new BookingSeed(y, "202", 14, 6, 2, 2, 0, C, "Invoice for the company"),
                 new BookingSeed(u, "301", 15, 40, 6, 4, 2, C, null),
-                // finished stays
                 new BookingSeed(m, "201", 1, -30, 3, 2, 0, D, null),
                 new BookingSeed(m, "101", 5, -21, 2, 2, 0, D, null),
                 new BookingSeed(b, "301", 2, -45, 4, 4, 2, D, "Early check-in"),
@@ -349,7 +342,6 @@ public class DataSeeder {
                 new BookingSeed(a, "101", 8, -12, 3, 2, 1, D, null),
                 new BookingSeed(q, "301", 4, -60, 4, 3, 2, D, null),
                 new BookingSeed(u, "201", 16, -9, 2, 2, 0, D, null),
-                // cancelled
                 new BookingSeed(m, "301", 6, 7, 3, 2, 0, X, "Cancelled - plans changed"),
                 new BookingSeed(b, "201", 9, 10, 2, 2, 0, X, "Cancelled - found a different date"),
                 new BookingSeed(d, "401", 12, 25, 2, 2, 0, X, "Cancelled by guest"),
@@ -403,14 +395,15 @@ public class DataSeeder {
         bookingRoom.setBooking(booking);
         bookingRoom.setRoom(room);
         bookingRoom.setPricePerNight(room.getPricePerNight());
-
-        String lastName = customer.getUserProfile() != null ? customer.getUserProfile().getLastName() : "Guest";
+        String[] name = CUSTOMERS[seed.customer() - 1];
         for (int a = 0; a < seed.adults(); a++) {
-            bookingRoom.getGuests().add(guest(bookingRoom, (a == 0 ? customer.getUserProfile().getFirstName() : "Guest " + (a + 1)) + " " + lastName,
+            bookingRoom.getGuests().add(guest(bookingRoom,
+                    (a == 0 ? name[0] : "Guest " + (a + 1)) + " " + name[1],
                     30 + a * 3, BookingGuest.GuestType.ADULT));
         }
         for (int c = 0; c < seed.children(); c++) {
-            bookingRoom.getGuests().add(guest(bookingRoom, "Child " + (c + 1) + " " + lastName,
+            bookingRoom.getGuests().add(guest(bookingRoom,
+                    "Child " + (c + 1) + " " + name[1],
                     5 + c * 3, BookingGuest.GuestType.CHILD));
         }
         booking.getBookingRooms().add(bookingRoom);

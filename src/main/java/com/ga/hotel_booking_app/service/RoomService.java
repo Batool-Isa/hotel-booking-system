@@ -65,6 +65,9 @@ public class RoomService {
                 throw new UnauthorizedActionException("You are not authorized to add room to this hotel");
             }
         }
+        if (roomRepository.existsByHotelIdAndRoomNumber(hotel.getId(), request.getRoomNumber())) {
+            throw new InformationExistException("Room number " + request.getRoomNumber() + " already exists in this hotel");
+        }
         Room room = new Room();
         RoomType type = roomTypeRepository.findById(request.getRoomTypeId())
                 .orElseThrow(() -> new InformationNotFoundException("Room Type with id " + request.getRoomTypeId() + " not found"));

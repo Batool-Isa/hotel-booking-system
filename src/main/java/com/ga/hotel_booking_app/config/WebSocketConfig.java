@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private static final Logger log = LoggerFactory.getLogger(WebSocketConfig.class);
     private static final Pattern HOTEL_TOPIC = Pattern.compile("^/topic/hotels/(\\d+)/bookings$");
+    private static final Pattern USER_TOPIC = Pattern.compile("^/topic/users/(\\d+)/bookings$");
     @Autowired
     @Lazy
     private JwtUtils jwtUtils;
@@ -109,8 +110,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         User user = details.getUser();
         Role.RoleName role = user.getRole().getName();
 
-        if (destination.equals("/user/queue/bookings")) {
-            return; // always the caller's own queue
+        if (destination.equals("/user/queue/bookings")
+                || destination.equals("/topic/users/" + user.getEmail() + "/bookings")) {
+            return;
         }
         if (destination.equals("/topic/admin/bookings") && role == Role.RoleName.ADMIN) {
             return;
@@ -131,5 +133,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         }
         throw new MessagingException("You are not allowed to subscribe to " + destination);
     }
-
 }

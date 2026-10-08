@@ -27,7 +27,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 
     Page<Room> findByHotelIdAndStatus(Long hotelId, Room.Status status, Pageable pageable);
     boolean existsByHotelIdAndRoomNumber(Long hotelId, String roomNumber);
-
     List<Room> findByHotel(Hotel hotel);
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT r FROM Room r WHERE r.id = :id")
