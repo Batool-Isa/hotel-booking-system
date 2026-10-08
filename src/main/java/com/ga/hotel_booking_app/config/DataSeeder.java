@@ -8,7 +8,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import org.springframework.core.io.ClassPathResource;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -25,6 +32,8 @@ public class DataSeeder {
     private final RoomRepository roomRepository;
     private final ChildPolicyRepository childPolicyRepository;
     private final BookingRepository bookingRepository;
+    private final HotelImageRepository hotelImageRepository;
+    private final RoomImageRepository roomImageRepository;
 
     @Bean
     CommandLineRunner seedData() {
@@ -275,6 +284,7 @@ public class DataSeeder {
         }
 
         createRooms(hotel, seed.priceFactor(), types);
+        createHotelImages(hotel);
     }
 
     private void createRooms(Hotel hotel, double factor, Map<String, RoomType> types) {
@@ -298,7 +308,8 @@ public class DataSeeder {
             room.setMaxOccupancy(Integer.parseInt(t[5]));
             room.setHotel(hotel);
             room.setRoomType(types.get(r[2]));
-            roomRepository.save(room);
+            room = roomRepository.save(room);
+            createRoomImage(room, r[2]);
         }
         Room maintenance = roomRepository.findByHotelId(hotel.getId()).stream()
                 .filter(r -> r.getRoomNumber().equals("104")).findFirst().orElse(null);
@@ -306,6 +317,100 @@ public class DataSeeder {
                 && hotel.getName().equals("VibeStay Beach Resort")) {
             maintenance.setStatus(Room.Status.UNDER_MAINTENANCE);
             roomRepository.save(maintenance);
+        }
+    }
+
+    private static final String UNSPLASH = "https://images.unsplash.com/photo-";
+    private static final String UNSPLASH_SIZE = "?auto=format&fit=crop&w=1200&q=75";
+    private static final String[] HOTEL_PHOTOS = {
+            "1566073771259-6a8506099945", "1551882547-ff40c63fe5fa", "1445019980597-93fa8acb246c"
+    };
+    private static final String[] ROOM_PHOTOS = {
+            "1611892440504-42a792e24d32", "1631049307264-da0ec9d70304", "1582719478250-c89cae4dc85b"
+    };
+    private final Map<String, byte[]> imageCache = new HashMap<>();
+    private final java.net.http.HttpClient http = java.net.http.HttpClient.newBuilder()
+            .followRedirects(java.net.http.HttpClient.Redirect.NORMAL)
+            .connectTimeout(java.time.Duration.ofSeconds(5)).build();
+
+    private void createHotelImages(Hotel hotel) {
+        for (int i = 0; i < 3; i++) {
+            int pick = (int) ((hotel.getId() + i) % 3);
+            String path = saveSeedImage(HOTEL_PHOTOS[pick], "hotel-" + (pick + 1) + ".jpg",
+                    "uploads/hotels/" + hotel.getId(), "seed-" + (i + 1) + ".jpg");
+            if (path != null) {
+                HotelImage image = new HotelImage();
+                image.setImageURL(path);
+                image.setAltText(hotel.getName() + " photo " + (i + 1));
+                image.setHotel(hotel);
+                hotelImageRepository.save(image);
+            }
+        }
+    }
+
+    private void createRoomImage(Room room, String typeName) {
+        int pick = typeName.contains("Suite") ? 2 : typeName.contains("Deluxe") ? 1 : 0;
+        String path = saveSeedImage(ROOM_PHOTOS[pick], "room-" + (pick + 1) + ".jpg",
+                "uploads/rooms/" + room.getHotel().getId() + "/" + room.getId(), "seed.jpg");
+        if (path != null) {
+            RoomImage image = new RoomImage();
+            image.setImageURL(path);
+            image.setRoom(room);
+            roomImageRepository.save(image);
+        }
+    }
+
+    private String saveSeedImage(String unsplashId, String fallbackName, String directory, String fileName) {
+        byte[] data = cached("web:" + unsplashId, () -> download(UNSPLASH + unsplashId + UNSPLASH_SIZE));
+        if (data.length == 0) {
+            data = cached("local:" + fallbackName, () -> readBundled(fallbackName));
+        }
+        if (data.length == 0) {
+            return null;
+        }
+        try {
+            Path dir = Paths.get(directory);
+            Files.createDirectories(dir);
+            Files.write(dir.resolve(fileName), data);
+            return directory + "/" + fileName;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private byte[] cached(String key, java.util.function.Supplier<byte[]> loader) {
+        byte[] data = imageCache.get(key);
+        if (data == null) {
+            data = loader.get();
+            if (data == null) {
+                data = new byte[0];
+            }
+            imageCache.put(key, data);
+        }
+        return data;
+    }
+
+    private byte[] download(String url) {
+        try {
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder(java.net.URI.create(url))
+                    .timeout(java.time.Duration.ofSeconds(10)).header("User-Agent", "VibeStay-Seeder").GET().build();
+            java.net.http.HttpResponse<byte[]> response = http.send(request,
+                    java.net.http.HttpResponse.BodyHandlers.ofByteArray());
+            String type = response.headers().firstValue("Content-Type").orElse("");
+            byte[] body = response.body();
+            if (response.statusCode() == 200 && type.startsWith("image/") && body.length > 5_000 && body.length < 1_000_000) {
+                return body;
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    private byte[] readBundled(String name) {
+        try (InputStream in = new ClassPathResource("seed-images/" + name).getInputStream()) {
+            return in.readAllBytes();
+        } catch (IOException e) {
+            return null;
         }
     }
 
