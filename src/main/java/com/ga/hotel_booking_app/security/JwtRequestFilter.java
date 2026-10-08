@@ -1,5 +1,6 @@
 package com.ga.hotel_booking_app.security;
 
+import com.ga.hotel_booking_app.model.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,10 +49,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 UserDetails userDetails = this.myUserDetailsService.loadUserByUsername(email);
                 System.out.println("userDetails: ==> " + userDetails.getUsername());
                 System.out.println("authorities: ==> " + userDetails.getAuthorities());
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                boolean accountActive = !(userDetails instanceof MyUserDetails details)
+                        || details.getUser().getStatus() == User.Status.ACTIVE;
+                if (accountActive) {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
         } catch (Exception e) {
             logger.error("Cannot set user authentication: {}", e);
