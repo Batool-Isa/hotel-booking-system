@@ -343,6 +343,20 @@ public class BookingService {
         return ResponseEntity.ok(new MessageResponse("Booking canceled successfully"));
     }
 
+    private static @NonNull String getLogDescription(User user, Booking booking) {
+        String logDescription;
+        if (user.getRole().getName().equals(Role.RoleName.HOTEL_MANAGER)) {
+            logDescription = "Manager " + user.getUsername() + " cancelled booking "
+                    + booking.getBookingReference() + " for user " + booking.getUser().getId();
+        } else if (user.getRole().getName().equals(Role.RoleName.ADMIN)) {
+            logDescription = "Admin " + user.getUsername() + " cancelled booking "
+                    + booking.getBookingReference() + " for user " + booking.getUser().getId();
+        } else {
+            logDescription = "Customer " + user.getUsername() + " cancelled booking " + booking.getBookingReference();
+        }
+        return logDescription;
+    }
+
     public ResponseEntity<?> getBookingById(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new InformationNotFoundException("Booking with id " + bookingId + " not found"));
