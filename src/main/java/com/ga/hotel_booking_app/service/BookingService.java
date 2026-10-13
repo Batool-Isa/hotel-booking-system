@@ -80,7 +80,7 @@ public class BookingService {
         ChildPolicy childPolicy = hotel.getChildPolicy();
         if (childPolicy == null) {
             throw new InvalidInformationException(
-                    "This hotel has not set its child policy yet, so it can\'t accept bookings right now");
+                    "This hotel has not set its child policy yet, so it can't accept bookings right now");
         }
 
 
@@ -166,8 +166,14 @@ public class BookingService {
 
         // insert into booking table
         Booking booking = new Booking();
-        String bookingReference = hotel.getName().substring(0, 2).toUpperCase() +
-                UUID.randomUUID().toString().substring(0, 4).toUpperCase();
+        String referencePrefix = hotel.getName().replaceAll("[^A-Za-z]","").toUpperCase();
+        if(referencePrefix.length() >= 4){
+            referencePrefix = referencePrefix.substring(0,4);
+        }else{
+            referencePrefix = referencePrefix+"XXXX".substring(0,4);
+        }
+        String referenceSuffix = UUID.randomUUID().toString().substring(0, 5).toUpperCase();
+        String bookingReference = referencePrefix + referenceSuffix;
         booking.setBookingReference(bookingReference);
         booking.setHotel(hotel);
         booking.setCheckIn(request.getCheckIn());
