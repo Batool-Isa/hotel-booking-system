@@ -51,7 +51,7 @@ public class BookingController {
 
     @PatchMapping("/{bookingId}/status")
     @PreAuthorize("hasAnyRole('ADMIN', 'HOTEL_MANAGER')")
-    @Operation(summary = "Get booking by Id", description = "Fetch booking by Id")
+    @Operation(summary = "Update booking status", description = "Update booking status")
     public ResponseEntity<?> updateBookingStatus(@PathVariable Long bookingId,
                                                  @Valid @RequestBody BookingStatusRequest request) {
         System.out.println("Booking controller calling --> update booking by id");

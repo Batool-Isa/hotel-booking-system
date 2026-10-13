@@ -1,8 +1,8 @@
 package com.ga.hotel_booking_app.service;
 
-import com.ga.hotel_booking_app.dto.reponse.AdminUserResponse;
-import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
-import com.ga.hotel_booking_app.dto.reponse.PageResponse;
+import com.ga.hotel_booking_app.dto.response.AdminUserResponse;
+import com.ga.hotel_booking_app.dto.response.MessageResponse;
+import com.ga.hotel_booking_app.dto.response.PageResponse;
 import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;
 import com.ga.hotel_booking_app.exception.custom.InvalidInformationException;
 import com.ga.hotel_booking_app.model.Role;
@@ -18,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;

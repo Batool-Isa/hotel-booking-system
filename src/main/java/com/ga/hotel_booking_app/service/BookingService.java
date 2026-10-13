@@ -1,9 +1,9 @@
 package com.ga.hotel_booking_app.service;
 
-import com.ga.hotel_booking_app.dto.reponse.BookingGuestResponse;
-import com.ga.hotel_booking_app.dto.reponse.BookingResponse;
-import com.ga.hotel_booking_app.dto.reponse.BookingRoomResponse;
-import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
+import com.ga.hotel_booking_app.dto.response.BookingGuestResponse;
+import com.ga.hotel_booking_app.dto.response.BookingResponse;
+import com.ga.hotel_booking_app.dto.response.BookingRoomResponse;
+import com.ga.hotel_booking_app.dto.response.MessageResponse;
 import com.ga.hotel_booking_app.dto.request.BookingGuestRequest;
 
 import java.math.BigDecimal;

@@ -1,9 +1,9 @@
 package com.ga.hotel_booking_app.service;
 
-import com.ga.hotel_booking_app.dto.reponse.AmenityResponse;
-import com.ga.hotel_booking_app.dto.reponse.HotelImageResponse;
-import com.ga.hotel_booking_app.dto.reponse.HotelResponse;
-import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
+import com.ga.hotel_booking_app.dto.response.AmenityResponse;
+import com.ga.hotel_booking_app.dto.response.HotelImageResponse;
+import com.ga.hotel_booking_app.dto.response.HotelResponse;
+import com.ga.hotel_booking_app.dto.response.MessageResponse;
 import com.ga.hotel_booking_app.dto.request.CreateHotelRequest;
 import com.ga.hotel_booking_app.dto.request.UpdateHotelRequest;
 import com.ga.hotel_booking_app.dto.request.UpdateHotelStatusRequest;

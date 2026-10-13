@@ -1,6 +1,6 @@
 package com.ga.hotel_booking_app.service;
 
-import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
+import com.ga.hotel_booking_app.dto.response.MessageResponse;
 import com.ga.hotel_booking_app.dto.request.ChangePasswordRequest;
 import com.ga.hotel_booking_app.dto.request.ForgotPasswordRequest;
 import com.ga.hotel_booking_app.dto.request.ResetPasswordRequest;

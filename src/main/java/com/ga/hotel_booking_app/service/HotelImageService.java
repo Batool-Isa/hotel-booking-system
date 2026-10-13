@@ -1,8 +1,8 @@
 package com.ga.hotel_booking_app.service;
 
 
-import com.ga.hotel_booking_app.dto.reponse.HotelImageResponse;
-import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
+import com.ga.hotel_booking_app.dto.response.HotelImageResponse;
+import com.ga.hotel_booking_app.dto.response.MessageResponse;
 import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;
 import com.ga.hotel_booking_app.exception.custom.InvalidInformationException;
 import com.ga.hotel_booking_app.exception.custom.UnauthorizedActionException;
@@ -10,7 +10,6 @@ import com.ga.hotel_booking_app.model.*;
 import com.ga.hotel_booking_app.repository.HotelImageRepository;
 import com.ga.hotel_booking_app.repository.HotelRepository;
 import com.ga.hotel_booking_app.repository.UserRepository;
-import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -18,14 +17,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.management.relation.Relation;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Service

@@ -1,7 +1,7 @@
 package com.ga.hotel_booking_app.service;
 
-import com.ga.hotel_booking_app.dto.reponse.AvailableHotelResponse;
-import com.ga.hotel_booking_app.dto.reponse.RoomResponse;
+import com.ga.hotel_booking_app.dto.response.AvailableHotelResponse;
+import com.ga.hotel_booking_app.dto.response.RoomResponse;
 import com.ga.hotel_booking_app.dto.request.AvailabilityRequest;
 import com.ga.hotel_booking_app.exception.custom.InvalidInformationException;
 import com.ga.hotel_booking_app.model.Booking;
@@ -9,6 +9,8 @@ import com.ga.hotel_booking_app.model.Hotel;
 import com.ga.hotel_booking_app.model.Room;
 import com.ga.hotel_booking_app.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -23,43 +25,32 @@ public class AvailabilityService {
     private HotelRepository hotelRepository;
     @Autowired
     private BookingRepository bookingRepository;
-
-    public ResponseEntity<?> searchAvailability(AvailabilityRequest request) {
+    @Autowired
+    private RoomRepository roomRepository;
+    public ResponseEntity<?> searchAvailability(AvailabilityRequest request, Pageable pageable) {
         // validate user request
         if (!request.getCheckOut().isAfter(request.getCheckIn())) {
             throw new InvalidInformationException("Checkout date must be after check-in date");
         }
+        Integer adultNum = request.getAdults();
+        // if adults num is null , use 1 b default
+        int adults = adultNum == null ? 1 :adultNum;
+        Integer childNum = request.getChildren();
+        int children = childNum==null ? 0: childNum;
+        String city = request.getCity();
+
         // get available hotels with room
 
-        //get active hotels
-        List<Hotel> hotelList = hotelRepository.findByStatus(Hotel.Status.ACTIVE);
-        // if city is provided
-        if (request.getCity() != null) {
-            hotelList = hotelList.stream().filter(h -> h.getCity().equalsIgnoreCase(request.getCity())).toList();
-        }
-        // get only active rooms
-        List<Room> activeRoomsList = hotelList.stream()
-                .flatMap(h -> h.getRooms().stream())
-                .filter(r -> r.getStatus().equals(Room.Status.ACTIVE)).toList();
+        //get available hotels --> activeOne and has available slots in room in selected date and number of occupacy
+        Page<Hotel> availableHotel = hotelRepository.findHotelsWithFreeRooms(city, adults, children,
+                request.getCheckIn(), request.getCheckOut(), pageable);
 
-        // get only active booking
-        List<Booking> bookingList = new ArrayList<>();
-        for (Hotel h : hotelList) {
-            bookingList.addAll(bookingRepository.findByHotelIdAndStatus(h.getId(), Booking.Status.CONFIRMED));
-        }
-        // gets booking that overlap
-        List<Booking> overLappedBookings = bookingList.stream()
-                .filter(b ->
-                        b.getCheckOut().isAfter(request.getCheckIn())
-                                && b.getCheckIn().isBefore(request.getCheckOut())).toList();
-        // get rooms id of rooms that overlapped and can't booked for this user
-        Set<Long> unavailableRooms = overLappedBookings.stream()
-                .flatMap(b -> b.getBookingRooms().stream())
-                .map(br -> br.getRoom().getId()).collect(Collectors.toSet());
+        List<Long> hotelsIds = availableHotel.stream().map(h ->h.getId()).toList();
+        List<Room> availableRoomsByHotel = roomRepository.findFreeRooms(hotelsIds, adults, children, request.getCheckIn(), request.getCheckOut());
 
 
         List<AvailableHotelResponse> hotelResponseList = new ArrayList<>();
-        for (Hotel hotel : hotelList) {
+        for (Hotel hotel : availableHotel) {
             List<RoomResponse> roomResponseList = new ArrayList<>();
             AvailableHotelResponse response = new AvailableHotelResponse();
             response.setHotelId(hotel.getId());
@@ -69,12 +60,8 @@ public class AvailabilityService {
             response.setHotelName(hotel.getName());
             response.setLatitude(hotel.getLatitude());
             response.setLongitude(hotel.getLongitude());
-            List<Room> hotelActiveRooms = hotel.getRooms().stream().filter(r -> r.getStatus().equals(Room.Status.ACTIVE)).toList();
-            for (Room r : hotelActiveRooms) {
-                //check if room can't be booked
-                if (unavailableRooms.contains(r.getId())) {
-                    continue;
-                }
+            List<Room> availableRoom = availableRoomsByHotel.stream().filter(r->r.getHotel().equals(hotel)).toList();
+            for (Room r : availableRoom) {
                 RoomResponse roomResponse = buildRoomResponse(r);
                 roomResponseList.add(roomResponse);
             }

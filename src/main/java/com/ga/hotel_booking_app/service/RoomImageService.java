@@ -1,7 +1,7 @@
 package com.ga.hotel_booking_app.service;
 
-import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
-import com.ga.hotel_booking_app.dto.reponse.RoomImageResponse;
+import com.ga.hotel_booking_app.dto.response.MessageResponse;
+import com.ga.hotel_booking_app.dto.response.RoomImageResponse;
 import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;
 import com.ga.hotel_booking_app.exception.custom.InvalidInformationException;
 import com.ga.hotel_booking_app.exception.custom.UnauthorizedActionException;

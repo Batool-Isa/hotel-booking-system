@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "")
+@Table(name = "hotels_amenities")
 @ToString
 public class HotelAmenity {
     @Id
@@ -28,6 +28,6 @@ public class HotelAmenity {
 
     @Column
     private String description;
-    @Column
+    @Column(precision = 10, scale = 2)
     private BigDecimal additionalCost;
 }

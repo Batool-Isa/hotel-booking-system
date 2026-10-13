@@ -1,7 +1,7 @@
 package com.ga.hotel_booking_app.service;
 
-import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
-import com.ga.hotel_booking_app.dto.reponse.RoomResponse;
+import com.ga.hotel_booking_app.dto.response.MessageResponse;
+import com.ga.hotel_booking_app.dto.response.RoomResponse;
 import com.ga.hotel_booking_app.dto.request.BulkCreateRoomsRequest;
 import com.ga.hotel_booking_app.dto.request.CreateRoomRequest;
 import com.ga.hotel_booking_app.dto.request.UpdateRoomStatusRequest;

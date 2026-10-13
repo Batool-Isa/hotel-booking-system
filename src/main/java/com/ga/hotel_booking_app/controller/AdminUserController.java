@@ -1,8 +1,8 @@
 package com.ga.hotel_booking_app.controller;
 
-import com.ga.hotel_booking_app.dto.reponse.AdminUserResponse;
-import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
-import com.ga.hotel_booking_app.dto.reponse.PageResponse;
+import com.ga.hotel_booking_app.dto.response.AdminUserResponse;
+import com.ga.hotel_booking_app.dto.response.MessageResponse;
+import com.ga.hotel_booking_app.dto.response.PageResponse;
 import com.ga.hotel_booking_app.dto.request.UpdateUserStatusRequest;
 import com.ga.hotel_booking_app.model.Role;
 import com.ga.hotel_booking_app.model.User;
