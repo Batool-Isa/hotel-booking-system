@@ -74,7 +74,9 @@ public class BookingService {
         // get hotel
         Hotel hotel = hotelRepository.findById(request.getHotelId())
                 .orElseThrow(() -> new InformationNotFoundException("Hotel with id " + request.getHotelId() + " not found"));
-
+        if(!hotel.getStatus().equals(Hotel.Status.ACTIVE)){
+            throw new InvalidInformationException("This hotel is not available for booking");
+        }
         // get hotel's child policy
         ChildPolicy childPolicy = hotel.getChildPolicy();
         if (childPolicy == null) {
