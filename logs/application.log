@@ -276,3 +276,461 @@ io.jsonwebtoken.MalformedJwtException: JWT strings must contain exactly 2 period
 2026-10-13T14:38:19.831+03:00  INFO 17300 --- [hotel-booking-app] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
 2026-10-13T14:38:19.838+03:00  INFO 17300 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
 2026-10-13T14:38:19.843+03:00  INFO 17300 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-10-13T14:46:50.828+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Starting HotelBookingAppApplication using Java 17.0.20.1 with PID 5812 (C:\Users\DELL\Ijdb\project\hotel-booking-app\target\classes started by DELL in C:\Users\DELL\Ijdb\project\hotel-booking-app)
+2026-10-13T14:46:50.838+03:00 DEBUG 5812 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-10-13T14:46:50.840+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : The following 1 profile is active: "dev"
+2026-10-13T14:46:50.991+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-10-13T14:46:50.992+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-10-13T14:46:53.075+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-13T14:46:53.264+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 170 ms. Found 16 JPA repository interfaces.
+2026-10-13T14:46:54.842+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8000 (http)
+2026-10-13T14:46:54.875+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-13T14:46:54.876+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-13T14:46:55.002+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 4009 ms
+2026-10-13T14:46:55.313+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-13T14:46:55.427+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-10-13T14:46:56.424+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-13T14:46:56.575+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-13T14:46:57.503+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1cc291ed
+2026-10-13T14:46:57.509+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-13T14:46:57.743+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5434/hotel-booking-app]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: hotel-booking-app/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-13T14:47:03.967+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-13T14:47:04.334+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-13T14:47:04.540+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-13T14:47:05.591+03:00 DEBUG 5812 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'authenticationJwtTokenFilter' configured for use
+2026-10-13T14:47:05.593+03:00 DEBUG 5812 --- [hotel-booking-app] [restartedMain] c.g.h.security.RateLimitFilter           : Filter 'rateLimitFilter' configured for use
+2026-10-13T14:47:05.595+03:00 DEBUG 5812 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'jwtRequestFilter' configured for use
+2026-10-13T14:47:10.508+03:00  WARN 5812 --- [hotel-booking-app] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-10-13T14:47:10.781+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsService
+2026-10-13T14:47:11.098+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] o.s.b.w.a.WelcomePageHandlerMapping      : Adding welcome page: class path resource [static/index.html]
+2026-10-13T14:47:11.880+03:00  WARN 5812 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T14:47:11.881+03:00  WARN 5812 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/index.html]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T14:47:11.881+03:00  WARN 5812 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/static/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T14:47:11.881+03:00  WARN 5812 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/css/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T14:47:11.881+03:00  WARN 5812 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/js/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T14:47:11.881+03:00  WARN 5812 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/images/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T14:47:11.882+03:00  WARN 5812 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/favicon.ico]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T14:47:11.882+03:00  WARN 5812 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/uploads/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T14:47:11.990+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-10-13T14:47:11.991+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6f3fbc47]]
+2026-10-13T14:47:11.994+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-10-13T14:47:12.025+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8000 (http) with context path '/'
+2026-10-13T14:47:12.039+03:00  INFO 5812 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Started HotelBookingAppApplication in 22.284 seconds (process running for 23.564)
+2026-10-13T14:47:12.220+03:00  WARN 5812 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-10-13T14:47:12.220+03:00  WARN 5812 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-10-13T14:47:25.177+03:00  INFO 5812 --- [hotel-booking-app] [http-nio-8000-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-13T14:47:25.179+03:00  INFO 5812 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-13T14:47:25.184+03:00  INFO 5812 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2026-10-13T14:47:26.147+03:00  WARN 5812 --- [hotel-booking-app] [http-nio-8000-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: Room with id 15 is not active for booking for now]
+2026-10-13T14:47:46.922+03:00  INFO 5812 --- [hotel-booking-app] [http-nio-8000-exec-2] c.g.h.service.NotificationService        : WebSocket notification sent for booking VIDAD6
+2026-10-13T14:47:54.244+03:00  INFO 5812 --- [hotel-booking-app] [http-nio-8000-exec-2] c.g.h.service.BookingService             : Booking created: reference=VIDAD6, userId=24, hotelId=2
+2026-10-13T14:48:11.995+03:00  INFO 5812 --- [hotel-booking-app] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
+2026-10-13T14:48:15.115+03:00  WARN 5812 --- [hotel-booking-app] [http-nio-8000-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: Booking room at these days is overlapped]
+2026-10-13T14:48:35.611+03:00  WARN 5812 --- [hotel-booking-app] [http-nio-8000-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: Invalid booking dates]
+2026-10-13T14:48:46.949+03:00 ERROR 5812 --- [hotel-booking-app] [http-nio-8000-exec-5] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because the return value of "com.ga.hotel_booking_app.dto.request.BookingGuestRequest.getAge()" is null] with root cause
+
+java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because the return value of "com.ga.hotel_booking_app.dto.request.BookingGuestRequest.getAge()" is null
+	at com.ga.hotel_booking_app.service.BookingService.createNewBooking(BookingService.java:120) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:190) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:158) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719) ~[spring-aop-7.0.9.jar:7.0.9]
+	at com.ga.hotel_booking_app.service.BookingService$$SpringCGLIB$$0.createNewBooking(<generated>) ~[classes/:na]
+	at com.ga.hotel_booking_app.controller.BookingController.createNewBooking(BookingController.java:24) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:715) ~[spring-aop-7.0.9.jar:7.0.9]
+	at com.ga.hotel_booking_app.controller.BookingController$$SpringCGLIB$$0.createNewBooking(<generated>) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568) ~[na:na]
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:252) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:184) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1000) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:903) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:649) ~[tomcat-embed-core-11.0.24.jar:6.1]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710) ~[tomcat-embed-core-11.0.24.jar:6.1]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:132) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:59) ~[tomcat-embed-websocket-11.0.24.jar:11.0.24]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at com.ga.hotel_booking_app.security.RateLimitFilter.doFilterInternal(RateLimitFilter.java:76) ~[classes/:na]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at com.ga.hotel_booking_app.security.JwtRequestFilter.doFilterInternal(JwtRequestFilter.java:64) ~[classes/:na]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$2(FilterChainProxy.java:235) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:376) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:132) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:86) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:181) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at com.ga.hotel_booking_app.security.JwtRequestFilter.doFilterInternal(JwtRequestFilter.java:64) ~[classes/:na]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317) ~[spring-security-config-7.1.1.jar:7.1.1]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:535) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:86) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:71) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:347) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:406) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:71) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:1307) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:2036) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:74) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:949) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:483) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:74) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at java.base/java.lang.Thread.run(Thread.java:842) ~[na:na]
+
+2026-10-13T14:53:39.975+03:00 ERROR 5812 --- [hotel-booking-app] [http-nio-8000-exec-6] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because the return value of "com.ga.hotel_booking_app.dto.request.BookingGuestRequest.getAge()" is null] with root cause
+
+java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because the return value of "com.ga.hotel_booking_app.dto.request.BookingGuestRequest.getAge()" is null
+	at com.ga.hotel_booking_app.service.BookingService.createNewBooking(BookingService.java:120) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:190) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:158) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130) ~[spring-tx-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719) ~[spring-aop-7.0.9.jar:7.0.9]
+	at com.ga.hotel_booking_app.service.BookingService$$SpringCGLIB$$0.createNewBooking(<generated>) ~[classes/:na]
+	at com.ga.hotel_booking_app.controller.BookingController.createNewBooking(BookingController.java:24) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-7.0.9.jar:7.0.9]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:715) ~[spring-aop-7.0.9.jar:7.0.9]
+	at com.ga.hotel_booking_app.controller.BookingController$$SpringCGLIB$$0.createNewBooking(<generated>) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568) ~[na:na]
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:252) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:184) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1000) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:903) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:649) ~[tomcat-embed-core-11.0.24.jar:6.1]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710) ~[tomcat-embed-core-11.0.24.jar:6.1]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:132) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:59) ~[tomcat-embed-websocket-11.0.24.jar:11.0.24]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at com.ga.hotel_booking_app.security.RateLimitFilter.doFilterInternal(RateLimitFilter.java:76) ~[classes/:na]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at com.ga.hotel_booking_app.security.JwtRequestFilter.doFilterInternal(JwtRequestFilter.java:64) ~[classes/:na]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$2(FilterChainProxy.java:235) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:376) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:132) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:86) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:181) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at com.ga.hotel_booking_app.security.JwtRequestFilter.doFilterInternal(JwtRequestFilter.java:64) ~[classes/:na]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:385) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317) ~[spring-security-config-7.1.1.jar:7.1.1]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:535) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:86) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:71) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:347) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:406) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:71) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:1307) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:2036) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:74) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:949) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:483) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:74) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at java.base/java.lang.Thread.run(Thread.java:842) ~[na:na]
+
+2026-10-13T15:04:25.603+03:00  WARN 5812 --- [hotel-booking-app] [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m39s772ms486µs700ns).
+2026-10-13T15:06:35.496+03:00  INFO 5812 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-10-13T15:06:35.797+03:00  INFO 5812 --- [hotel-booking-app] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-10-13T15:06:35.800+03:00  INFO 5812 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-10-13T15:06:35.801+03:00  INFO 5812 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6f3fbc47]]
+2026-10-13T15:06:35.801+03:00  INFO 5812 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-10-13T15:06:35.818+03:00  INFO 5812 --- [hotel-booking-app] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-13T15:06:35.822+03:00  INFO 5812 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-10-13T15:06:35.832+03:00  INFO 5812 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-10-13T15:06:43.737+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Starting HotelBookingAppApplication using Java 17.0.20.1 with PID 18228 (C:\Users\DELL\Ijdb\project\hotel-booking-app\target\classes started by DELL in C:\Users\DELL\Ijdb\project\hotel-booking-app)
+2026-10-13T15:06:43.742+03:00 DEBUG 18228 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-10-13T15:06:43.744+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : The following 1 profile is active: "dev"
+2026-10-13T15:06:43.835+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-10-13T15:06:43.836+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-10-13T15:06:45.350+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-13T15:06:45.505+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 142 ms. Found 16 JPA repository interfaces.
+2026-10-13T15:06:46.600+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8000 (http)
+2026-10-13T15:06:46.620+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-13T15:06:46.621+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-13T15:06:46.707+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2869 ms
+2026-10-13T15:06:46.953+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-13T15:06:47.054+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-10-13T15:06:47.722+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-13T15:06:47.768+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-13T15:06:47.997+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@b98ba11
+2026-10-13T15:06:48.000+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-13T15:06:48.125+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5434/hotel-booking-app]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: hotel-booking-app/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-13T15:06:49.961+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-13T15:06:50.099+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-13T15:06:50.211+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-13T15:06:50.670+03:00 DEBUG 18228 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'authenticationJwtTokenFilter' configured for use
+2026-10-13T15:06:50.672+03:00 DEBUG 18228 --- [hotel-booking-app] [restartedMain] c.g.h.security.RateLimitFilter           : Filter 'rateLimitFilter' configured for use
+2026-10-13T15:06:50.672+03:00 DEBUG 18228 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'jwtRequestFilter' configured for use
+2026-10-13T15:06:53.287+03:00  WARN 18228 --- [hotel-booking-app] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-10-13T15:06:53.475+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsService
+2026-10-13T15:06:53.726+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] o.s.b.w.a.WelcomePageHandlerMapping      : Adding welcome page: class path resource [static/index.html]
+2026-10-13T15:06:54.328+03:00  WARN 18228 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:06:54.328+03:00  WARN 18228 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/index.html]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:06:54.328+03:00  WARN 18228 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/static/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:06:54.328+03:00  WARN 18228 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/css/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:06:54.328+03:00  WARN 18228 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/js/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:06:54.329+03:00  WARN 18228 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/images/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:06:54.329+03:00  WARN 18228 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/favicon.ico]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:06:54.330+03:00  WARN 18228 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/uploads/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:06:54.397+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-10-13T15:06:54.399+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6f3fbc47]]
+2026-10-13T15:06:54.400+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-10-13T15:06:54.422+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8000 (http) with context path '/'
+2026-10-13T15:06:54.433+03:00  INFO 18228 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Started HotelBookingAppApplication in 11.402 seconds (process running for 12.219)
+2026-10-13T15:06:54.552+03:00  WARN 18228 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-10-13T15:06:54.553+03:00  WARN 18228 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-10-13T15:07:23.366+03:00  INFO 18228 --- [hotel-booking-app] [http-nio-8000-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-13T15:07:23.367+03:00  INFO 18228 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-13T15:07:23.371+03:00  INFO 18228 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 4 ms
+2026-10-13T15:07:24.151+03:00  WARN 18228 --- [hotel-booking-app] [http-nio-8000-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: Age is required]
+2026-10-13T15:07:34.786+03:00  WARN 18228 --- [hotel-booking-app] [http-nio-8000-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: Age is required]
+2026-10-13T15:07:43.163+03:00  WARN 18228 --- [hotel-booking-app] [http-nio-8000-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: Age is required]
+2026-10-13T15:07:54.409+03:00  INFO 18228 --- [hotel-booking-app] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
+2026-10-13T15:10:21.851+03:00  INFO 18228 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-10-13T15:10:22.045+03:00  INFO 18228 --- [hotel-booking-app] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-10-13T15:10:22.046+03:00  INFO 18228 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-10-13T15:10:22.047+03:00  INFO 18228 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6f3fbc47]]
+2026-10-13T15:10:22.047+03:00  INFO 18228 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-10-13T15:10:22.053+03:00  INFO 18228 --- [hotel-booking-app] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-13T15:10:22.057+03:00  INFO 18228 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-10-13T15:10:22.060+03:00  INFO 18228 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-10-13T15:10:28.245+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Starting HotelBookingAppApplication using Java 17.0.20.1 with PID 18180 (C:\Users\DELL\Ijdb\project\hotel-booking-app\target\classes started by DELL in C:\Users\DELL\Ijdb\project\hotel-booking-app)
+2026-10-13T15:10:28.250+03:00 DEBUG 18180 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-10-13T15:10:28.252+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : The following 1 profile is active: "dev"
+2026-10-13T15:10:28.331+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-10-13T15:10:28.331+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-10-13T15:10:30.035+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-13T15:10:30.175+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 126 ms. Found 16 JPA repository interfaces.
+2026-10-13T15:10:31.309+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8000 (http)
+2026-10-13T15:10:31.329+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-13T15:10:31.329+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-13T15:10:31.412+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 3080 ms
+2026-10-13T15:10:31.688+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-13T15:10:31.789+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-10-13T15:10:32.478+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-13T15:10:32.520+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-13T15:10:32.763+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6fd245f
+2026-10-13T15:10:32.766+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-13T15:10:33.163+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5434/hotel-booking-app]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: hotel-booking-app/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-13T15:10:35.273+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-13T15:10:35.402+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-13T15:10:35.541+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-13T15:10:36.153+03:00 DEBUG 18180 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'authenticationJwtTokenFilter' configured for use
+2026-10-13T15:10:36.153+03:00 DEBUG 18180 --- [hotel-booking-app] [restartedMain] c.g.h.security.RateLimitFilter           : Filter 'rateLimitFilter' configured for use
+2026-10-13T15:10:36.154+03:00 DEBUG 18180 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'jwtRequestFilter' configured for use
+2026-10-13T15:10:39.164+03:00  WARN 18180 --- [hotel-booking-app] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-10-13T15:10:39.452+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsService
+2026-10-13T15:10:39.821+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] o.s.b.w.a.WelcomePageHandlerMapping      : Adding welcome page: class path resource [static/index.html]
+2026-10-13T15:10:40.417+03:00  WARN 18180 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:10:40.417+03:00  WARN 18180 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/index.html]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:10:40.418+03:00  WARN 18180 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/static/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:10:40.418+03:00  WARN 18180 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/css/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:10:40.418+03:00  WARN 18180 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/js/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:10:40.418+03:00  WARN 18180 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/images/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:10:40.419+03:00  WARN 18180 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/favicon.ico]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:10:40.419+03:00  WARN 18180 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/uploads/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-10-13T15:10:40.504+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-10-13T15:10:40.505+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@17162783]]
+2026-10-13T15:10:40.506+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-10-13T15:10:40.521+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8000 (http) with context path '/'
+2026-10-13T15:10:40.534+03:00  INFO 18180 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Started HotelBookingAppApplication in 13.022 seconds (process running for 13.739)
+2026-10-13T15:10:40.661+03:00  WARN 18180 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-10-13T15:10:40.661+03:00  WARN 18180 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-10-13T15:10:42.752+03:00  INFO 18180 --- [hotel-booking-app] [http-nio-8000-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-13T15:10:42.752+03:00  INFO 18180 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-13T15:10:42.754+03:00  INFO 18180 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-10-13T15:10:43.315+03:00  WARN 18180 --- [hotel-booking-app] [http-nio-8000-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: Age is required]
+2026-10-13T15:10:48.547+03:00  WARN 18180 --- [hotel-booking-app] [http-nio-8000-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: Age is required]
+2026-10-13T15:11:40.525+03:00  INFO 18180 --- [hotel-booking-app] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
+2026-10-13T15:11:50.566+03:00  WARN 18180 --- [hotel-booking-app] [http-nio-8000-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: Age is required]
+2026-10-13T15:14:58.107+03:00  WARN 18180 --- [hotel-booking-app] [http-nio-8000-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: Room 14 needs at least one guest]
+2026-10-13T15:25:06.956+03:00  INFO 18180 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-10-13T15:25:07.154+03:00  INFO 18180 --- [hotel-booking-app] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-10-13T15:25:07.156+03:00  INFO 18180 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-10-13T15:25:07.156+03:00  INFO 18180 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@17162783]]
+2026-10-13T15:25:07.156+03:00  INFO 18180 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-10-13T15:25:07.163+03:00  INFO 18180 --- [hotel-booking-app] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-13T15:25:07.169+03:00  INFO 18180 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-10-13T15:25:07.173+03:00  INFO 18180 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

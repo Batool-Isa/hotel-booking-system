@@ -1,7 +1,6 @@
 package com.ga.hotel_booking_app.controller;
 
 import com.ga.hotel_booking_app.dto.request.*;
-import com.ga.hotel_booking_app.model.User;
 import com.ga.hotel_booking_app.service.PasswordResetService;
 import com.ga.hotel_booking_app.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,8 +8,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.sql.ast.tree.expression.Summarization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -97,7 +94,6 @@ public class UserController {
     public ResponseEntity<?> updateProfileImage(
             @RequestParam("image") MultipartFile image) {
         System.out.println("User Controller calling ---> update user profile image");
-
         return userService.updateProfileImage(image);
     }
 }
