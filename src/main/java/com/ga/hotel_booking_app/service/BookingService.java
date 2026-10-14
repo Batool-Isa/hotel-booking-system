@@ -1,9 +1,9 @@
 package com.ga.hotel_booking_app.service;
 
-import com.ga.hotel_booking_app.dto.reponse.BookingGuestResponse;
-import com.ga.hotel_booking_app.dto.reponse.BookingResponse;
-import com.ga.hotel_booking_app.dto.reponse.BookingRoomResponse;
-import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
+import com.ga.hotel_booking_app.dto.response.BookingGuestResponse;
+import com.ga.hotel_booking_app.dto.response.BookingResponse;
+import com.ga.hotel_booking_app.dto.response.BookingRoomResponse;
+import com.ga.hotel_booking_app.dto.response.MessageResponse;
 import com.ga.hotel_booking_app.dto.request.BookingGuestRequest;
 
 import java.math.BigDecimal;
@@ -60,8 +60,7 @@ public class BookingService {
         return userRepository.findUserByEmail(email);
     }
 
-    @Transactional
-    public ResponseEntity<?> createNewBooking(BookingRequest request) {
+    private Hotel validateBookingRequest(BookingRequest request){
         // validate dates
         boolean validDate = !request.getCheckIn().isBefore(LocalDate.now())
                 && request.getCheckOut().isAfter(request.getCheckIn());
@@ -74,12 +73,14 @@ public class BookingService {
         // get hotel
         Hotel hotel = hotelRepository.findById(request.getHotelId())
                 .orElseThrow(() -> new InformationNotFoundException("Hotel with id " + request.getHotelId() + " not found"));
-
+        if (!hotel.getStatus().equals(Hotel.Status.ACTIVE)) {
+            throw new InvalidInformationException("This hotel is not available for booking");
+        }
         // get hotel's child policy
         ChildPolicy childPolicy = hotel.getChildPolicy();
         if (childPolicy == null) {
             throw new InvalidInformationException(
-                    "This hotel has not set its child policy yet, so it can\'t accept bookings right now");
+                    "This hotel has not set its child policy yet, so it can't accept bookings right now");
         }
 
 
@@ -113,7 +114,14 @@ public class BookingService {
             }
             List<BookingGuestRequest> guestRequests = r.getGuests();
 
+            if (guestRequests == null || guestRequests.isEmpty()) {
+                throw new InvalidInformationException("Room " + r.getRoomId() + " needs at least one guest");
+            }
+
             for (BookingGuestRequest guestRequest : guestRequests) {
+                if (guestRequest.getAge() == null) {
+                    throw new InvalidInformationException("Age is required");
+                }
                 // check guests ages
                 if (guestRequest.getAge() <= childPolicy.getInfantMaxAge()) {
                     infantNum++;
@@ -134,24 +142,38 @@ public class BookingService {
                         || total > room.getMaxOccupancy()) {
                     throw new InvalidInformationException("Invalid number of guests, room can't accommodate this number of guests");
                 }
-
-                // check booking that might overlap
-                List<Booking> overlappingBookings = bookingRepository.findOverlappingBookings(r.getRoomId()
-                        , Booking.Status.CONFIRMED, request.getCheckIn(), request.getCheckOut());
-                if (!overlappingBookings.isEmpty()) {
-                    throw new InvalidInformationException("Booking room at these days is overlapped");
-                }
+            }
+            // check booking that might overlap
+            List<Booking> overlappingBookings = bookingRepository.findOverlappingBookings(r.getRoomId()
+                    , Booking.Status.CONFIRMED, request.getCheckIn(), request.getCheckOut());
+            if (!overlappingBookings.isEmpty()) {
+                throw new InvalidInformationException("Booking room at these days is overlapped");
             }
         }
-
-        // insert into booking table
-        Booking booking = new Booking();
+        return hotel;
+    }
+    @Transactional
+    public ResponseEntity<?> createNewBooking(BookingRequest request) {
+        // check user status
         User customer = getCurrentLoggedInUser();
         if (!customer.getStatus().equals(User.Status.ACTIVE)) {
             throw new InvalidInformationException("Only active customer can book hotels");
         }
-        String bookingReference = hotel.getName().substring(0, 2).toUpperCase() +
-                UUID.randomUUID().toString().substring(0, 4).toUpperCase();
+
+        // validate user request and get hotel wanted
+        Hotel hotel = validateBookingRequest(request);
+        ChildPolicy childPolicy = hotel.getChildPolicy();
+
+        // insert into booking table
+        Booking booking = new Booking();
+        String referencePrefix = hotel.getName().replaceAll("[^A-Za-z]","").toUpperCase();
+        if(referencePrefix.length() >= 4){
+            referencePrefix = referencePrefix.substring(0,4);
+        }else{
+            referencePrefix = referencePrefix+"XXXX".substring(0,4);
+        }
+        String referenceSuffix = UUID.randomUUID().toString().substring(0, 5).toUpperCase();
+        String bookingReference = referencePrefix + referenceSuffix;
         booking.setBookingReference(bookingReference);
         booking.setHotel(hotel);
         booking.setCheckIn(request.getCheckIn());
@@ -167,8 +189,10 @@ public class BookingService {
         int daysNum = (int) ChronoUnit.DAYS.between(request.getCheckIn(), request.getCheckOut());
         BigDecimal totalAmount = BigDecimal.valueOf(0.0);
 
-        for (BookingRoomRequest roomRequest : bookingRoomRequests) {
+        // get rooms that customer wants to book
+        List<BookingRoomRequest> bookingRoomRequests = request.getRooms();
 
+        for (BookingRoomRequest roomRequest : bookingRoomRequests) {
             Room room = roomRepository.findById(roomRequest.getRoomId())
                     .orElseThrow(() -> new InformationNotFoundException("Room with id " + roomRequest.getRoomId() + " not found"));
 

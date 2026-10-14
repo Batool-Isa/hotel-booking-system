@@ -1,7 +1,7 @@
 package com.ga.hotel_booking_app.service;
 
-import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
-import com.ga.hotel_booking_app.dto.reponse.RoomTypeResponse;
+import com.ga.hotel_booking_app.dto.response.MessageResponse;
+import com.ga.hotel_booking_app.dto.response.RoomTypeResponse;
 import com.ga.hotel_booking_app.dto.request.RoomTypeRequest;
 import com.ga.hotel_booking_app.dto.request.UpdateRoomTypeStatusRequest;
 import com.ga.hotel_booking_app.exception.custom.InformationExistException;

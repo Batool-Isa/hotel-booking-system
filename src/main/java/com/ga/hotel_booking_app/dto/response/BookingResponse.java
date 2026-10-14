@@ -1,4 +1,4 @@
-package com.ga.hotel_booking_app.dto.reponse;
+package com.ga.hotel_booking_app.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class BookingResponse<BookingRoomResponse> {
+public class BookingResponse {
     private Long id;
     private String bookingReference;
     private Long hotelId;

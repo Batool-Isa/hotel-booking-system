@@ -1,7 +1,7 @@
 package com.ga.hotel_booking_app.service;
 
-import com.ga.hotel_booking_app.dto.reponse.ChildPolicyResponse;
-import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
+import com.ga.hotel_booking_app.dto.response.ChildPolicyResponse;
+import com.ga.hotel_booking_app.dto.response.MessageResponse;
 import com.ga.hotel_booking_app.dto.request.CreateChildPolicyRequest;
 import com.ga.hotel_booking_app.exception.custom.InformationExistException;
 import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;

@@ -14,10 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/rooms-types")
 public class RoomTypeController {
 
-//    POST   /api/room-types
-//    GET    /api/room-types
-//    GET    /api/room-types/{id}
-//    PUT    /api/room-types/{id}
 @Autowired
 private RoomTypeService roomTypeService;
 

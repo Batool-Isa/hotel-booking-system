@@ -1,12 +1,10 @@
-package com.ga.hotel_booking_app.dto.reponse;
+package com.ga.hotel_booking_app.dto.response;
 
 import com.ga.hotel_booking_app.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Set;
 
 @Getter
 @Setter

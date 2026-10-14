@@ -1,9 +1,9 @@
 package com.ga.hotel_booking_app.service;
 
-import com.ga.hotel_booking_app.dto.reponse.AmenityResponse;
-import com.ga.hotel_booking_app.dto.reponse.HotelImageResponse;
-import com.ga.hotel_booking_app.dto.reponse.HotelResponse;
-import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
+import com.ga.hotel_booking_app.dto.response.AmenityResponse;
+import com.ga.hotel_booking_app.dto.response.HotelImageResponse;
+import com.ga.hotel_booking_app.dto.response.HotelResponse;
+import com.ga.hotel_booking_app.dto.response.MessageResponse;
 import com.ga.hotel_booking_app.dto.request.CreateHotelRequest;
 import com.ga.hotel_booking_app.dto.request.UpdateHotelRequest;
 import com.ga.hotel_booking_app.dto.request.UpdateHotelStatusRequest;
@@ -22,9 +22,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class HotelService {
@@ -86,9 +86,28 @@ public class HotelService {
     public ResponseEntity<?> getHotel(Long id) {
         Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new InformationNotFoundException("Hotel with id " + id + " not found"));
-
+        // show only active hotels to customer while all hotels for admin and manger is he assigned to it
+        if (!hotel.getStatus().equals(Hotel.Status.ACTIVE) && !canViewNonActiveHotels(hotel)) {
+            throw new InformationNotFoundException("Hotel with id " + id + " not found");
+        }
         return ResponseEntity.ok(buildHotelResponse(hotel));
 
+    }
+
+    public boolean canViewNonActiveHotels(Hotel hotel) {
+        User user = getCurrentLoggedInUser();
+        if (user == null) {
+            return false;
+        }
+        Role role = user.getRole();
+        if (role.getName().equals(Role.RoleName.ADMIN)) {
+            return true;
+        } else if (role.getName().equals(Role.RoleName.HOTEL_MANAGER)) {
+            // if assigned then have ability otherwise false
+            return hotel.getManagers().stream()
+                    .anyMatch(m -> m.getId().equals(user.getId()));
+        }
+        return false;
     }
 
     public HotelResponse buildHotelResponse(Hotel hotel) {
@@ -105,7 +124,7 @@ public class HotelService {
         response.setUpdatedAt(hotel.getUpdatedAt());
         response.setCreatedAt(hotel.getCreatedAt());
         //response.getReviewCount(hotel.getreview);
-       // response.getAverageRating(hotel.get)
+        // response.getAverageRating(hotel.get)
         List<AmenityResponse> amenities = new ArrayList<>();
 
         for (HotelAmenity hotelAmenity : hotel.getAmenities()) {
@@ -162,7 +181,7 @@ public class HotelService {
 
     public ResponseEntity<?> getMangerHotels(Pageable pageable) {
         User manager = getCurrentLoggedInUser();
-        Page<Hotel> hotels = hotelRepository.findByManagers_Id(manager.getId(),pageable);
+        Page<Hotel> hotels = hotelRepository.findByManagers_Id(manager.getId(), pageable);
         List<HotelResponse> responses = new ArrayList<>();
         for (Hotel hotel : hotels) {
             HotelResponse hotelResponse = buildHotelResponse(hotel);

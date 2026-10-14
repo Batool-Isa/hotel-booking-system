@@ -1,4 +1,4 @@
-package com.ga.hotel_booking_app.dto.reponse;
+package com.ga.hotel_booking_app.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;

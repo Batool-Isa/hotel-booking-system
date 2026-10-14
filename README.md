@@ -26,7 +26,7 @@ I built it as a real booking application, not just a set of CRUD endpoints. Most
 
 **Behind the scenes**
 - JWT login, role based access, password hashing, input validation
-- Rate limit on login, audit log, one error format for every API error
+- Rate limit on login, register and forgot password, audit log, one error format for every API error
 - Pagination, sorting, search and filtering
 - Swagger documentation
 - Real time notifications with WebSocket and STOMP
@@ -88,7 +88,7 @@ cd hotel-booking-system
 | `JWT_EXPIRATION_MS` | token lifetime, default 86400000 (24 hours) |
 | `EMAIL_USERNAME`, `EMAIL_PASSWORD` | SMTP account (a Gmail app password) |
 
-The `test` profile uses an in-memory H2 database and needs no secrets.
+The app itself runs on PostgreSQL. The `test` profile (used by `./mvnw test`) uses an in-memory H2 database, so the tests need no PostgreSQL and no secrets.
 
 **4. Run**
 
@@ -121,14 +121,14 @@ Base URL: `http://localhost:8000`. The full interactive documentation is in Swag
 
 | Method | Path | Access | What it does |
 |---|---|---|---|
-| POST | `/auth/users` | Public | Register (profile photo is optional) |
+| POST | `/auth/users/register` | Public | Register (profile photo is optional, sent as multipart form data) |
 | GET | `/auth/users/verify-email?token=` | Public | Verify email |
 | POST | `/auth/users/login` | Public | Log in, returns the JWT |
 | POST | `/auth/users/forgot-password` | Public | Send a password reset link |
 | POST | `/auth/users/reset-link` | Public | Set a new password with the link token |
 | POST | `/auth/users/change-password` | Logged in | Change my password |
 | GET, PUT | `/auth/users/profile` | Logged in | View or update my profile |
-| PUT | `/auth/users` | Logged in | Change my profile photo |
+| PUT | `/auth/users/profile/image` | Logged in | Change my profile photo |
 
 ### Hotels (`/api/hotels`)
 
@@ -232,7 +232,7 @@ Every error uses the same JSON shape, with an `errors` map for validation proble
 | 403 | Logged in, but not allowed to do this |
 | 404 | Not found |
 | 409 | Already exists (for example the same email or room number) |
-| 429 | Too many login attempts, wait a minute |
+| 429 | Too many requests from one IP address, wait a minute (login and register: 5 per minute, forgot password: 3 per minute) |
 
 ## Real time notifications
 
@@ -299,6 +299,7 @@ The app sends verification, password reset and booking emails. They share one de
 
 - [Spring Boot: sending email via SMTP](https://www.geeksforgeeks.org/springboot/spring-boot-sending-email-via-smtp/)
 - [Spring Boot logging](https://www.geeksforgeeks.org/springboot/spring-boot-logging/)
+- [Swagger Documentation](https://www.baeldung.com/swagger-operation-vs-apiresponse)
 
 ## Future improvements
 

@@ -1,11 +1,11 @@
 package com.ga.hotel_booking_app.service;
 
-import com.ga.hotel_booking_app.dto.reponse.UserProfileResponse;
+import com.ga.hotel_booking_app.dto.response.UserProfileResponse;
 import com.ga.hotel_booking_app.dto.request.RegisterRequest;
 import com.ga.hotel_booking_app.dto.request.UpdateProfileRequest;
 import com.ga.hotel_booking_app.exception.custom.*;
 import com.ga.hotel_booking_app.model.EmailVerificationToken;
-import com.ga.hotel_booking_app.dto.reponse.MessageResponse;
+import com.ga.hotel_booking_app.dto.response.MessageResponse;
 import com.ga.hotel_booking_app.dto.request.LoginRequest;
 import com.ga.hotel_booking_app.model.Role;
 import com.ga.hotel_booking_app.model.UserProfile;
@@ -38,7 +38,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 /**
