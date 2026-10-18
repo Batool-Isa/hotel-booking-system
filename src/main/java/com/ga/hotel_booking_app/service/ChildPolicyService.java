@@ -48,12 +48,7 @@ public class ChildPolicyService {
 
         // hotel manager can only manage their own hotel
         if (user.getRole().getName().equals(Role.RoleName.HOTEL_MANAGER)) {
-            boolean isHotelManager = hotel.getManagers().stream()
-                    .anyMatch(manager ->
-                            manager.getId().equals(user.getId()));
-            if (!isHotelManager) {
-                throw new UnauthorizedActionException("You are not authorized to manage this hotel's child policy");
-            }
+            checkManagerAuthority(user, hotel);
         }
 
         // 1 policy only for each hotel
@@ -81,7 +76,7 @@ public class ChildPolicyService {
     }
 
     public ResponseEntity<?> getChildPolicy(Long hotelId) {
-        Hotel hotel = hotelRepository.findById(hotelId)
+        hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new InformationNotFoundException("Hotel with id " + hotelId + " not found"));
 
         ChildPolicy childPolicy = childPolicyRepository
@@ -98,6 +93,15 @@ public class ChildPolicyService {
     }
 
 
+    public void checkManagerAuthority(User user,Hotel hotel){
+        boolean isHotelManager = hotel.getManagers().stream()
+                .anyMatch(manager ->
+                        manager.getId().equals(user.getId()));
+        if (!isHotelManager) {
+            throw new UnauthorizedActionException(
+                    "You are not authorized to manage this hotel's child policy");
+        }
+    }
     public ResponseEntity<?> updateChildPolicy(
             Long hotelId,
             CreateChildPolicyRequest request) {
@@ -109,13 +113,7 @@ public class ChildPolicyService {
 
         // hotel manager can only update their own hotel's policy
         if (user.getRole().getName().equals(Role.RoleName.HOTEL_MANAGER)) {
-            boolean isHotelManager = hotel.getManagers().stream()
-                    .anyMatch(manager ->
-                            manager.getId().equals(user.getId()));
-            if (!isHotelManager) {
-                throw new UnauthorizedActionException(
-                        "You are not authorized to manage this hotel's child policy");
-            }
+            checkManagerAuthority(user, hotel);
         }
         ChildPolicy childPolicy = childPolicyRepository
                 .findByHotelId(hotelId)

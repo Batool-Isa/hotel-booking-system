@@ -170,7 +170,7 @@ public class BookingService {
         if(referencePrefix.length() >= 4){
             referencePrefix = referencePrefix.substring(0,4);
         }else{
-            referencePrefix = referencePrefix+"XXXX".substring(0,4);
+            referencePrefix = (referencePrefix+"XXXX").substring(0,4);
         }
         String referenceSuffix = UUID.randomUUID().toString().substring(0, 5).toUpperCase();
         String bookingReference = referencePrefix + referenceSuffix;
@@ -260,7 +260,7 @@ public class BookingService {
         User user = getCurrentLoggedInUser();
         Page<Booking> bookingList = bookingRepository.findByUserId(user.getId(), pageable);
         List<BookingResponse> responses = bookingList.stream()
-                .map(b -> mapToBookingResponse((b))).toList();
+                .map(this::mapToBookingResponse).toList();
         return ResponseEntity.ok(responses);
     }
 
@@ -375,11 +375,7 @@ public class BookingService {
             throw new UnauthorizedActionException("You are not authorized to view this booking");
         }
         if (role.equals(Role.RoleName.HOTEL_MANAGER)) {
-            boolean isHotelManager = booking.getHotel()
-                    .getManagers().stream().anyMatch(manager -> manager.getId().equals(user.getId()));
-            if (!isHotelManager) {
-                throw new UnauthorizedActionException("You are not authorized to view this booking");
-            }
+            checkManagerAuthority(user, booking.getHotel());
         }
         BookingResponse response = mapToBookingResponse(booking);
         return ResponseEntity.ok(response);
@@ -391,11 +387,7 @@ public class BookingService {
         User user = getCurrentLoggedInUser();
         Role.RoleName role = user.getRole().getName();
         if (role.equals(Role.RoleName.HOTEL_MANAGER)) {
-            boolean isHotelManager = booking.getHotel()
-                    .getManagers().stream().anyMatch(manager -> manager.getId().equals(user.getId()));
-            if (!isHotelManager) {
-                throw new UnauthorizedActionException("You are not authorized to update this booking");
-            }
+            checkManagerAuthority(user, booking.getHotel());
         } else if (!role.equals(Role.RoleName.ADMIN)) {
             throw new UnauthorizedActionException("You are not authorized to update booking status");
         }
@@ -441,5 +433,14 @@ public class BookingService {
                 user.getId()
         );
         return ResponseEntity.ok(new MessageResponse("Booking status updated successfully"));
+    }
+    public void checkManagerAuthority(User user,Hotel hotel){
+        boolean isHotelManager = hotel.getManagers().stream()
+                .anyMatch(manager ->
+                        manager.getId().equals(user.getId()));
+        if (!isHotelManager) {
+            throw new UnauthorizedActionException(
+                    "You are not authorized to manage this hotel's child policy");
+        }
     }
 }

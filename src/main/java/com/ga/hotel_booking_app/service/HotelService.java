@@ -14,6 +14,7 @@ import com.ga.hotel_booking_app.exception.custom.UnauthorizedActionException;
 import com.ga.hotel_booking_app.model.*;
 import com.ga.hotel_booking_app.repository.HotelRepository;
 import com.ga.hotel_booking_app.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Page;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class HotelService {
     @Autowired
@@ -40,7 +42,7 @@ public class HotelService {
         return userRepository.findUserByEmail(email);
     }
 
-    public ResponseEntity<?> create(CreateHotelRequest request) {
+    public ResponseEntity<?> createHotel(CreateHotelRequest request) {
         if (hotelRepository.existsByName(request.getName())) {
             throw new InformationExistException("Hotel " + request.getName() + " already exists");
         }
@@ -195,8 +197,7 @@ public class HotelService {
                 .orElseThrow(() -> new InformationNotFoundException("Hotel with id " + id + " not found"));
 
         User user = (getCurrentLoggedInUser());
-        System.out.println("User Logged in  ->" + user.getId());
-
+        log.info("User Logged in  ->{}", user.getId());
 
         if (user.getRole().getName().equals(Role.RoleName.HOTEL_MANAGER)) {
             boolean isMangerHotel = hotel.getManagers().stream()
