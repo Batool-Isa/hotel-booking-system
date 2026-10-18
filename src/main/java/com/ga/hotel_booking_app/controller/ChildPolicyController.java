@@ -27,7 +27,7 @@ public class ChildPolicyController {
             @ApiResponse(responseCode = "401", description = "Not logged in"),
             @ApiResponse(responseCode = "403", description = "Manager can only create policy for their own hotels"),
             @ApiResponse(responseCode = "409", description = "Hotel already have a child policy"),
-            @ApiResponse(responseCode = "400", description = "Invalid Ages (Infant maximum age must be less than child minimum age)"),
+            @ApiResponse(responseCode = "400", description = "Invalid ages (infant maximum age must be less than child maximum age)"),
     })
     public ResponseEntity<?> createChildPolicy(@PathVariable("hotelId") Long hotelId,
                                                @Valid @RequestBody CreateChildPolicyRequest request) {
@@ -49,9 +49,9 @@ public class ChildPolicyController {
     @Operation(summary = "Update Child Policy", description = "Update a child policy for a hotel")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Update child policy successfully"),
-            @ApiResponse(responseCode = "404", description = "Hotel not found"),
-            @ApiResponse(responseCode = "403", description = "Manager are forbidden to create a child policy for a hotel that is not assign to it"),
-            @ApiResponse(responseCode = "400", description = "Invalid Ages (Infant maximum age must be less than child minimum age)"),
+            @ApiResponse(responseCode = "404", description = "Hotel or child policy not found"),
+            @ApiResponse(responseCode = "403", description = "Manager can only update the policy of their own hotels"),
+            @ApiResponse(responseCode = "400", description = "Invalid ages (infant maximum age must be less than child maximum age)"),
     })
     public ResponseEntity<?> updateChildPolicy(@PathVariable("hotelId") Long hotelId,
                                                @Valid @RequestBody CreateChildPolicyRequest request) {
