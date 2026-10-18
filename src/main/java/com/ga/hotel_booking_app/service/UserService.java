@@ -50,7 +50,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
-    private MyUserDetails myUserDetails;
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final EmailService emailService;
     private final RoleRepository roleRepository;
@@ -65,7 +64,6 @@ public class UserService {
                        @Lazy PasswordEncoder passwordEncoder,
                        JwtUtils jwtUtils,
                        @Lazy AuthenticationManager authenticationManager,
-                       @Lazy MyUserDetails myUserDetails,
                        EmailVerificationTokenRepository emailVerificationTokenRepository,
                        EmailService emailService,
                        RoleRepository roleRepository) {
@@ -73,7 +71,6 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
-        this.myUserDetails = myUserDetails;
         this.emailVerificationTokenRepository = emailVerificationTokenRepository;
         this.emailService = emailService;
         this.roleRepository = roleRepository;
@@ -224,7 +221,7 @@ public class UserService {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            myUserDetails = (MyUserDetails) authentication.getPrincipal();
+           MyUserDetails myUserDetails = (MyUserDetails) authentication.getPrincipal();
             User user = findUserByEmailAddress(loginRequest.getEmail());
             System.out.println("Status  :" + user.getStatus());
             if (user.getStatus() == (User.Status.UNVERIFIED)) {
