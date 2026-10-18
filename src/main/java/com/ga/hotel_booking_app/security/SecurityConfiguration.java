@@ -42,60 +42,38 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .exceptionHandling(  // to handle expired token
-                        e-> e.authenticationEntryPoint(
-                                ((request, response, authException) ->  writeJson(response, 401,
-                                        "Your session has expired or is invalid. Please sign in again.")))
-                ).authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/auth/users",
-                                "/auth/users/login",
-                                "/auth/users/register",
-                                "/auth/users/verify-email",
-                                "/auth/users/forgot-password",
-                                "/auth/users/reset-link",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**",
-                                "/ws/**",
-                                "/api/availability/**",
-                                "/log",
-                                "/error"
-                        ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/hotels/**","/api/amenities").permitAll()
-                        .anyRequest().authenticated()
-                );
+        http.csrf(csrf -> csrf.disable()).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).exceptionHandling(  // to handle expired token
+                e -> e.authenticationEntryPoint(((request, response, authException) ->
+                        SecurityErrorWriter.write(request, response, 401,
+                                "UNAUTHORIZED", "Your session has expired or is invalid. Please sign in again."))))
+                .authorizeHttpRequests(auth -> auth.requestMatchers(
+                        "/auth/users",
+                        "/auth/users/login",
+                        "/auth/users/register",
+                        "/auth/users/verify-email",
+                        "/auth/users/forgot-password",
+                        "/auth/users/reset-link",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/ws/**",
+                        "/api/availability/**",
+                        "/log",
+                        "/error").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/hotels/**", "/api/amenities")
+                        .permitAll().anyRequest().authenticated());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-    private static void writeJson(jakarta.servlet.http.HttpServletResponse res, int status, String message)
-            throws java.io.IOException {
-        res.setStatus(status);
-        res.setContentType("application/json");
-        res.setCharacterEncoding("UTF-8");
-        res.getWriter().write("{\"status\":" + status + ",\"message\":\"" + message.replace("\"", "\\\"") + "\"}");
-    }
+
+
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers(
-                "/",
-                "/index.html",
-                "/static/**",
-                "/css/**",
-                "/js/**",
-                "/images/**",
-                "/favicon.ico",
-                "/uploads/**"
-        );
+        return (web) -> web.ignoring().requestMatchers("/", "/index.html", "/static/**", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/uploads/**");
     }
+
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authConfig) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
