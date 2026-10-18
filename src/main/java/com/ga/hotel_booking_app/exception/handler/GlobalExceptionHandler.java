@@ -3,16 +3,20 @@ package com.ga.hotel_booking_app.exception.handler;
 import com.ga.hotel_booking_app.exception.custom.*;
 import com.ga.hotel_booking_app.exception.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import lombok.extern.slf4j.Slf4j;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(InformationNotFoundException.class)
@@ -83,7 +87,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.FORBIDDEN.value(),
-                "Unauthorized",
+                "FORBIDDEN",
                 ex.getMessage(),
                 request.getRequestURI()
         );
@@ -135,5 +139,69 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(
+            AccessDeniedException ex, HttpServletRequest request) {
+
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.FORBIDDEN.value(),
+                "FORBIDDEN",
+                "You don't have permission to do that.",
+                request.getRequestURI());
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleMalformedJsonObj(
+            HttpMessageNotReadableException ex, HttpServletRequest request) {
+
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "BAD_REQUEST",
+                "Request body is missing or not valid JSON.",
+                request.getRequestURI());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex,
+                                                             HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value(),
+                "DATA_CONFLICT",
+                "The data conflicts with existing records.",
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex, HttpServletRequest request) {
+        if (ex instanceof org.springframework.web.ErrorResponse springError) {
+            HttpStatus status = HttpStatus.valueOf(springError.getStatusCode().value());
+            ErrorResponse errorResponse = new ErrorResponse(
+                    LocalDateTime.now(),
+                    status.value(),
+                    status.name(),
+                    status.getReasonPhrase(),
+                    request.getRequestURI()
+            );
+            return ResponseEntity.status(status).body(errorResponse);
+        }
+
+        log.error("Unexpected error", ex);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "INTERNAL_ERROR",
+                "Something went wrong. Please try again later",
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

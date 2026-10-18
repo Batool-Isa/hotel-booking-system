@@ -65,12 +65,9 @@ import java.util.concurrent.ConcurrentHashMap;
                 }
 
                 if (bucket != null && !bucket.tryConsume(1)) {
-                    response.setStatus(429);
-                    response.setContentType("application/json");
-                    response.setHeader("Retry-After", "60");
-                    response.getWriter().write("""
-                    { "message": "Too many requests. Please try again later. "}
-                    """);
+                    response.setHeader("Retry-After", String.valueOf(60));
+                    SecurityErrorWriter.write(request, response, 429, "TOO_MANY_REQUESTS",
+                            "Too many requests. Please try again in 60 seconds.");
                     return;
                 }
                 filterChain.doFilter(request, response);
