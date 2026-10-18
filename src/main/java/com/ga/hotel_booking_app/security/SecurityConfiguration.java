@@ -53,7 +53,6 @@ public class SecurityConfiguration {
                                         "Your session has expired or is invalid. Please sign in again.")))
                 ).authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/users",
                                 "/auth/users/login",
                                 "/auth/users/register",
                                 "/auth/users/verify-email",
@@ -63,8 +62,7 @@ public class SecurityConfiguration {
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/ws/**",
-                                "/api/availability/**",
-                                "/log"
+                                "/api/availability/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/hotels/**").permitAll()
                         .anyRequest().authenticated()

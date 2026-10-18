@@ -2,6 +2,8 @@ package com.ga.hotel_booking_app.service;
 
 import com.ga.hotel_booking_app.dto.BookingNotification;
 import com.ga.hotel_booking_app.model.Booking;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -10,7 +12,8 @@ import org.springframework.stereotype.Service;
 public class NotificationService {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
-
+    private static final Logger logger =
+            LoggerFactory.getLogger(NotificationService.class);
     public void sendBookingNotification(Booking booking) {
         String message;
 
@@ -26,8 +29,7 @@ public class NotificationService {
                 message,
                 booking.getStatus().name()
         );
-        System.out.println("Sending WebSocket notification: "
-                + booking.getBookingReference());
+        logger.info("Sending WebSocket notification: {}", booking.getBookingReference());
         simpMessagingTemplate.convertAndSend(
                 "/topic/bookings",
                 notification

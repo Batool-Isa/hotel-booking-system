@@ -23,8 +23,7 @@ public class AvailabilityService {
     private HotelRepository hotelRepository;
     @Autowired
     private BookingRepository bookingRepository;
-
-    public ResponseEntity<?> searchAvailability(AvailabilityRequest request) {
+ public ResponseEntity<?> searchAvailability(AvailabilityRequest request) {
         // validate user request
         if (!request.getCheckOut().isAfter(request.getCheckIn())) {
             throw new InvalidInformationException("Checkout date must be after check-in date");

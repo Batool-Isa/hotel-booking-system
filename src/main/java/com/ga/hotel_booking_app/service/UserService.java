@@ -36,7 +36,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -109,7 +108,6 @@ public class UserService {
      * @return saved user
      */
     public ResponseEntity<?> register(RegisterRequest request, MultipartFile image) {
-        System.out.println("User service calling ----> register");
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new InformationExistException(
                     "User with email " + request.getEmail() + " already exists!"
@@ -167,6 +165,7 @@ public class UserService {
             image.transferTo(filePath);
             return (UPLOAD_DIR + imageFileName);
         } catch (IOException e) {
+            logger.debug("Failed to save image because of {}", e);
             throw new RuntimeException("Could not save image", e);
         }
     }
@@ -179,7 +178,6 @@ public class UserService {
      * @return token created
      */
     public EmailVerificationToken createEmailVerificationToken(User user) {
-        System.out.println("User Service Calling create Verification Token");
         EmailVerificationToken emailVerificationToken = new EmailVerificationToken();
         emailVerificationToken.setUser(user);
         emailVerificationToken.setToken(UUID.randomUUID().toString());
