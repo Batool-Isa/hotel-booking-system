@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -34,6 +35,12 @@ public class HotelImageService {
     private HotelImageRepository hotelImageRepository;
     @Autowired
     private UserRepository userRepository;
+
+    private static final Map<String, String> allowedTypes = Map.of(
+            "image/jpeg", ".jpg",
+            "image/png", ".png",
+            "image/webp", ".webp"
+    );
 
     public User getCurrentLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -81,23 +88,19 @@ public class HotelImageService {
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
-            String fileExtenstion;
             for (int i = 0; i < images.size(); i++) {
                 String type = images.get(i).getContentType();
 
-                if (type.equals("image/png")){
-                    fileExtenstion=".png";
-                }else if (type.equals("image/webp")) {
-                    fileExtenstion=".webp";
-                }else{
-                    fileExtenstion=".jpg";
+                if(!allowedTypes.containsKey(type)){
+                    throw new InvalidInformationException("Only JPG, PNG or WEBP images are allowed");
                 }
 
                 MultipartFile image = images.get(i);
                 String altText = altTexts.get(i);
+                String fileExtension = allowedTypes.get(type);
                 //create images naming
                 String uniqueId = UUID.randomUUID().toString().substring(0, 5);
-                String imageName = uniqueId + fileExtenstion;
+                String imageName = uniqueId + fileExtension;
 
                 //upload images
                 Path imageFilePath = uploadPath.resolve(imageName);
