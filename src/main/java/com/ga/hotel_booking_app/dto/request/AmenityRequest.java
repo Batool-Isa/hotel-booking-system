@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class AmenityRequest {
     @NotBlank(message = "Amenity name is required")
-    @Size(max = 60, message = "Amenity name must not exceed 60 characters")
+    @Size(min =3, max = 60, message = "Amenity name must be between 3 and 60 characters")
     private String name;
 
     @Size(max = 255, message = "Description must not exceed 255 characters")
