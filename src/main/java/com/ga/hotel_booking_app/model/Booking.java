@@ -59,6 +59,8 @@ public class Booking {
             orphanRemoval = true
     )
     private Set<BookingRoom> bookingRooms  = new HashSet<>();
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL,orphanRemoval = true)
+    private Payment payment;
 
     public enum Status {
         PENDING,
