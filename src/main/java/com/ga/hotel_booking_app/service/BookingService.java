@@ -335,10 +335,7 @@ public class BookingService {
             throw new InvalidInformationException("A completed booking can't be cancelled");
         }
 
-        // only confirmed booking can be canceled
-        if (!booking.getStatus().equals(Booking.Status.CONFIRMED)) {
-            throw new InvalidInformationException("This booking can't be canceled");
-        }
+
         booking.setStatus(Booking.Status.CANCELLED);
         bookingRepository.save(booking);
         notificationService.sendBookingNotification(booking);
