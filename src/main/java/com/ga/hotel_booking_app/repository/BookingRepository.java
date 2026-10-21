@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -26,15 +27,17 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                 FROM Booking b
                 JOIN b.bookingRooms br
                 WHERE br.room.id = :roomId
-                AND b.status = :status
+                AND ( b.status = com.ga.hotel_booking_app.model.Booking.Status.CONFIRMED OR 
+                            (b.status = com.ga.hotel_booking_app.model.Booking.Status.PENDING
+                                        AND b.holdExpiresAt > :now))
                 AND b.checkIn < :checkOut
                 AND b.checkOut > :checkIn
             """)
     List<Booking> findOverlappingBookings(
             @Param("roomId") Long roomId,
-            @Param("status") Booking.Status status,
             @Param("checkIn") LocalDate checkIn,
-            @Param("checkOut") LocalDate checkOut
+            @Param("checkOut") LocalDate checkOut,
+            @Param("now") LocalDateTime now
     );
     @Query("""
                 SELECT COUNT(b) > 0
@@ -46,4 +49,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                 AND b.checkOut > :today
             """)
     boolean existsUpcomingBookingForRoom(@Param("roomId") Long roomId, @Param("today") LocalDate today);
+    List<Booking> findByStatusAndHoldExpiresAtBefore(Booking.Status status, LocalDateTime dateTime);
+
 }

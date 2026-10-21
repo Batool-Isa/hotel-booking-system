@@ -7,6 +7,7 @@ import com.ga.hotel_booking_app.dto.response.MessageResponse;
 import com.ga.hotel_booking_app.dto.request.BookingGuestRequest;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 import com.ga.hotel_booking_app.dto.request.BookingRequest;
@@ -14,6 +15,7 @@ import com.ga.hotel_booking_app.dto.request.BookingRoomRequest;
 import com.ga.hotel_booking_app.dto.request.BookingStatusRequest;
 import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;
 import com.ga.hotel_booking_app.exception.custom.InvalidInformationException;
+import com.ga.hotel_booking_app.exception.custom.RoomUnavailableException;
 import com.ga.hotel_booking_app.exception.custom.UnauthorizedActionException;
 import com.ga.hotel_booking_app.model.*;
 import com.ga.hotel_booking_app.repository.BookingRepository;
@@ -145,9 +147,9 @@ public class BookingService {
             }
             // check booking that might overlap
             List<Booking> overlappingBookings = bookingRepository.findOverlappingBookings(r.getRoomId()
-                    , Booking.Status.CONFIRMED, request.getCheckIn(), request.getCheckOut());
+                    ,request.getCheckIn(), request.getCheckOut(), LocalDateTime.now());
             if (!overlappingBookings.isEmpty()) {
-                throw new InvalidInformationException("Booking room at these days is overlapped");
+                throw new RoomUnavailableException("Room " + r.getRoomId() + " is not available for these dates");
             }
         }
         return hotel;
@@ -179,7 +181,8 @@ public class BookingService {
         booking.setCheckIn(request.getCheckIn());
         booking.setCheckOut(request.getCheckOut());
         booking.setSpecialRequest(request.getSpecialRequest());
-        booking.setStatus(Booking.Status.CONFIRMED);
+        booking.setStatus(Booking.Status.PENDING);
+        booking.setHoldExpiresAt(LocalDateTime.now().plusMinutes(15));
         booking.setUser(customer);
         Set<BookingRoom> bookingRooms = new HashSet<>();
         int totalAdults = 0;
@@ -332,10 +335,7 @@ public class BookingService {
             throw new InvalidInformationException("A completed booking can't be cancelled");
         }
 
-        // only confirmed booking can be canceled
-        if (!booking.getStatus().equals(Booking.Status.CONFIRMED)) {
-            throw new InvalidInformationException("This booking can't be canceled");
-        }
+
         booking.setStatus(Booking.Status.CANCELLED);
         bookingRepository.save(booking);
         notificationService.sendBookingNotification(booking);
