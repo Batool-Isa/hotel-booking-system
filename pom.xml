@@ -110,6 +110,12 @@
 			<artifactId>bucket4j_jdk17-core</artifactId>
 			<version>8.14.0</version>
 		</dependency>
+		<!-- Strip Dependency -->
+		<dependency>
+			<groupId>com.stripe</groupId>
+			<artifactId>stripe-java</artifactId>
+			<version>34.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
