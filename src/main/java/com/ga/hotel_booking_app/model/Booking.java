@@ -37,6 +37,8 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status = Status.PENDING;
+    @Column(nullable = true)
+    private LocalDateTime holdExpiresAt;
     @Column(columnDefinition = "TEXT")
     private String specialRequest;
     @CreationTimestamp

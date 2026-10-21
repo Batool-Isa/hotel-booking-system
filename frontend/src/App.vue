@@ -4867,7 +4867,7 @@ const printPage = () => window.print();
                   >View hotel</a
                 >
                 <button
-                  v-if="b.status === 'CONFIRMED'"
+                  v-if="b.status === 'CONFIRMED' || b.status === 'PENDING'"
                   class="btn btn-danger-o btn-sm"
                   @click="cancelBooking(b, () => loadBookings(mb.page))"
                 >

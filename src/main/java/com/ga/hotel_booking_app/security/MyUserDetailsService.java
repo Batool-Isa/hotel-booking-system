@@ -1,5 +1,6 @@
 package com.ga.hotel_booking_app.security;
 
+import com.ga.hotel_booking_app.exception.custom.InvalidCredentialsException;
 import com.ga.hotel_booking_app.model.User;
 import com.ga.hotel_booking_app.service.UserService;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,9 @@ public class MyUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userService.findUserByEmailAddress(email);
+        if(user == null){
+            throw new UsernameNotFoundException("User with email "+email+" not found");
+        }
         return new MyUserDetails(user);
     }
 }
