@@ -28,6 +28,12 @@ public class Payment {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private STATUS status = STATUS.PENDING;
+    @Column(nullable = false)
+    private String providerReference;
+    @Column(nullable = false)
+    private String idempotencyKey;
+    @Column(length = 1000)
+    private String sessionURL;
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;

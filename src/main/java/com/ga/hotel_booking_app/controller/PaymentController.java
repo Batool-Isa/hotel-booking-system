@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController {
     @Autowired
     private PaymentService stripeService;
-    @PostMapping
-    public ResponseEntity<?> initiatePayment(@PathVariable("bookingId") Long id){
-        return stripeService.initiatePayment(id);
 
+    @PostMapping
+    public ResponseEntity<?> initiatePayment(@PathVariable("bookingId") Long id,  @RequestHeader("Idempotency-Key") String idempotencyKey) {
+        return stripeService.initiatePayment(id, idempotencyKey);
     }
+
+
 }

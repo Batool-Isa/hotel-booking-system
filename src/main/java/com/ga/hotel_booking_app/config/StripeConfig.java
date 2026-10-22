@@ -1,7 +1,5 @@
 package com.ga.hotel_booking_app.config;
 
-import com.ga.hotel_booking_app.dto.request.PaymentRequest;
-import com.ga.hotel_booking_app.dto.response.StripeResponse;
 import com.stripe.Stripe;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
