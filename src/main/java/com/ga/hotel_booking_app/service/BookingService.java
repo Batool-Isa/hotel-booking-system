@@ -239,14 +239,13 @@ public class BookingService {
         booking.setChildren(totalChildren);
         bookingRepository.save(booking);
         BookingResponse bookingResponse = mapToBookingResponse(booking);
-        notificationService.sendBookingNotification(booking);
-        emailService.sendBookingConfirmationEmail(booking);
+
         auditLogService.log(
                 customer,
-                "BOOKING_CONFIRMED",
+                "BOOKING_CREATED",
                 "BOOKING",
                 booking.getId(),
-                "Customer " + customer.getUsername() + " confirmed booking " + booking.getBookingReference()
+                "Customer " + customer.getUsername() + " reserve booking " + booking.getBookingReference()
         );
         logger.info(
                 "Booking created: reference={}, userId={}, hotelId={}",
