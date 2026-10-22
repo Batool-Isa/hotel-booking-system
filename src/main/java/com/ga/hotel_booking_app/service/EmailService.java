@@ -5,17 +5,12 @@ import com.ga.hotel_booking_app.model.Booking;
 import com.ga.hotel_booking_app.model.EmailVerificationToken;
 import com.ga.hotel_booking_app.model.PasswordResetToken;
 import com.ga.hotel_booking_app.model.User;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import com.ga.hotel_booking_app.model.BookingGuest;
 import com.ga.hotel_booking_app.model.BookingRoom;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.HtmlUtils;
 
 import javax.imageio.ImageIO;
@@ -40,60 +35,15 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
-import java.io.File;
+
 
 @Service
 public class EmailService {
-
     @Autowired
-    private JavaMailSender javaMailSender;
-    @Value("${spring.mail.username}")
-    private String sender;
-
+    MailSenderService mailSenderService;
     private static final java.util.Map<String, byte[]> MAP_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
 
-    public String sendSimpleMail(EmailDetails details) {
-        try {
-            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
-            MimeMessageHelper helper =
-                    new MimeMessageHelper(mimeMessage, true);
-
-            helper.setFrom(sender);
-            helper.setTo(details.getRecipient());
-            helper.setSubject(details.getSubject());
-            helper.setText(details.getMsgBody(), true);
-
-            javaMailSender.send(mimeMessage);
-            return "Mail Sent Successfully";
-        } catch (Exception e) {
-            return "Error while sending mail";
-        }
-    }
-
-    public String sendMailWithAttachment(EmailDetails details) {
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper;
-        try {
-            helper = new MimeMessageHelper(mimeMessage, true);
-
-            helper.setFrom(sender);
-            helper.setTo(details.getRecipient());
-            helper.setText(details.getMsgBody(), true);
-            helper.setSubject(details.getSubject());
-            FileSystemResource fileSystemResource = new FileSystemResource(new File(details.getAttachment()));
-
-            helper.addAttachment(fileSystemResource.getFilename(), fileSystemResource);
-
-            javaMailSender.send(mimeMessage);
-
-            return "Mail Sent Successfully";
-
-        } catch (MessagingException e) {
-
-            return "Error while sending mail";
-        }
-    }
     public String buildActionEmailBody(
             String title,
             String message,
@@ -109,13 +59,13 @@ public class EmailService {
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <title>VibeStay - {{TITLE}}</title>
                 </head>
-
+                
                 <body style="margin: 0; padding: 0; background-color: #f2f4f8; font-family: Arial, Helvetica, sans-serif; color: #2d2d3a;">
-
+                
                     <div style="width: 100%; padding: 35px 0;">
-
+                
                         <div style="max-width: 620px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden;">
-
+                
                             <div style="background-color: #172554; padding: 28px 30px;">
                                 <div style="font-size: 25px; font-weight: bold; color: #ffffff;">
                                     VibeStay
@@ -124,30 +74,30 @@ public class EmailService {
                                     Your stay starts here
                                 </div>
                             </div>
-
+                
                             <div style="padding: 35px 32px;">
-
+                
                                 <h1 style="margin: 0 0 12px 0; font-size: 28px; color: #172554;">
                                     {{TITLE}}
                                 </h1>
-
+                
                                 <div style="height: 1px; background-color: #e5e7eb; margin-bottom: 24px;"></div>
-
+                
                                 <p style="margin: 0 0 8px 0; font-size: 15px; color: #333333;">
                                     Hello,
                                 </p>
-
+                
                                 <p style="margin: 0 0 25px 0; font-size: 14px; line-height: 1.6; color: #666666;">
                                     {{MESSAGE}}
                                 </p>
-
+                
                                 <div style="text-align: center; margin: 28px 0;">
                                     <a href="{{LINK}}"
                                        style="display: inline-block; padding: 12px 25px; background-color: #172554; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: bold;">
                                         {{BUTTON}}
                                     </a>
                                 </div>
-
+                
                                 <div style="background-color: #f7f8fc; padding: 20px; border-radius: 8px; margin-bottom: 28px;">
                                     <div style="font-size: 13px; font-weight: bold; color: #172554; margin-bottom: 10px;">
                                         IMPORTANT
@@ -156,14 +106,14 @@ public class EmailService {
                                         {{EXPIRY}}
                                     </div>
                                 </div>
-
+                
                                 <div style="font-size: 12px; line-height: 1.6; color: #999999; margin-bottom: 8px;">
                                     If the button does not work, copy and paste this link into your browser:
                                 </div>
                                 <div style="font-size: 12px; line-height: 1.6; color: #172554; word-break: break-all;">
                                     {{LINK}}
                                 </div>
-
+                
                                 <div style="margin-top: 30px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
                                     <div style="font-size: 14px; font-weight: bold; color: #333333; margin-bottom: 8px;">
                                         Didn't request this?
@@ -172,9 +122,9 @@ public class EmailService {
                                         If you did not request this, you can safely ignore this email.
                                     </div>
                                 </div>
-
+                
                             </div>
-
+                
                             <div style="background-color: #f2f4f8; padding: 25px; text-align: center;">
                                 <div style="font-size: 17px; font-weight: bold; color: #172554;">
                                     VibeStay
@@ -186,11 +136,11 @@ public class EmailService {
                                     © 2026 VibeStay. All rights reserved.
                                 </div>
                             </div>
-
+                
                         </div>
-
+                
                     </div>
-
+                
                 </body>
                 </html>
                 """
@@ -219,9 +169,10 @@ public class EmailService {
         emailDetails.setSubject("Reset your VibeStay password");
         emailDetails.setMsgBody(body);
         emailDetails.setRecipient(user.getEmail());
-        sendSimpleMail(emailDetails);
+        mailSenderService.sendSimpleMail(emailDetails);
         System.out.println("sending reset password email");
     }
+
     public void sendVerificationEmail(EmailVerificationToken emailVerificationToken) {
         String verificationLink =
                 "http://localhost:8000/auth/users/verify-email?token="
@@ -241,7 +192,7 @@ public class EmailService {
         emailDetails.setMsgBody(emailBody);
         emailDetails.setRecipient(emailVerificationToken.getUser().getEmail());
         System.out.println("sending verification email");
-        sendSimpleMail(emailDetails);
+        mailSenderService.sendSimpleMail(emailDetails);
 
     }
 
@@ -287,30 +238,30 @@ public class EmailService {
                 && !booking.getSpecialRequest().isBlank()) {
 
             specialRequestHtml = """
-                <div style="
-                    margin-top: 24px;
-                    padding: 16px;
-                    background-color: #f7f8fc;
-                    border-radius: 8px;
-                ">
                     <div style="
-                        font-size: 13px;
-                        font-weight: bold;
-                        color: #333333;
-                        margin-bottom: 6px;
+                        margin-top: 24px;
+                        padding: 16px;
+                        background-color: #f7f8fc;
+                        border-radius: 8px;
                     ">
-                        Special request
+                        <div style="
+                            font-size: 13px;
+                            font-weight: bold;
+                            color: #333333;
+                            margin-bottom: 6px;
+                        ">
+                            Special request
+                        </div>
+                    
+                        <div style="
+                            font-size: 14px;
+                            color: #666666;
+                            line-height: 1.5;
+                        ">
+                            {{SPECIAL_REQUEST_TEXT}}
+                        </div>
                     </div>
-
-                    <div style="
-                        font-size: 14px;
-                        color: #666666;
-                        line-height: 1.5;
-                    ">
-                        {{SPECIAL_REQUEST_TEXT}}
-                    </div>
-                </div>
-                """;
+                    """;
 
             specialRequestHtml = specialRequestHtml.replace(
                     "{{SPECIAL_REQUEST_TEXT}}",
@@ -321,436 +272,436 @@ public class EmailService {
         String guestSummary = buildGuestSummary(booking);
 
         String html = """
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport"
-                      content="width=device-width, initial-scale=1.0">
-
-                <title>VibeStay - {{TITLE}}</title>
-            </head>
-
-            <body style="
-                margin: 0;
-                padding: 0;
-                background-color: #f2f4f8;
-                font-family: Arial, Helvetica, sans-serif;
-                color: #2d2d3a;
-            ">
-
-                <div style="
-                    width: 100%;
-                    padding: 35px 0;
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport"
+                          content="width=device-width, initial-scale=1.0">
+                
+                    <title>VibeStay - {{TITLE}}</title>
+                </head>
+                
+                <body style="
+                    margin: 0;
+                    padding: 0;
+                    background-color: #f2f4f8;
+                    font-family: Arial, Helvetica, sans-serif;
+                    color: #2d2d3a;
                 ">
-
+                
                     <div style="
-                        max-width: 620px;
-                        margin: 0 auto;
-                        background-color: #ffffff;
-                        border-radius: 10px;
-                        overflow: hidden;
+                        width: 100%;
+                        padding: 35px 0;
                     ">
-
-                        <!-- HEADER -->
+                
                         <div style="
-                            background-color: #172554;
-                            padding: 28px 30px;
+                            max-width: 620px;
+                            margin: 0 auto;
+                            background-color: #ffffff;
+                            border-radius: 10px;
+                            overflow: hidden;
                         ">
-
+                
+                            <!-- HEADER -->
                             <div style="
-                                font-size: 25px;
-                                font-weight: bold;
-                                color: #ffffff;
+                                background-color: #172554;
+                                padding: 28px 30px;
                             ">
-                                VibeStay
+                
+                                <div style="
+                                    font-size: 25px;
+                                    font-weight: bold;
+                                    color: #ffffff;
+                                ">
+                                    VibeStay
+                                </div>
+                
+                                <div style="
+                                    margin-top: 5px;
+                                    font-size: 13px;
+                                    color: #cbd5e1;
+                                ">
+                                    Your stay starts here
+                                </div>
+                
                             </div>
-
+                
+                
+                            <!-- MAIN CONTENT -->
                             <div style="
-                                margin-top: 5px;
-                                font-size: 13px;
-                                color: #cbd5e1;
+                                padding: 35px 32px;
                             ">
-                                Your stay starts here
-                            </div>
-
-                        </div>
-
-
-                        <!-- MAIN CONTENT -->
-                        <div style="
-                            padding: 35px 32px;
-                        ">
-
-                            <!-- TITLE -->
-                            <h1 style="
-                                margin: 0 0 12px 0;
-                                font-size: 28px;
-                                color: #172554;
-                            ">
-                                {{TITLE}}
-                            </h1>
-
-                            <div style="
-                                height: 1px;
-                                background-color: #e5e7eb;
-                                margin-bottom: 24px;
-                            "></div>
-
-
-                            <!-- GREETING -->
-                            <p style="
-                                margin: 0 0 8px 0;
-                                font-size: 15px;
-                                color: #333333;
-                            ">
-                                Hello {{CUSTOMER_NAME}},
-                            </p>
-
-                            <p style="
-                                margin: 0 0 25px 0;
-                                font-size: 14px;
-                                line-height: 1.6;
-                                color: #666666;
-                            ">
-                                {{MESSAGE}}
-                            </p>
-
-
-                            <!-- BOOKING DETAILS -->
-                            <div style="
-                                background-color: #f7f8fc;
-                                padding: 20px;
-                                border-radius: 8px;
-                                margin-bottom: 28px;
-                            ">
-
+                
+                                <!-- TITLE -->
+                                <h1 style="
+                                    margin: 0 0 12px 0;
+                                    font-size: 28px;
+                                    color: #172554;
+                                ">
+                                    {{TITLE}}
+                                </h1>
+                
+                                <div style="
+                                    height: 1px;
+                                    background-color: #e5e7eb;
+                                    margin-bottom: 24px;
+                                "></div>
+                
+                
+                                <!-- GREETING -->
+                                <p style="
+                                    margin: 0 0 8px 0;
+                                    font-size: 15px;
+                                    color: #333333;
+                                ">
+                                    Hello {{CUSTOMER_NAME}},
+                                </p>
+                
+                                <p style="
+                                    margin: 0 0 25px 0;
+                                    font-size: 14px;
+                                    line-height: 1.6;
+                                    color: #666666;
+                                ">
+                                    {{MESSAGE}}
+                                </p>
+                
+                
+                                <!-- BOOKING DETAILS -->
+                                <div style="
+                                    background-color: #f7f8fc;
+                                    padding: 20px;
+                                    border-radius: 8px;
+                                    margin-bottom: 28px;
+                                ">
+                
+                                    <div style="
+                                        font-size: 13px;
+                                        font-weight: bold;
+                                        color: #172554;
+                                        margin-bottom: 15px;
+                                    ">
+                                        BOOKING DETAILS
+                                    </div>
+                
+                                    <table width="100%"
+                                           cellpadding="0"
+                                           cellspacing="0"
+                                           style="font-size: 14px;">
+                
+                                        <tr>
+                                            <td style="
+                                                padding: 6px 0;
+                                                color: #777777;
+                                            ">
+                                                Booking reference
+                                            </td>
+                
+                                            <td style="
+                                                padding: 6px 0;
+                                                text-align: right;
+                                                font-weight: bold;
+                                                color: #222222;
+                                            ">
+                                                {{BOOKING_REFERENCE}}
+                                            </td>
+                                        </tr>
+                
+                                        <tr>
+                                            <td style="
+                                                padding: 6px 0;
+                                                color: #777777;
+                                            ">
+                                                Check-in
+                                            </td>
+                
+                                            <td style="
+                                                padding: 6px 0;
+                                                text-align: right;
+                                                font-weight: bold;
+                                            ">
+                                                {{CHECK_IN}}
+                                            </td>
+                                        </tr>
+                
+                                        <tr>
+                                            <td style="
+                                                padding: 6px 0;
+                                                color: #777777;
+                                            ">
+                                                Check-out
+                                            </td>
+                
+                                            <td style="
+                                                padding: 6px 0;
+                                                text-align: right;
+                                                font-weight: bold;
+                                            ">
+                                                {{CHECK_OUT}}
+                                            </td>
+                                        </tr>
+                
+                                        <tr>
+                                            <td style="
+                                                padding: 6px 0;
+                                                color: #777777;
+                                            ">
+                                                Guests
+                                            </td>
+                
+                                            <td style="
+                                                padding: 6px 0;
+                                                text-align: right;
+                                                font-weight: bold;
+                                            ">
+                                                {{GUESTS}}
+                                            </td>
+                                        </tr>
+                
+                                        <tr>
+                                            <td style="
+                                                padding: 6px 0;
+                                                color: #777777;
+                                            ">
+                                                Status
+                                            </td>
+                
+                                            <td style="
+                                                padding: 6px 0;
+                                                text-align: right;
+                                                font-weight: bold;
+                                                color: #16a34a;
+                                            ">
+                                                {{STATUS}}
+                                            </td>
+                                        </tr>
+                
+                                    </table>
+                
+                                </div>
+                
+                
+                                <!-- HOTEL -->
                                 <div style="
                                     font-size: 13px;
                                     font-weight: bold;
                                     color: #172554;
+                                    margin-bottom: 14px;
+                                ">
+                                    HOTEL
+                                </div>
+                
+                                <div style="
                                     margin-bottom: 15px;
                                 ">
-                                    BOOKING DETAILS
+                
+                                    <div style="
+                                        font-size: 20px;
+                                        font-weight: bold;
+                                        color: #222222;
+                                        margin-bottom: 6px;
+                                    ">
+                                        {{HOTEL_NAME}}
+                                    </div>
+                
+                                    <div style="
+                                        font-size: 14px;
+                                        color: #777777;
+                                        line-height: 1.5;
+                                    ">
+                                        {{HOTEL_ADDRESS}}
+                                    </div>
+                
                                 </div>
-
-                                <table width="100%"
-                                       cellpadding="0"
-                                       cellspacing="0"
-                                       style="font-size: 14px;">
-
-                                    <tr>
-                                        <td style="
-                                            padding: 6px 0;
-                                            color: #777777;
-                                        ">
-                                            Booking reference
-                                        </td>
-
-                                        <td style="
-                                            padding: 6px 0;
-                                            text-align: right;
-                                            font-weight: bold;
-                                            color: #222222;
-                                        ">
-                                            {{BOOKING_REFERENCE}}
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td style="
-                                            padding: 6px 0;
-                                            color: #777777;
-                                        ">
-                                            Check-in
-                                        </td>
-
-                                        <td style="
-                                            padding: 6px 0;
-                                            text-align: right;
-                                            font-weight: bold;
-                                        ">
-                                            {{CHECK_IN}}
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td style="
-                                            padding: 6px 0;
-                                            color: #777777;
-                                        ">
-                                            Check-out
-                                        </td>
-
-                                        <td style="
-                                            padding: 6px 0;
-                                            text-align: right;
-                                            font-weight: bold;
-                                        ">
-                                            {{CHECK_OUT}}
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td style="
-                                            padding: 6px 0;
-                                            color: #777777;
-                                        ">
-                                            Guests
-                                        </td>
-
-                                        <td style="
-                                            padding: 6px 0;
-                                            text-align: right;
-                                            font-weight: bold;
-                                        ">
-                                            {{GUESTS}}
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td style="
-                                            padding: 6px 0;
-                                            color: #777777;
-                                        ">
-                                            Status
-                                        </td>
-
-                                        <td style="
-                                            padding: 6px 0;
-                                            text-align: right;
-                                            font-weight: bold;
-                                            color: #16a34a;
-                                        ">
-                                            {{STATUS}}
-                                        </td>
-                                    </tr>
-
-                                </table>
-
-                            </div>
-
-
-                            <!-- HOTEL -->
-                            <div style="
-                                font-size: 13px;
-                                font-weight: bold;
-                                color: #172554;
-                                margin-bottom: 14px;
-                            ">
-                                HOTEL
-                            </div>
-
-                            <div style="
-                                margin-bottom: 15px;
-                            ">
-
+                
+                
+                                {{MAP_BLOCK}}
+                
+                
+                                <!-- DIRECTIONS BUTTON -->
                                 <div style="
-                                    font-size: 20px;
-                                    font-weight: bold;
-                                    color: #222222;
-                                    margin-bottom: 6px;
+                                    text-align: center;
+                                    margin: 18px 0 30px 0;
                                 ">
-                                    {{HOTEL_NAME}}
+                
+                                    <a href="{{DIRECTIONS_URL}}"
+                                       style="
+                                           display: inline-block;
+                                           padding: 12px 25px;
+                                           background-color: #172554;
+                                           color: #ffffff;
+                                           text-decoration: none;
+                                           border-radius: 6px;
+                                           font-size: 14px;
+                                           font-weight: bold;
+                                       ">
+                                        Get directions
+                                    </a>
+                
                                 </div>
-
-                                <div style="
-                                    font-size: 14px;
-                                    color: #777777;
-                                    line-height: 1.5;
-                                ">
-                                    {{HOTEL_ADDRESS}}
-                                </div>
-
-                            </div>
-
-
-                            {{MAP_BLOCK}}
-
-
-                            <!-- DIRECTIONS BUTTON -->
-                            <div style="
-                                text-align: center;
-                                margin: 18px 0 30px 0;
-                            ">
-
-                                <a href="{{DIRECTIONS_URL}}"
-                                   style="
-                                       display: inline-block;
-                                       padding: 12px 25px;
-                                       background-color: #172554;
-                                       color: #ffffff;
-                                       text-decoration: none;
-                                       border-radius: 6px;
-                                       font-size: 14px;
-                                       font-weight: bold;
-                                   ">
-                                    Get directions
-                                </a>
-
-                            </div>
-
-
-                            <!-- ROOMS -->
-                            <div style="
-                                font-size: 13px;
-                                font-weight: bold;
-                                color: #172554;
-                                margin-bottom: 12px;
-                            ">
-                                ROOM DETAILS
-                            </div>
-
-                            {{ROOMS}}
-
-
-                            {{SPECIAL_REQUEST}}
-
-
-                            <!-- TOTAL -->
-                            <div style="
-                                margin-top: 25px;
-                                border: 1px solid #dfe3eb;
-                                border-radius: 8px;
-                                overflow: hidden;
-                            ">
-
-                                <div style="
-                                    padding: 16px 18px;
-                                    background-color: #f7f8fc;
-                                ">
-
-                                    <table width="100%"
-                                           cellpadding="0"
-                                           cellspacing="0">
-
-                                        <tr>
-                                            <td style="
-                                                font-size: 14px;
-                                                color: #555555;
-                                            ">
-                                                {{NIGHTS}} {{NIGHT_LABEL}}
-                                            </td>
-
-                                            <td style="
-                                                text-align: right;
-                                                font-size: 14px;
-                                                color: #555555;
-                                            ">
-                                                BHD {{TOTAL}}
-                                            </td>
-                                        </tr>
-
-                                    </table>
-
-                                </div>
-
-
-                                <div style="
-                                    padding: 18px;
-                                    border-top: 1px solid #e1e4ea;
-                                ">
-
-                                    <table width="100%"
-                                           cellpadding="0"
-                                           cellspacing="0">
-
-                                        <tr>
-                                            <td style="
-                                                font-size: 18px;
-                                                font-weight: bold;
-                                                color: #172554;
-                                            ">
-                                                Total
-                                            </td>
-
-                                            <td style="
-                                                text-align: right;
-                                                font-size: 20px;
-                                                font-weight: bold;
-                                                color: #172554;
-                                            ">
-                                                BHD {{TOTAL}}
-                                            </td>
-                                        </tr>
-
-                                    </table>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- FOOTER MESSAGE -->
-                            <div style="
-                                margin-top: 30px;
-                                padding-top: 24px;
-                                border-top: 1px solid #e5e7eb;
-                            ">
-
-                                <div style="
-                                    font-size: 14px;
-                                    font-weight: bold;
-                                    color: #333333;
-                                    margin-bottom: 8px;
-                                ">
-                                    Questions?
-                                </div>
-
+                
+                
+                                <!-- ROOMS -->
                                 <div style="
                                     font-size: 13px;
-                                    line-height: 1.6;
-                                    color: #777777;
+                                    font-weight: bold;
+                                    color: #172554;
+                                    margin-bottom: 12px;
                                 ">
-                                    If you have any questions about your
-                                    reservation, please contact VibeStay support.
+                                    ROOM DETAILS
                                 </div>
-
+                
+                                {{ROOMS}}
+                
+                
+                                {{SPECIAL_REQUEST}}
+                
+                
+                                <!-- TOTAL -->
+                                <div style="
+                                    margin-top: 25px;
+                                    border: 1px solid #dfe3eb;
+                                    border-radius: 8px;
+                                    overflow: hidden;
+                                ">
+                
+                                    <div style="
+                                        padding: 16px 18px;
+                                        background-color: #f7f8fc;
+                                    ">
+                
+                                        <table width="100%"
+                                               cellpadding="0"
+                                               cellspacing="0">
+                
+                                            <tr>
+                                                <td style="
+                                                    font-size: 14px;
+                                                    color: #555555;
+                                                ">
+                                                    {{NIGHTS}} {{NIGHT_LABEL}}
+                                                </td>
+                
+                                                <td style="
+                                                    text-align: right;
+                                                    font-size: 14px;
+                                                    color: #555555;
+                                                ">
+                                                    BHD {{TOTAL}}
+                                                </td>
+                                            </tr>
+                
+                                        </table>
+                
+                                    </div>
+                
+                
+                                    <div style="
+                                        padding: 18px;
+                                        border-top: 1px solid #e1e4ea;
+                                    ">
+                
+                                        <table width="100%"
+                                               cellpadding="0"
+                                               cellspacing="0">
+                
+                                            <tr>
+                                                <td style="
+                                                    font-size: 18px;
+                                                    font-weight: bold;
+                                                    color: #172554;
+                                                ">
+                                                    Total
+                                                </td>
+                
+                                                <td style="
+                                                    text-align: right;
+                                                    font-size: 20px;
+                                                    font-weight: bold;
+                                                    color: #172554;
+                                                ">
+                                                    BHD {{TOTAL}}
+                                                </td>
+                                            </tr>
+                
+                                        </table>
+                
+                                    </div>
+                
+                                </div>
+                
+                
+                                <!-- FOOTER MESSAGE -->
+                                <div style="
+                                    margin-top: 30px;
+                                    padding-top: 24px;
+                                    border-top: 1px solid #e5e7eb;
+                                ">
+                
+                                    <div style="
+                                        font-size: 14px;
+                                        font-weight: bold;
+                                        color: #333333;
+                                        margin-bottom: 8px;
+                                    ">
+                                        Questions?
+                                    </div>
+                
+                                    <div style="
+                                        font-size: 13px;
+                                        line-height: 1.6;
+                                        color: #777777;
+                                    ">
+                                        If you have any questions about your
+                                        reservation, please contact VibeStay support.
+                                    </div>
+                
+                                </div>
+                
                             </div>
-
+                
+                
+                            <!-- FOOTER -->
+                            <div style="
+                                background-color: #f2f4f8;
+                                padding: 25px;
+                                text-align: center;
+                            ">
+                
+                                <div style="
+                                    font-size: 17px;
+                                    font-weight: bold;
+                                    color: #172554;
+                                ">
+                                    VibeStay
+                                </div>
+                
+                                <div style="
+                                    margin-top: 6px;
+                                    font-size: 12px;
+                                    color: #999999;
+                                ">
+                                    Your stay starts here.
+                                </div>
+                
+                                <div style="
+                                    margin-top: 12px;
+                                    font-size: 11px;
+                                    color: #aaaaaa;
+                                ">
+                                    © 2026 VibeStay. All rights reserved.
+                                </div>
+                
+                            </div>
+                
                         </div>
-
-
-                        <!-- FOOTER -->
-                        <div style="
-                            background-color: #f2f4f8;
-                            padding: 25px;
-                            text-align: center;
-                        ">
-
-                            <div style="
-                                font-size: 17px;
-                                font-weight: bold;
-                                color: #172554;
-                            ">
-                                VibeStay
-                            </div>
-
-                            <div style="
-                                margin-top: 6px;
-                                font-size: 12px;
-                                color: #999999;
-                            ">
-                                Your stay starts here.
-                            </div>
-
-                            <div style="
-                                margin-top: 12px;
-                                font-size: 11px;
-                                color: #aaaaaa;
-                            ">
-                                © 2026 VibeStay. All rights reserved.
-                            </div>
-
-                        </div>
-
+                
                     </div>
-
-                </div>
-
-            </body>
-            </html>
-            """;
+                
+                </body>
+                </html>
+                """;
 
         /*
          * Replace dynamic values.
@@ -850,78 +801,78 @@ public class EmailService {
                     .multiply(BigDecimal.valueOf(nights));
 
             html.append("""
-                <div style="
-                    border: 1px solid #e1e4ea;
-                    border-radius: 8px;
-                    padding: 17px;
-                    margin-bottom: 12px;
-                ">
-
-                    <table width="100%%"
-                           cellpadding="0"
-                           cellspacing="0">
-
-                        <tr>
-
-                            <td style="
-                                vertical-align: top;
-                            ">
-
-                                <div style="
-                                    font-size: 16px;
-                                    font-weight: bold;
-                                    color: #222222;
+                    <div style="
+                        border: 1px solid #e1e4ea;
+                        border-radius: 8px;
+                        padding: 17px;
+                        margin-bottom: 12px;
+                    ">
+                    
+                        <table width="100%%"
+                               cellpadding="0"
+                               cellspacing="0">
+                    
+                            <tr>
+                    
+                                <td style="
+                                    vertical-align: top;
                                 ">
-                                    %s
-                                </div>
-
-                                <div style="
-                                    margin-top: 5px;
-                                    font-size: 13px;
-                                    color: #777777;
+                    
+                                    <div style="
+                                        font-size: 16px;
+                                        font-weight: bold;
+                                        color: #222222;
+                                    ">
+                                        %s
+                                    </div>
+                    
+                                    <div style="
+                                        margin-top: 5px;
+                                        font-size: 13px;
+                                        color: #777777;
+                                    ">
+                                        Room %s
+                                    </div>
+                    
+                                    <div style="
+                                        margin-top: 10px;
+                                        font-size: 12px;
+                                        color: #777777;
+                                    ">
+                                        Guests: %s
+                                    </div>
+                    
+                                </td>
+                    
+                                <td style="
+                                    vertical-align: top;
+                                    text-align: right;
                                 ">
-                                    Room %s
-                                </div>
-
-                                <div style="
-                                    margin-top: 10px;
-                                    font-size: 12px;
-                                    color: #777777;
-                                ">
-                                    Guests: %s
-                                </div>
-
-                            </td>
-
-                            <td style="
-                                vertical-align: top;
-                                text-align: right;
-                            ">
-
-                                <div style="
-                                    font-size: 14px;
-                                    color: #777777;
-                                ">
-                                    BHD %s / night
-                                </div>
-
-                                <div style="
-                                    margin-top: 7px;
-                                    font-size: 15px;
-                                    font-weight: bold;
-                                    color: #222222;
-                                ">
-                                    BHD %s
-                                </div>
-
-                            </td>
-
-                        </tr>
-
-                    </table>
-
-                </div>
-                """.formatted(
+                    
+                                    <div style="
+                                        font-size: 14px;
+                                        color: #777777;
+                                    ">
+                                        BHD %s / night
+                                    </div>
+                    
+                                    <div style="
+                                        margin-top: 7px;
+                                        font-size: 15px;
+                                        font-weight: bold;
+                                        color: #222222;
+                                    ">
+                                        BHD %s
+                                    </div>
+                    
+                                </td>
+                    
+                            </tr>
+                    
+                        </table>
+                    
+                    </div>
+                    """.formatted(
                     HtmlUtils.htmlEscape(roomType),
                     HtmlUtils.htmlEscape(roomNumber),
                     buildRoomGuestNames(bookingRoom),
@@ -932,6 +883,7 @@ public class EmailService {
 
         return html.toString();
     }
+
     private String buildRoomGuestNames(BookingRoom bookingRoom) {
 
         StringBuilder guests = new StringBuilder();
@@ -953,6 +905,7 @@ public class EmailService {
 
         return guests.toString();
     }
+
     private String buildGuestSummary(Booking booking) {
 
         int adults = booking.getAdults();
@@ -977,6 +930,7 @@ public class EmailService {
 
         return summary.toString();
     }
+
     private String formatMoney(BigDecimal amount) {
 
         if (amount == null) {
@@ -1012,23 +966,6 @@ public class EmailService {
         return png;
     }
 
-    private String sendMailWithInlineImage(EmailDetails details, String contentId, byte[] image) {
-        try {
-            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
-            helper.setFrom(sender);
-            helper.setTo(details.getRecipient());
-            helper.setSubject(details.getSubject());
-            helper.setText(details.getMsgBody(), true);
-            if (image != null) {
-                helper.addInline(contentId, new ByteArrayResource(image), "image/png");
-            }
-            javaMailSender.send(mimeMessage);
-            return "Mail Sent Successfully";
-        } catch (Exception e) {
-            return "Error while sending mail";
-        }
-    }
 
     private String buildDirectionsUrl(Booking booking) {
 
@@ -1044,6 +981,9 @@ public class EmailService {
                 + latitude + "," + longitude
                 + "&travelmode=driving";
     }
+
+    @Async("emailThreadExecutor")
+    @Transactional(readOnly = true)
     public void sendBookingConfirmationEmail(Booking booking) {
         byte[] map = loadHotelMap(booking);
         String body = buildBookingEmailBody(booking, "Booking Confirmed", "Your VibeStay booking has been successfully confirmed.", map != null);
@@ -1051,8 +991,9 @@ public class EmailService {
         emailDetails.setSubject("VibeStay Booking Confirmed - " + booking.getBookingReference());
         emailDetails.setMsgBody(body);
         emailDetails.setRecipient(booking.getUser().getEmail());
-        sendMailWithInlineImage(emailDetails, "hotelmap", map);
+        mailSenderService.sendMailWithInlineImage(emailDetails, "hotelmap", map);
     }
+
     public void sendBookingCancellationEmail(Booking booking) {
         byte[] map = loadHotelMap(booking);
         String body = buildBookingEmailBody(
@@ -1063,7 +1004,7 @@ public class EmailService {
         emailDetails.setMsgBody(body);
         emailDetails.setRecipient(booking.getUser().getEmail());
 
-        sendMailWithInlineImage(emailDetails, "hotelmap", map);
+        mailSenderService.sendMailWithInlineImage(emailDetails, "hotelmap", map);
     }
 
     private static class MapImageBuilder {

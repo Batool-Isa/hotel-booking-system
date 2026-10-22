@@ -301,6 +301,7 @@ The app sends verification, password reset and booking emails. They share one de
 - [Spring Boot logging](https://www.geeksforgeeks.org/springboot/spring-boot-logging/)
 - [Swagger Documentation](https://www.baeldung.com/swagger-operation-vs-apiresponse)
 - [Stripe API Integration](https://www.youtube.com/watch?v=BczS-wbxgp4)
+- [Thread POOLING](https://dev.to/realnamehidden1_61/how-does-spring-manage-thread-pools-for-web-requests-mid)
 ## Future improvements
 
 - Online payments
