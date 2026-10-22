@@ -59,6 +59,7 @@ public class SecurityConfiguration {
                         "/ws/**",
                         "/api/availability/**",
                         "/log",
+                        "/webhook",
                         "/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/hotels/**", "/api/amenities")
                         .permitAll().anyRequest().authenticated());

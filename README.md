@@ -300,7 +300,7 @@ The app sends verification, password reset and booking emails. They share one de
 - [Spring Boot: sending email via SMTP](https://www.geeksforgeeks.org/springboot/spring-boot-sending-email-via-smtp/)
 - [Spring Boot logging](https://www.geeksforgeeks.org/springboot/spring-boot-logging/)
 - [Swagger Documentation](https://www.baeldung.com/swagger-operation-vs-apiresponse)
-
+- [Stripe API Integration](https://www.youtube.com/watch?v=BczS-wbxgp4)
 ## Future improvements
 
 - Online payments

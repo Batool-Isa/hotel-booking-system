@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -59,6 +60,8 @@ public class Booking {
             orphanRemoval = true
     )
     private Set<BookingRoom> bookingRooms  = new HashSet<>();
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Payment> payments;
 
     public enum Status {
         PENDING,

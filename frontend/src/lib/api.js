@@ -36,8 +36,8 @@ function friendly(status, msg){
 }
 
 export async function api(method, path, opts={}){
-  const { body, form, query, auth: useAuth=true, timeout=20000 } = opts;
-  const headers = {};
+  const { body, form, query, auth: useAuth=true, timeout=20000, headers: extraHeaders } = opts;
+  const headers = { ...extraHeaders };
   if(useAuth && auth.token) headers.Authorization = 'Bearer '+auth.token;
   let payload;
   if(form) payload = form;

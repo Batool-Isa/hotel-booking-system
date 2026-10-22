@@ -2,7 +2,10 @@ package com.ga.hotel_booking_app.exception.handler;
 
 import com.ga.hotel_booking_app.exception.custom.*;
 import com.ga.hotel_booking_app.exception.response.ErrorResponse;
+import com.ga.hotel_booking_app.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,9 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private static final Logger logger =
+            LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(InformationNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleInformationNotFound(InformationNotFoundException ex,
                                                                    HttpServletRequest request) {
@@ -177,6 +183,7 @@ public class GlobalExceptionHandler {
                 "The data conflicts with existing records.",
                 request.getRequestURI()
         );
+        logger.warn("Data Integrity Violation {}",ex.getMessage() );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
     @ExceptionHandler(Exception.class)
