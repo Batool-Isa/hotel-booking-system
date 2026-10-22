@@ -14,6 +14,7 @@ import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
+import com.stripe.model.PaymentIntent;
 import com.stripe.net.Webhook;
 
 import org.slf4j.Logger;
@@ -176,7 +177,7 @@ public class PaymentService {
         }
         Booking booking = payment.getBooking();
         payment.setStatus(Payment.STATUS.SUCCEED);
-
+        payment.setPaymentIntent(session.getPaymentIntent());
         paymentRepository.save(payment);
         if (booking.getStatus() == Booking.Status.PENDING
                 && booking.getHoldExpiresAt() != null
