@@ -61,6 +61,8 @@ const TITLES = {
   "manage-new": "Add a hotel",
   "manage-hotel": "Manage hotel",
   admin: "Admin panel",
+  "payment-success": "Payment successful",
+  "payment-cancel": "Payment cancelled",
 };
 
 function parseHash() {
@@ -101,6 +103,11 @@ function parseHash() {
         params.id = segs[2];
       } else name = "manage";
       break;
+    case "payment":
+      if (segs[1] === "success") name = "payment-success";
+      else if (segs[1] === "cancel") name = "payment-cancel";
+      else name = "notfound";
+      break;
     default:
       name = "notfound";
   }
@@ -129,6 +136,8 @@ function guard(r) {
       "manage-new",
       "manage-hotel",
       "admin",
+      "payment-success",
+      "payment-cancel",
     ].includes(n) &&
     !auth.user
   )
@@ -221,6 +230,10 @@ async function loadRoute(r, seq) {
       return loadManageHotel(r.params.id, r.query.tab || "overview");
     case "admin":
       return loadAdmin(r.query.tab || "overview");
+    case "payment-success":
+      return loadPaymentResult(r.query.bookingId, true);
+    case "payment-cancel":
+      return loadPaymentResult(r.query.bookingId, false);
     case "verify-email":
       return runVerify(r.query.token);
     case "reset-password":
@@ -1320,7 +1333,7 @@ async function submitBooking() {
   }
   bk.busy = true;
   try {
-    await api("POST", "/api/bookings", {
+    const created = await api("POST", "/api/bookings", {
       body: {
         hotelId: bk.hotel.id,
         checkIn: bk.q.checkIn,
@@ -1335,33 +1348,59 @@ async function submitBooking() {
         })),
       },
     });
-    let latest = null;
-    try {
-      const list = await api("GET", "/api/bookings/my-bookings", {
-        query: { page: 0, size: 1, sort: "id,desc" },
-      });
-      latest = (Array.isArray(list) && list[0]) || null;
-    } catch {}
-    bk.done = latest || {
-      bookingReference: "",
-      hotelName: bk.hotel.name,
-      checkIn: bk.q.checkIn,
-      checkOut: bk.q.checkOut,
-      totalAmount: bkTotal.value,
-      status: "CONFIRMED",
-      rooms: [],
-      adults: 0,
-      children: 0,
-    };
-    if (latest) quiet(latest.bookingReference);
-    toast("Booking confirmed! A confirmation email is on its way.");
-    window.scrollTo(0, 0);
+    // the booking is now PENDING and held for 15 minutes: send the guest to Stripe to pay
+    quiet(created.bookingReference);
+    if (!(await startPayment(created.id)))
+      go(`/payment/cancel?bookingId=${created.id}`);
   } catch (e) {
     bk.banner = bookingHelp(e);
     window.scrollTo({ top: 0, behavior: "smooth" });
   } finally {
     bk.busy = false;
   }
+}
+
+/* ---------------- payment (Stripe) ---------------- */
+const pay = reactive({ booking: null, state: "", busy: false });
+function paymentKey(bookingId) {
+  let key = store.get("vs_pay_" + bookingId);
+  if (!key) {
+    key = crypto.randomUUID();
+    store.set("vs_pay_" + bookingId, key);
+  }
+  return key;
+}
+async function startPayment(bookingId) {
+  pay.busy = true;
+  try {
+    const url = await api("POST", `/api/bookings/${bookingId}/payment`, {
+      headers: { "Idempotency-Key": paymentKey(bookingId) },
+    });
+    if (typeof url !== "string" || !/^https:\/\//.test(url))
+      throw new ApiError(200, "The payment page could not be opened. Please try again.");
+    location.href = url;
+    return true;
+  } catch (e) {
+    toast(e.message, "error");
+    return false;
+  } finally {
+    pay.busy = false;
+  }
+}
+async function loadPaymentResult(id, success) {
+  Object.assign(pay, { booking: null, state: "checking", busy: false });
+  if (!id) {
+    pay.state = "missing";
+    return;
+  }
+  const routeName = success ? "payment-success" : "payment-cancel";
+  for (let i = 0; i < (success ? 8 : 1); i++) {
+    if (route.name !== routeName) return; // the guest left the page
+    pay.booking = await api("GET", `/api/bookings/${id}`);
+    if (pay.booking.status !== "PENDING") break;
+    if (success) await new Promise((r) => setTimeout(r, 2000));
+  }
+  pay.state = pay.booking.status.toLowerCase(); // pending / confirmed / cancelled / completed
 }
 
 /* ---------------- my bookings ---------------- */
@@ -2755,6 +2794,9 @@ document.addEventListener("click", () => {
   feedOpen.value = false;
 });
 window.addEventListener("hashchange", applyRoute);
+// Stripe redirects to /payment/success?bookingId=… (a real path): turn it into our #/ route
+if (location.pathname.startsWith("/payment/"))
+  history.replaceState(null, "", "/#" + location.pathname + location.search);
 (async () => {
   if (auth.token) {
     const exp = jwtExp(auth.token);
@@ -6335,6 +6377,99 @@ const printPage = () => window.print();
               @complete="completeBooking"
               @cancel="cancelFromLookup"
             ></lookup-panel>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= PAYMENT RESULT (Stripe redirects back here) ================= -->
+      <section
+        v-if="route.name === 'payment-success' || route.name === 'payment-cancel'"
+        class="page"
+      >
+        <div class="wrap">
+          <div class="card pad authbox wide center">
+            <alert-box v-if="page.error" type="error" :msg="page.error"></alert-box>
+
+            <template v-else-if="pay.state === 'missing'">
+              <h2>Booking not found</h2>
+              <p class="muted">This payment link has no booking attached.</p>
+            </template>
+
+            <template v-else-if="pay.state === 'checking'">
+              <div class="skel" style="height: 90px"></div>
+              <p class="muted mt">Checking your payment…</p>
+            </template>
+
+            <!-- paid and confirmed -->
+            <template v-else-if="pay.state === 'confirmed' || pay.state === 'completed'">
+              <div class="pay-icon ok"><icon name="check" :size="38"></icon></div>
+              <h2>Booking confirmed!</h2>
+              <p class="muted">
+                Thank you – your payment was successful. A confirmation email is on its way.
+              </p>
+            </template>
+
+            <!-- back from Stripe "success" but the webhook hasn't confirmed it yet -->
+            <template v-else-if="pay.state === 'pending' && route.name === 'payment-success'">
+              <div class="pay-icon wait"><icon name="clock" :size="38"></icon></div>
+              <h2>Payment received – confirming your booking</h2>
+              <p class="muted">
+                This usually takes a few seconds. Check “My bookings” in a moment, or refresh this page.
+              </p>
+            </template>
+
+            <!-- cancelled on Stripe: booking is still held and can be paid -->
+            <template v-else-if="pay.state === 'pending'">
+              <div class="pay-icon warn"><icon name="x" :size="38"></icon></div>
+              <h2>Payment cancelled</h2>
+              <p class="muted">
+                You weren’t charged. Your rooms are held for 15 minutes after booking –
+                pay before then to keep them.
+              </p>
+            </template>
+
+            <template v-else-if="pay.state === 'cancelled'">
+              <div class="pay-icon bad"><icon name="x" :size="38"></icon></div>
+              <h2>This booking was cancelled</h2>
+              <p class="muted">
+                It wasn’t paid in time or it was cancelled, so the rooms were released. You can book again.
+              </p>
+            </template>
+
+            <div v-if="pay.booking" class="card pad mt mb" style="text-align: left">
+              <booking-detail :b="pay.booking"></booking-detail>
+            </div>
+
+            <div class="row" style="justify-content: center">
+              <template v-if="pay.state === 'pending' && route.name === 'payment-cancel'">
+                <button
+                  class="btn btn-primary"
+                  :class="{ 'is-loading': pay.busy }"
+                  @click="startPayment(pay.booking.id)"
+                >
+                  Try payment again
+                </button>
+                <button
+                  class="btn btn-danger-o"
+                  @click="cancelBooking(pay.booking, () => go('/bookings'))"
+                >
+                  Cancel booking
+                </button>
+              </template>
+              <button
+                v-if="pay.state === 'confirmed'"
+                class="btn btn-outline"
+                @click="printPage"
+              >
+                <icon name="print"></icon>Print
+              </button>
+              <a class="btn btn-ghost" href="#/bookings">
+                <icon name="list"></icon>My bookings
+              </a>
+              <a v-if="pay.state === 'cancelled'" class="btn btn-ghost" href="#/">
+                Book another stay
+              </a>
+            </div>
           </div>
         </div>
       </section>

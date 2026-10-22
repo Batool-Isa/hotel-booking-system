@@ -1989,3 +1989,17 @@ video {
     box-shadow: none;
   }
 }
+
+/* payment result page */
+.pay-icon {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 14px;
+}
+.pay-icon.ok { background: var(--green-s); color: var(--green); }
+.pay-icon.wait { background: var(--blue-s); color: var(--blue); }
+.pay-icon.warn { background: var(--amber-s); color: var(--amber); }
+.pay-icon.bad { background: var(--red-s); color: var(--red); }

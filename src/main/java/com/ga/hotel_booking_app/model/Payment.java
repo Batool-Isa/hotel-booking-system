@@ -23,8 +23,9 @@ public class Payment {
     private Booking booking;
     @Column(nullable = false)
     private BigDecimal amount;
-    @Column(nullable = false)
-    private String method;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private METHOD method;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private STATUS status = STATUS.PENDING;
@@ -42,6 +43,11 @@ public class Payment {
     private LocalDateTime updatedAt;
 
     public enum STATUS{
+        PENDING,
+        FAILED,
+        SUCCEED
+    }
+    public enum METHOD{
         PENDING,
         FAILED,
         SUCCEED
