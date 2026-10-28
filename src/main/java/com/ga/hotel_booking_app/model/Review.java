@@ -14,7 +14,7 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    private double review;
+    private double rating;
     @Column(nullable = true, columnDefinition = "Text")
     private String comment;
     @CreationTimestamp

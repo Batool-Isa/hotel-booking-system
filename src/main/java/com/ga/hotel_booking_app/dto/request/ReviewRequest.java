@@ -10,7 +10,7 @@ public class ReviewRequest {
     @NotNull
     @Min(1)
     @Max(5)
-    private double review;
+    private double rating;
 
     private String comment;
 }

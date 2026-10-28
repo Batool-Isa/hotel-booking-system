@@ -61,7 +61,7 @@ public class SecurityConfiguration {
                         "/log",
                         "/webhook",
                         "/error").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/hotels/**", "/api/amenities")
+                        .requestMatchers(HttpMethod.GET, "/api/hotels/**", "/api/amenities", "/api/hotels/*/reviews")
                         .permitAll().anyRequest().authenticated());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
