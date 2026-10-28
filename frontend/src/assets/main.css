@@ -1990,7 +1990,6 @@ video {
   }
 }
 
-/* payment result page */
 .pay-icon {
   width: 76px;
   height: 76px;
@@ -2003,3 +2002,16 @@ video {
 .pay-icon.wait { background: var(--blue-s); color: var(--blue); }
 .pay-icon.warn { background: var(--amber-s); color: var(--amber); }
 .pay-icon.bad { background: var(--red-s); color: var(--red); }
+
+.card.room-taken { border-color: #f3bcc4; background: #fffafa; opacity: .85; }
+.card.room-taken h3 .badge { margin-left: 8px; vertical-align: middle; }
+
+.review { padding: 14px 0; border-top: 1px solid var(--line); margin-top: 14px; }
+.review + .review { margin-top: 0; }
+.stars { color: var(--yellow); font-size: 1.05rem; letter-spacing: 2px; margin: 4px 0; }
+
+.star-pick { display: flex; align-items: center; gap: 2px; }
+.star-pick button { background: none; border: 0; padding: 2px; font-size: 2rem; line-height: 1; color: #cfd5dc; cursor: pointer; transition: transform .1s, color .1s; }
+.star-pick button.on { color: var(--yellow); }
+.star-pick button:hover { transform: scale(1.12); }
+.star-pick span { margin-left: 10px; }

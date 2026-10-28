@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -46,7 +47,7 @@ public class AvailabilityService {
                 request.getCheckIn(), request.getCheckOut(), pageable);
 
         List<Long> hotelsIds = availableHotel.stream().map(h ->h.getId()).toList();
-        List<Room> availableRoomsByHotel = roomRepository.findFreeRooms(hotelsIds, adults, children, request.getCheckIn(), request.getCheckOut());
+        List<Room> availableRoomsByHotel = roomRepository.findFreeRooms(hotelsIds, adults, children, request.getCheckIn(), request.getCheckOut(), LocalDateTime.now());
 
 
         List<AvailableHotelResponse> hotelResponseList = new ArrayList<>();

@@ -1,7 +1,7 @@
 import { ref, reactive, computed } from 'vue';
 import { API_BASE, store, jwtExp } from './utils';
 
-export class ApiError extends Error { constructor(status, message, data){ super(message); this.status=status; this.data=data; } }
+export class ApiError extends Error { constructor(status, message, data){ super(message); this.status=status; this.data=data; this.code=(data && data.error) || ''; } }
 
 export const pending = ref(0);
 export const auth = reactive({ token: store.get('vs_token')||'', user: null });

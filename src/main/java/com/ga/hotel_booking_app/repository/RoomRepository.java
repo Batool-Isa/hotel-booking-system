@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,12 +37,14 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             "AND r.maxAdults >= :adults AND r.maxChildren >= :children " +
             "AND r.maxOccupancy >= :adults + :children " +
             "AND NOT EXISTS (SELECT br FROM BookingRoom br WHERE br.room = r " +
-            "  AND br.booking.status = 'CONFIRMED' " +
+            "  AND (br.booking.status = 'CONFIRMED' " +
+            "       OR (br.booking.status = 'PENDING' AND br.booking.holdExpiresAt > :now)) " +
             "  AND br.booking.checkIn < :checkOut AND br.booking.checkOut > :checkIn)")
     List<Room> findFreeRooms(
             @Param("hotelIds") List<Long> hotelIds,
             @Param("adults") int adults,
             @Param("children") int children,
             @Param("checkIn") LocalDate checkIn,
-            @Param("checkOut") LocalDate checkOut);
+            @Param("checkOut") LocalDate checkOut,
+            @Param("now") LocalDateTime now);
 }

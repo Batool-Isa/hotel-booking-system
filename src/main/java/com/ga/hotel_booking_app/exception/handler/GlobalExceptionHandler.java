@@ -146,6 +146,19 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
+    // someone else booked (or is holding) the room first; without this the catch-all below turns it into a 500
+    @ExceptionHandler(RoomUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleRoomUnavailable(RoomUnavailableException ex,
+                                                               HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value(),
+                "ROOM_UNAVAILABLE",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(

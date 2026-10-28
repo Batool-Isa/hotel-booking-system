@@ -973,9 +973,27 @@ const hp = reactive({
   sel: [],
   q: null,
   lightbox: -1,
+  reviews: [],
+  reviewsShown: 3,
+  rating: 0, // average from GET /api/hotels/{id}/reviews (0 = no reviews)
 });
+// 4.3 -> "★★★★☆" and a word for the score badge
+const stars = (n) => "★".repeat(Math.round(n)) + "☆".repeat(5 - Math.round(n));
+const ratingLabel = (n) =>
+  n >= 4.5 ? "Excellent" : n >= 4 ? "Very good" : n >= 3 ? "Good" : n >= 2 ? "Fair" : "Poor";
 async function loadHotel(id, q) {
+  // reviews load on the side: the page still works if they fail
+  api("GET", `/api/hotels/${id}/reviews`, { auth: false })
+    .then((r) => {
+      if (String(route.params.id) !== String(id)) return;
+      hp.reviews = (r && r.reviews) || [];
+      hp.rating = (r && r.averageRating) || 0;
+    })
+    .catch(() => {});
   Object.assign(hp, {
+    reviews: [],
+    reviewsShown: 3,
+    rating: 0,
     hotel: null,
     policy: null,
     policyMissing: false,
@@ -1218,12 +1236,13 @@ async function loadBook(id, q) {
         " " +
         (auth.user.lastName || "")
       ).trim();
-    return { ...r, guests };
+    return { ...r, guests, taken: false };
   });
 }
 const bkNights = computed(() =>
   bk.q ? nightsBetween(bk.q.checkIn, bk.q.checkOut) : 0,
 );
+const bkTaken = computed(() => bk.rooms.filter((r) => r.taken));
 const bkTotal = computed(
   () =>
     bk.rooms.reduce((s, r) => s + Number(r.pricePerNight), 0) * bkNights.value,
@@ -1309,15 +1328,47 @@ watch(
 );
 function bookingHelp(e) {
   const m = e.message || "";
-  if (/overlap/i.test(m))
-    return "Sorry – one of these rooms was just booked for your dates. Please go back and choose another room or different dates.";
   if (/accommodate|number of guests/i.test(m))
     return m + " Please adjust the guests in each room.";
   if (/only active customer/i.test(m))
     return "Your account needs to be active (email verified) before you can book.";
+  if (e.status === 409)
+    return "Someone else changed this at the same time. Please try again.";
   if (e.status >= 500)
-    return "The hotel can’t take this booking right now. It may not be fully set up for online booking yet (for example, it has no child policy). Please try another hotel.";
+    return "We couldn’t complete your booking right now. Please try again in a moment.";
   return m;
+}
+// another guest booked/holds the room, or the manager just deactivated it
+const isRoomConflict = (e) =>
+  e.code === "ROOM_UNAVAILABLE" ||
+  /not available for these dates|not active for booking/i.test(e.message || "");
+/** After a room clash: find out which selected rooms are gone and mark them, keeping the guest details. */
+async function markTakenRooms(e) {
+  const fromMsg = Number(((e.message || "").match(/Room (?:with id )?(\d+)/) || [])[1]);
+  let free = null;
+  try {
+    const data = await api("POST", "/api/availability/search", {
+      auth: false,
+      body: { ...bk.q, city: bk.hotel.city },
+    });
+    const mine = (Array.isArray(data) ? data : []).find(
+      (x) => Number(x.hotelId) === Number(bk.hotel.id),
+    );
+    free = new Set((mine ? mine.rooms : []).map((r) => r.id));
+  } catch {}
+  // the search only hides CONFIRMED bookings, so a room on a 15-min payment hold still looks free: trust the error too
+  bk.rooms.forEach((r) => {
+    r.taken = r.id === fromMsg || (free !== null && !free.has(r.id));
+  });
+  const taken = bk.rooms.filter((r) => r.taken);
+  bk.banner = taken.length
+    ? `Sorry – ${taken.map((r) => `${r.roomTypeName} (room ${r.roomNumber})`).join(", ")} ${taken.length === 1 ? "was" : "were"} just booked by someone else while you were filling in the form.`
+    : "Sorry – one of these rooms was just booked by someone else. Please choose another room or different dates.";
+}
+function removeTakenRooms() {
+  bk.rooms = bk.rooms.filter((r) => !r.taken);
+  bk.banner = "";
+  bk.errs = {};
 }
 async function submitBooking() {
   bk.touched = true;
@@ -1353,7 +1404,8 @@ async function submitBooking() {
     if (!(await startPayment(created.id)))
       go(`/payment/cancel?bookingId=${created.id}`);
   } catch (e) {
-    bk.banner = bookingHelp(e);
+    if (isRoomConflict(e)) await markTakenRooms(e);
+    else bk.banner = bookingHelp(e);
     window.scrollTo({ top: 0, behavior: "smooth" });
   } finally {
     bk.busy = false;
@@ -1386,6 +1438,11 @@ async function startPayment(bookingId) {
   } finally {
     pay.busy = false;
   }
+}
+/** "Try payment again": if the hold expired or the booking was cancelled meanwhile, show that instead. */
+async function retryPayment() {
+  if (!(await startPayment(pay.booking.id)))
+    await loadPaymentResult(pay.booking.id, false);
 }
 async function loadPaymentResult(id, success) {
   Object.assign(pay, { booking: null, state: "checking", busy: false });
@@ -1472,6 +1529,52 @@ async function cancelBooking(b, after) {
     if (after) await after();
   } catch (e) {
     toast(e.message, "error");
+    // 400/409 here means the booking changed meanwhile (e.g. already cancelled or completed): show its real state
+    if ((e.status === 400 || e.status === 409) && after) await after();
+  }
+}
+
+/* ---------------- write a review (completed stays) ---------------- */
+// reviewed just now, before the list reloads (after a reload `b.reviewed` comes from the API)
+const reviewed = reactive({});
+const RATING_WORDS = ["", "Poor", "Fair", "Good", "Very good", "Excellent"];
+const reviewF = useForm(
+  { bookingId: null, hotelName: "", rating: 0, comment: "" },
+  {
+    rating: [
+      (v) => (Number(v) >= 1 && Number(v) <= 5 ? "" : "Please choose a rating from 1 to 5 stars"),
+    ],
+    comment: [R.max(1000, "Comment")],
+  },
+);
+const reviewModal = reactive({ open: false, hover: 0 });
+function openReview(b) {
+  reviewF.reset({ bookingId: b.id, hotelName: b.hotelName });
+  reviewModal.hover = 0;
+  reviewModal.open = true;
+}
+async function saveReview() {
+  reviewF.banner = "";
+  if (!reviewF.validateAll()) return;
+  reviewF.busy = true;
+  const v = reviewF.values;
+  try {
+    await api("POST", `/api/bookings/${v.bookingId}/review`, {
+      body: { rating: Number(v.rating), comment: v.comment.trim() || null },
+    });
+    reviewed[v.bookingId] = true;
+    reviewModal.open = false;
+    toast("Thanks for your review!");
+  } catch (e) {
+    if (e.status === 409) {
+      reviewed[v.bookingId] = true;
+      reviewModal.open = false;
+      toast("You already reviewed this stay.", "info");
+    } else if (e.status === 400 && /uncompleted/i.test(e.message))
+      reviewF.banner = "You can only review a stay after it’s completed.";
+    else reviewF.banner = e.message;
+  } finally {
+    reviewF.busy = false;
   }
 }
 
@@ -1511,6 +1614,7 @@ async function completeBooking(b) {
     await lookupBooking();
   } catch (e) {
     toast(e.message, "error");
+    if (e.status === 400 || e.status === 409) await lookupBooking(); // changed by someone else meanwhile
   }
 }
 const cancelFromLookup = (b) => cancelBooking(b, lookupBooking);
@@ -2787,6 +2891,10 @@ function scrollToRooms() {
   const el = document.getElementById("rooms");
   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
+function scrollToReviews() {
+  const el = document.getElementById("reviews");
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 
 /* ---------------- boot ---------------- */
 document.addEventListener("click", () => {
@@ -3539,12 +3647,18 @@ const printPage = () => window.print();
                 </div>
               </div>
               <div class="row no-print">
-                <div class="row" v-if="hp.hotel.averageRating" style="gap: 8px">
+                <div
+                  class="row"
+                  v-if="hp.rating"
+                  style="gap: 8px; cursor: pointer"
+                  title="Read the reviews"
+                  @click="scrollToReviews"
+                >
                   <span class="score">{{
-                    Number(hp.hotel.averageRating).toFixed(1)
+                    Number(hp.rating).toFixed(1)
                   }}</span
-                  ><span class="small muted" v-if="hp.hotel.reviewCount">{{
-                    plural(hp.hotel.reviewCount, "review")
+                  ><span class="small muted" v-if="hp.reviews.length">{{
+                    plural(hp.reviews.length, "review")
                   }}</span>
                 </div>
                 <button class="btn btn-primary" @click="scrollToRooms">
@@ -3783,6 +3897,55 @@ const printPage = () => window.print();
                     </table>
                   </div>
                 </div>
+
+                <!-- guest reviews -->
+                <div class="card pad" id="reviews">
+                  <div class="row between">
+                    <h3 style="margin: 0">Guest reviews</h3>
+                    <div v-if="hp.rating" class="row" style="gap: 8px">
+                      <span class="score">{{
+                        Number(hp.rating).toFixed(1)
+                      }}</span>
+                      <div>
+                        <b>{{ ratingLabel(hp.rating) }}</b>
+                        <div class="xs muted">
+                          {{ plural(hp.reviews.length, "review") }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <p v-if="!hp.reviews.length" class="muted small mt" style="margin-bottom: 0">
+                    No reviews yet. Guests can review this hotel after their stay.
+                  </p>
+                  <div
+                    v-for="rv in hp.reviews.slice(0, hp.reviewsShown)"
+                    :key="rv.id"
+                    class="review"
+                  >
+                    <div class="row between">
+                      <div class="row" style="gap: 8px">
+                        <span class="avatar" style="width: 30px; height: 30px; font-size: 0.8rem">{{
+                          initials(rv.guestName)
+                        }}</span>
+                        <b>{{ rv.guestName || "Guest" }}</b>
+                      </div>
+                      <span class="xs muted">{{ fmtDate(rv.createdAt) }}</span>
+                    </div>
+                    <div class="stars" :aria-label="rv.rating + ' out of 5'">
+                      {{ stars(rv.rating) }}
+                    </div>
+                    <p v-if="rv.comment" class="small" style="margin: 0; white-space: pre-line">
+                      {{ rv.comment }}
+                    </p>
+                  </div>
+                  <button
+                    v-if="hp.reviews.length > hp.reviewsShown"
+                    class="btn btn-ghost btn-sm mt"
+                    @click="hp.reviewsShown += 5"
+                  >
+                    Show more reviews ({{ hp.reviews.length - hp.reviewsShown }})
+                  </button>
+                </div>
               </div>
 
               <aside class="stack sticky">
@@ -3971,7 +4134,37 @@ const printPage = () => window.print();
             <alert-box v-if="bk.banner" type="error"
               ><div>
                 {{ bk.banner }}
-                <a :href="'#/hotel/' + bk.hotel.id">Back to rooms</a>
+                <template v-if="bkTaken.length">
+                  Your guest details are kept.
+                  <div class="row mt" style="gap: 8px">
+                    <button
+                      v-if="bkTaken.length < bk.rooms.length"
+                      type="button"
+                      class="btn btn-primary btn-sm"
+                      @click="removeTakenRooms"
+                    >
+                      Remove {{ bkTaken.length === 1 ? "it" : "them" }} and
+                      continue
+                    </button>
+                    <a
+                      class="btn btn-outline btn-sm"
+                      :href="
+                        '#/hotel/' +
+                        bk.hotel.id +
+                        '?in=' +
+                        bk.q.checkIn +
+                        '&out=' +
+                        bk.q.checkOut +
+                        '&a=' +
+                        bk.q.adults +
+                        '&c=' +
+                        bk.q.children
+                      "
+                      >Choose other rooms</a
+                    >
+                  </div>
+                </template>
+                <a v-else :href="'#/hotel/' + bk.hotel.id">Back to rooms</a>
               </div></alert-box
             >
             <alert-box v-if="bk.noPolicy" type="warn"
@@ -4017,10 +4210,21 @@ const printPage = () => window.print();
               novalidate
             >
               <div class="stack">
-                <div v-for="(r, ri) in bk.rooms" :key="r.id" class="card">
+                <div
+                  v-for="(r, ri) in bk.rooms"
+                  :key="r.id"
+                  class="card"
+                  :class="{ 'room-taken': r.taken }"
+                >
                   <div class="card-h">
                     <div>
-                      <h3>Room {{ ri + 1 }}: {{ r.roomTypeName }}</h3>
+                      <h3>
+                        Room {{ ri + 1 }}: {{ r.roomTypeName }}
+                        <span v-if="r.taken" class="badge b-red"
+                          ><icon name="x" :size="12"></icon>Just booked by
+                          someone else</span
+                        >
+                      </h3>
                       <div class="xs muted">
                         Room {{ r.roomNumber }} · up to
                         {{ r.maxAdults }} adults, {{ r.maxChildren }} children,
@@ -4195,16 +4399,21 @@ const printPage = () => window.print();
                     }}</strong>
                   </div>
                   <div class="xs muted">
-                    Pay at the hotel. Free cancellation from “My bookings” while
-                    your booking is confirmed.
+                    You’ll pay securely on the next page. Your rooms are held for
+                    15 minutes while you pay.
                   </div>
                   <button
                     class="btn btn-yellow btn-block btn-lg mt"
                     :class="{ 'is-loading': bk.busy }"
+                    :disabled="bkTaken.length > 0"
                     style="font-weight: 800"
                   >
-                    Confirm booking
+                    Continue to payment
                   </button>
+                  <div v-if="bkTaken.length" class="err mt">
+                    <icon name="alert" :size="14"></icon>Remove the rooms that
+                    were just booked, or choose other rooms.
+                  </div>
                   <a
                     class="btn btn-ghost btn-block mt"
                     :href="
@@ -4915,6 +5124,18 @@ const printPage = () => window.print();
                 >
                   <icon name="x" :size="15"></icon>Cancel booking
                 </button>
+                <template v-if="b.status === 'COMPLETED'">
+                  <span v-if="b.reviewed || reviewed[b.id]" class="badge b-green"
+                    ><icon name="check" :size="12"></icon>Reviewed</span
+                  >
+                  <button
+                    v-else
+                    class="btn btn-primary btn-sm"
+                    @click="openReview(b)"
+                  >
+                    <icon name="star" :size="15"></icon>Write a review
+                  </button>
+                </template>
               </div>
             </article>
             <div class="pager" v-if="mb.page > 0 || mb.hasNext">
@@ -6445,7 +6666,7 @@ const printPage = () => window.print();
                 <button
                   class="btn btn-primary"
                   :class="{ 'is-loading': pay.busy }"
-                  @click="startPayment(pay.booking.id)"
+                  @click="retryPayment"
                 >
                   Try payment again
                 </button>
@@ -6497,6 +6718,95 @@ const printPage = () => window.print();
     </footer>
 
     <!-- ================= MODALS ================= -->
+    <div
+      v-if="reviewModal.open"
+      class="modal-bg"
+      @click.self="reviewModal.open = false"
+    >
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-h">
+          <h3>Review your stay</h3>
+          <button
+            class="x-btn"
+            @click="reviewModal.open = false"
+            aria-label="Close"
+          >
+            <icon name="x"></icon>
+          </button>
+        </div>
+        <form @submit.prevent="saveReview" novalidate>
+          <div class="modal-b">
+            <p class="muted" style="margin-top: 0">
+              How was your stay at <b>{{ reviewF.values.hotelName }}</b>?
+            </p>
+            <alert-box
+              v-if="reviewF.banner"
+              type="error"
+              :msg="reviewF.banner"
+            ></alert-box>
+            <div class="field" :class="{ 'has-error': !!reviewF.errors.rating }">
+              <label>Your rating<span class="req">*</span></label>
+              <div
+                class="star-pick"
+                role="radiogroup"
+                aria-label="Rating"
+                @mouseleave="reviewModal.hover = 0"
+              >
+                <button
+                  v-for="n in 5"
+                  :key="n"
+                  type="button"
+                  role="radio"
+                  :aria-checked="reviewF.values.rating === n"
+                  :aria-label="plural(n, 'star')"
+                  :class="{ on: n <= (reviewModal.hover || reviewF.values.rating) }"
+                  @mouseenter="reviewModal.hover = n"
+                  @click="
+                    reviewF.values.rating = n;
+                    reviewF.check('rating');
+                  "
+                >
+                  ★
+                </button>
+                <span class="small muted">{{
+                  RATING_WORDS[reviewModal.hover || reviewF.values.rating]
+                }}</span>
+              </div>
+              <div class="field-foot">
+                <span v-if="reviewF.errors.rating" class="err" role="alert"
+                  ><icon name="alert" :size="14"></icon
+                  >{{ reviewF.errors.rating }}</span
+                >
+              </div>
+            </div>
+            <f-input
+              v-model="reviewF.values.comment"
+              label="Comment (optional)"
+              textarea
+              :rows="4"
+              maxlength="1000"
+              counter
+              placeholder="What did you like? What could be better?"
+              :error="reviewF.errors.comment"
+            ></f-input>
+          </div>
+          <div class="modal-f">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              @click="reviewModal.open = false"
+            >
+              Cancel</button
+            ><button
+              class="btn btn-primary"
+              :class="{ 'is-loading': reviewF.busy }"
+            >
+              Submit review
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
     <div v-if="bd.open" class="modal-bg" @click.self="bd.open = false">
       <div class="modal lg" role="dialog" aria-modal="true">
         <div class="modal-h">

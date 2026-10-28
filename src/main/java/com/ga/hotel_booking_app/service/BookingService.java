@@ -279,6 +279,7 @@ public class BookingService {
         response.setChildren(booking.getChildren());
         response.setTotalAmount(booking.getTotalAmount());
         response.setSpecialRequest(booking.getSpecialRequest());
+        response.setReviewed(booking.getReview() != null);
         List<BookingRoomResponse> rooms = booking.getBookingRooms()
                 .stream()
                 .map(this::mapToBookingRoomResponse)
