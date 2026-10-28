@@ -22,4 +22,6 @@ public class BookingResponse {
     private BigDecimal totalAmount;
     private String specialRequest;
     private List<BookingRoomResponse> rooms;
+    // true when the guest already posted a review for this booking
+    private boolean reviewed;
 }

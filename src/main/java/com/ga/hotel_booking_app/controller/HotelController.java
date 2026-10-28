@@ -4,6 +4,7 @@ import com.ga.hotel_booking_app.dto.request.CreateHotelRequest;
 import com.ga.hotel_booking_app.dto.request.UpdateHotelRequest;
 import com.ga.hotel_booking_app.dto.request.UpdateHotelStatusRequest;
 import com.ga.hotel_booking_app.service.HotelService;
+import com.ga.hotel_booking_app.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -20,6 +21,9 @@ import org.springframework.web.bind.annotation.*;
 public class HotelController {
     @Autowired
     private HotelService hotelService;
+    @Autowired
+    private ReviewService reviewService;
+
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','HOTEL_MANAGER')")
@@ -124,6 +128,16 @@ public class HotelController {
             @PathVariable("managerId") Long managerId) {
 
         return hotelService.assignManager(hotelId, managerId);
+    }
+
+    @GetMapping("/{hotelId}/reviews")
+    @Operation(summary = "Get hotel reviews & rating", description = "Fetch hotel reviews & rating")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of review and average rating"),
+    })
+    public ResponseEntity<?> getHotelReviews(@PathVariable("hotelId") Long hotelId) {
+
+        return reviewService.getHotelReviews(hotelId);
     }
 
 }

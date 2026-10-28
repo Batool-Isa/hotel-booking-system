@@ -48,7 +48,6 @@ public class HotelService {
         }
 
         User user = (getCurrentLoggedInUser());
-        System.out.println("User  ->" + user.getId());
         Hotel hotel = new Hotel();
         hotel.setName(request.getName());
         hotel.setAddress(request.getAddress());
