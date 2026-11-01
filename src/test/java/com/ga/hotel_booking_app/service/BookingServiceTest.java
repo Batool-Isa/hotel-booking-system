@@ -5,15 +5,18 @@ import com.ga.hotel_booking_app.dto.request.BookingRequest;
 import com.ga.hotel_booking_app.dto.request.BookingRoomRequest;
 import com.ga.hotel_booking_app.dto.request.BookingStatusRequest;
 import com.ga.hotel_booking_app.exception.custom.InvalidInformationException;
+import com.ga.hotel_booking_app.exception.custom.RoomUnavailableException;
 import com.ga.hotel_booking_app.exception.custom.UnauthorizedActionException;
 import com.ga.hotel_booking_app.model.*;
 import com.ga.hotel_booking_app.repository.BookingRepository;
 import com.ga.hotel_booking_app.repository.HotelRepository;
 import com.ga.hotel_booking_app.repository.RoomRepository;
 import com.ga.hotel_booking_app.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,6 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -59,9 +63,12 @@ class BookingServiceTest {
     @InjectMocks
     private BookingService bookingService;
 
-    @Test
-    @DisplayName("Create booking when room is available")
-    void createNewBooking() {
+    @AfterEach
+    void clearSecurityContext() {
+        // runs even when a test fails, so a login never leaks into the next test
+    }
+
+    private User loginActiveCustomer() {
         User customer = new User();
         customer.setId(1L);
         customer.setEmail("test@example.com");
@@ -69,9 +76,21 @@ class BookingServiceTest {
         Role role = new Role();
         role.setName(Role.RoleName.CUSTOMER);
         customer.setRole(role);
+        when(userRepository.findUserByEmail("test@example.com")).thenReturn(customer);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("test@example.com", null)
+        );
+        return customer;
+    }
+
+    @Test
+    @DisplayName("Create booking when room is available")
+    void createNewBooking() {
+        User customer = loginActiveCustomer();
         Hotel hotel = new Hotel();
         hotel.setId(1L);
         hotel.setName("VibeStay-hotel");
+        hotel.setStatus(Hotel.Status.ACTIVE);
         ChildPolicy childPolicy = new ChildPolicy();
         childPolicy.setInfantMaxAge(2);
         childPolicy.setChildMaxAge(12);
@@ -85,6 +104,9 @@ class BookingServiceTest {
         room.setMaxAdults(2);
         room.setMaxChildren(2);
         room.setMaxOccupancy(4);
+        RoomType roomType = new RoomType();
+        roomType.setName("Deluxe");
+        room.setRoomType(roomType);
         BookingGuestRequest guestRequest = new BookingGuestRequest();
         guestRequest.setName("Test User");
         guestRequest.setAge(25);
@@ -101,53 +123,54 @@ class BookingServiceTest {
         when(hotelRepository.findById(1L))
                 .thenReturn(Optional.of(hotel));
 
+        when(roomRepository.findByIdForUpdate(1L))
+                .thenReturn(Optional.of(room));
+
         when(roomRepository.findById(1L))
                 .thenReturn(Optional.of(room));
 
         when(bookingRepository.findOverlappingBookings(
                 eq(1L),
-                eq(Booking.Status.CONFIRMED),
                 any(LocalDate.class),
-                any(LocalDate.class)))
+                any(LocalDate.class),
+                any(LocalDateTime.class)))
                 .thenReturn(Collections.emptyList());
-
-        when(userRepository.findUserByEmail("test@example.com"))
-                .thenReturn(customer);
 
         when(bookingRepository.save(any(Booking.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken(
-                        "test@example.com",
-                        null
-                )
-        );
 
         var response = bookingService.createNewBooking(request);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
 
-        verify(bookingRepository).save(any(Booking.class));
-        verify(notificationService).sendBookingNotification(any(Booking.class));
-        verify(emailService).sendBookingConfirmationEmail(any(Booking.class));
+        // the room row must be locked before availability is checked
+        verify(roomRepository).findByIdForUpdate(1L);
+
+        ArgumentCaptor<Booking> saved = ArgumentCaptor.forClass(Booking.class);
+        verify(bookingRepository).save(saved.capture());
+        // booking is only held until payment, it is confirmed later by the Stripe webhook
+        assertEquals(Booking.Status.PENDING, saved.getValue().getStatus());
+        assertNotNull(saved.getValue().getHoldExpiresAt());
+        assertEquals(new BigDecimal("100.00"), saved.getValue().getTotalAmount());
+
+        verifyNoInteractions(notificationService, emailService);
         verify(auditLogService).log(
                 eq(customer),
-                eq("BOOKING_CONFIRMED"),
+                eq("BOOKING_CREATED"),
                 eq("BOOKING"),
                 any(),
                 anyString()
         );
-
-        SecurityContextHolder.clearContext();
     }
 
     @Test
-    @DisplayName("Create booking with overlapping room throws custom InvalidInformationException")
+    @DisplayName("Create booking with overlapping room throws RoomUnavailableException")
     void createBookingWithUnavailableRoom() {
+        loginActiveCustomer();
         Hotel hotel = new Hotel();
         hotel.setId(1L);
         hotel.setName("VibeStay-hotel");
+        hotel.setStatus(Hotel.Status.ACTIVE);
         ChildPolicy childPolicy = new ChildPolicy();
         childPolicy.setInfantMaxAge(2);
         childPolicy.setChildMaxAge(12);
@@ -174,17 +197,19 @@ class BookingServiceTest {
         request.setRooms(List.of(roomRequest));
         Booking existingBooking = new Booking();
         when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
+        when(roomRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(room));
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
-        when(bookingRepository.findOverlappingBookings(eq(1L), eq(Booking.Status.CONFIRMED),
-                any(LocalDate.class), any(LocalDate.class))).thenReturn(List.of(existingBooking));
+        when(bookingRepository.findOverlappingBookings(eq(1L),
+                any(LocalDate.class), any(LocalDate.class), any(LocalDateTime.class))).thenReturn(List.of(existingBooking));
 
-        assertThrows(InvalidInformationException.class, () -> bookingService.createNewBooking(request));
+        assertThrows(RoomUnavailableException.class, () -> bookingService.createNewBooking(request));
         verify(bookingRepository, never()).save(any(Booking.class));
     }
 
     @Test
     @DisplayName("Create booking with invalid dates throws InvalidInformationException")
     void createBookingWithInvalidDates() {
+        loginActiveCustomer();
         BookingRequest request = new BookingRequest();
         request.setHotelId(1L);
         request.setCheckIn(LocalDate.now().plusDays(5));
@@ -231,7 +256,6 @@ class BookingServiceTest {
                 eq(1L), anyString()
         );
 
-        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -258,7 +282,6 @@ class BookingServiceTest {
 
         verify(bookingRepository, never()).save(any(Booking.class));
 
-        SecurityContextHolder.clearContext();
     }
 
 
@@ -291,7 +314,6 @@ class BookingServiceTest {
         );
         verify(bookingRepository, never()).save(any(Booking.class));
 
-        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -313,6 +335,9 @@ class BookingServiceTest {
         booking.setBookingReference("VI1234");
         booking.setHotel(hotel);
         booking.setStatus(Booking.Status.CONFIRMED);
+        User customer = new User();
+        customer.setId(2L);
+        booking.setUser(customer);
         BookingStatusRequest request = new BookingStatusRequest();
         request.setStatus(Booking.Status.COMPLETED);
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
@@ -331,7 +356,6 @@ class BookingServiceTest {
                 eq("BOOKING"), eq(1L), anyString()
         );
 
-        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -361,6 +385,5 @@ class BookingServiceTest {
                 UnauthorizedActionException.class, () -> bookingService.updateBookingStatus(1L, request)
         );
         verify(bookingRepository, never()).save(any(Booking.class));
-        SecurityContextHolder.clearContext();
     }
 }
