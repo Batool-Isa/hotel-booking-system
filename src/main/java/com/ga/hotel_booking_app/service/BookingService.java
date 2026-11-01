@@ -165,8 +165,6 @@ public class BookingService {
         // validate user request and get hotel wanted
         Hotel hotel = validateBookingRequest(request);
         ChildPolicy childPolicy = hotel.getChildPolicy();
-
-        // insert into booking table
         Booking booking = new Booking();
         String referencePrefix = hotel.getName().replaceAll("[^A-Za-z]","").toUpperCase();
         if(referencePrefix.length() >= 4){
