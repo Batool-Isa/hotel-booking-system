@@ -32,7 +32,7 @@ public class Payment {
     private STATUS status = STATUS.PENDING;
     @Column(nullable = false)
     private String providerReference;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String idempotencyKey;
     @Column(length = 1000)
     private String sessionURL;

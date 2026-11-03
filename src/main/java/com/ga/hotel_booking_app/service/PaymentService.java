@@ -16,6 +16,8 @@ import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.net.Webhook;
 
+import jakarta.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,6 +135,7 @@ public class PaymentService {
     }
 
 
+    @Transactional
     public ResponseEntity<?> handleStripeWebhook(String payload, String sigHeader) {
 
         Event event;
@@ -178,7 +181,13 @@ public class PaymentService {
             logger.warn("Booking is not paid");
             return;
         }
-        Booking booking = payment.getBooking();
+        // lock the booking row so duplicate webhooks wait and then see it is already confirmed
+        Booking booking = bookingRepository.findByIdForUpdate(payment.getBooking().getId())
+                .orElseThrow(() -> new InformationNotFoundException("Booking for payment " + payment.getId() + " not found"));
+        if (booking.getStatus() == Booking.Status.CONFIRMED) {
+            logger.info("Booking {} is already confirmed, ignoring duplicate webhook", booking.getId());
+            return;
+        }
         payment.setStatus(Payment.STATUS.SUCCEED);
         payment.setPaymentIntent(session.getPaymentIntent());
         paymentRepository.save(payment);
