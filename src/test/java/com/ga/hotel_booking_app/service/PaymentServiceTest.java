@@ -1,5 +1,7 @@
 package com.ga.hotel_booking_app.service;
 
+import com.ga.hotel_booking_app.exception.custom.InvalidInformationException;
+import com.ga.hotel_booking_app.exception.custom.UnauthorizedActionException;
 import com.ga.hotel_booking_app.model.Booking;
 import com.ga.hotel_booking_app.model.Payment;
 import com.ga.hotel_booking_app.model.User;
@@ -23,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -86,6 +89,49 @@ public class PaymentServiceTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("https://stripe.test/session", response.getBody());
         verify(paymentRepository).save(any(Payment.class));
+    }
+
+    @Test
+    @DisplayName("Create & initiate payment session for pending booking for non owner should throws 403 error")
+    void initiatePaymentForPendingBookingForNonOwnerUserShouldThrowsUnauthorizedException()  {
+        User customer1 = new User();
+        customer1.setId(1L);
+        Booking booking = pendingBooking(customer1);
+        User customer2 = loginCustomer(2L);
+
+        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+        assertThrows(UnauthorizedActionException.class, () -> paymentService.initiatePayment(1L, "test-key"));
+        verifyNoInteractions(stripeGateway);
+    }
+
+    @Test
+    @DisplayName("Create & initiate payment session for cancelled booking should throws invalid information")
+    void initiatePaymentForCancelledShouldThrowsInvalidInformationException()  {
+        User customer1 = loginCustomer(1L);
+        Booking booking = pendingBooking(customer1);
+        booking.setStatus(Booking.Status.CANCELLED);
+
+        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+        assertThrows(InvalidInformationException.class, () -> paymentService.initiatePayment(1L, "test-key"));
+        verifyNoInteractions(stripeGateway);
+    }
+
+    @Test
+    @DisplayName("Reuse The Idempotency Key Should Return Same Session URL")
+    void reuseTheIdempotencyKeyShouldReturnSameSessionURL() throws StripeException {
+        User customer1 = loginCustomer(1L);
+        Booking booking = pendingBooking(customer1);
+        Payment existingPayment = new Payment();
+        existingPayment.setBooking(booking);
+        existingPayment.setIdempotencyKey("key-1");
+        existingPayment.setSessionURL("https://stripe.test/existing-session");
+        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+        when(paymentRepository.findByIdempotencyKey("key-1")).thenReturn(Optional.of(existingPayment));
+        ResponseEntity<?> response = paymentService.initiatePayment(1L, "key-1");
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("https://stripe.test/existing-session", response.getBody());
+        verify(stripeGateway, never()).createCheckoutSession(any());
+        verify(paymentRepository, never()).save(any(Payment.class));
     }
 
 }
