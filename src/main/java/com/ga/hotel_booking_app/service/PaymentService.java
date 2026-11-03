@@ -14,7 +14,6 @@ import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
-import com.stripe.model.PaymentIntent;
 import com.stripe.net.Webhook;
 
 import org.slf4j.Logger;
@@ -47,6 +46,10 @@ public class PaymentService {
     private EmailService emailService;
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private StripeGateway stripeGateway;
+
 
     private static final Logger logger =
             LoggerFactory.getLogger(PaymentService.class);
@@ -105,7 +108,7 @@ public class PaymentService {
                     )
                     .build();
 
-            Session session = Session.create(params);
+            Session session = stripeGateway.createCheckoutSession(params);
 
             savePayment(session, booking, idempotencyKey);
             logger.info("Payment session for booking {} has been created", booking.getId());
