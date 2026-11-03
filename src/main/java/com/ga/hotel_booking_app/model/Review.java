@@ -21,6 +21,6 @@ public class Review {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "booking_id")
+    @JoinColumn(name = "booking_id", unique = true)
     private Booking booking;
 }

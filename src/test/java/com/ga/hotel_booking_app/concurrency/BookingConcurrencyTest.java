@@ -162,12 +162,9 @@ private final List<String> emails = new ArrayList<>();
                 }
             });
         }
-
-        // release all threads at the same moment
         startGate.countDown();
         executor.shutdown();
         executor.awaitTermination(5, TimeUnit.MINUTES);
-
         assertEquals(0, errors.get(), "unexpected errors");
         assertEquals(1, success.get(), "exactly one booking must succeed");
         assertEquals(4, conflicts.get(), "all others must get a conflict");
@@ -206,12 +203,9 @@ private final List<String> emails = new ArrayList<>();
                 }
             });
         }
-
-        // release all threads at the same moment
         startGate.countDown();
         executor.shutdown();
         executor.awaitTermination(5, TimeUnit.MINUTES);
-
         assertEquals(0, errors.get(), "unexpected errors");
         assertEquals(3, success.get(), "All three bookings must succeed");
         assertEquals(0, conflicts.get(), "no conflict");
@@ -249,12 +243,9 @@ private final List<String> emails = new ArrayList<>();
                 }
             });
         }
-
-        // release all threads at the same moment
         startGate.countDown();
         executor.shutdown();
         executor.awaitTermination(5, TimeUnit.MINUTES);
-
         assertEquals(0, errors.get(), "unexpected errors");
         assertEquals(3, success.get(), "All three bookings must succeed");
         assertEquals(0, conflicts.get(), "no conflict");
@@ -266,11 +257,9 @@ private final List<String> emails = new ArrayList<>();
         BookingGuestRequest guest = new BookingGuestRequest();
         guest.setName("Guest");
         guest.setAge(25);
-
         BookingRoomRequest roomRequest = new BookingRoomRequest();
         roomRequest.setRoomId(roomId);
         roomRequest.setGuests(List.of(guest));
-
         BookingRequest request = new BookingRequest();
         request.setHotelId(hotelId);
         request.setCheckIn(checkin);

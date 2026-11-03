@@ -181,7 +181,6 @@ public class PaymentService {
             logger.warn("Booking is not paid");
             return;
         }
-        // lock the booking row so duplicate webhooks wait and then see it is already confirmed
         Booking booking = bookingRepository.findByIdForUpdate(payment.getBooking().getId())
                 .orElseThrow(() -> new InformationNotFoundException("Booking for payment " + payment.getId() + " not found"));
         if (booking.getStatus() == Booking.Status.CONFIRMED) {

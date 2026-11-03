@@ -43,7 +43,6 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 @ActiveProfiles("test")
 public class PaymentConcurrencyTest {
-
     @Autowired
     PaymentService paymentService;
     @Autowired
@@ -56,7 +55,6 @@ public class PaymentConcurrencyTest {
     UserRepository userRepository;
     @Autowired
     TransactionTemplate transactionTemplate;
-
     @MockitoBean
     StripeGateway stripeGateway;
     @MockitoBean
@@ -251,7 +249,6 @@ public class PaymentConcurrencyTest {
                 }
             });
         }
-
         startGate.countDown();
         executor.shutdown();
         executor.awaitTermination(5, TimeUnit.MINUTES);

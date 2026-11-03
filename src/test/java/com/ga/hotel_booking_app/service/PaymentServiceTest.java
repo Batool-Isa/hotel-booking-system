@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -132,6 +133,43 @@ public class PaymentServiceTest {
         assertEquals("https://stripe.test/existing-session", response.getBody());
         verify(stripeGateway, never()).createCheckoutSession(any());
         verify(paymentRepository, never()).save(any(Payment.class));
+    }
+    @Test
+    @DisplayName("Paying after the hold expired throws InvalidInformationException")
+    void payingAfterTheHoldExpiredShouldThrowsInvalidInformationException() {
+        User customer1 = loginCustomer(1L);
+        Booking booking = pendingBooking(customer1);
+        booking.setHoldExpiresAt(LocalDateTime.now().minusMinutes(1));
+        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+        assertThrows(InvalidInformationException.class, () -> paymentService.initiatePayment(1L, "key-1"));
+        verifyNoInteractions(stripeGateway);
+    }
+
+    @Test
+    @DisplayName("Reusing idempotency key for another booking throws InvalidInformationException")
+    void reuseIdempotencyKeyForAnotherBookingShouldThrowsInvalidInformationException() throws StripeException {
+        User customer1 = loginCustomer(1L);
+        Booking booking = pendingBooking(customer1);
+        Booking otherBooking = pendingBooking(customer1);
+        otherBooking.setId(2L);
+        Payment existingPayment = new Payment();
+        existingPayment.setBooking(otherBooking);
+        existingPayment.setIdempotencyKey("key-1");
+        existingPayment.setSessionURL("https://stripe.test/other-session");
+        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+        when(paymentRepository.findByIdempotencyKey("key-1")).thenReturn(Optional.of(existingPayment));
+        assertThrows(InvalidInformationException.class, () -> paymentService.initiatePayment(1L, "key-1"));
+        verify(stripeGateway, never()).createCheckoutSession(any());
+        verify(paymentRepository, never()).save(any(Payment.class));
+    }
+
+    @Test
+    @DisplayName("Webhook with invalid signature returns bad request")
+    void webhookWithInvalidSignatureShouldReturnBadRequest() {
+        ReflectionTestUtils.setField(paymentService, "endpointSecret", "whsec_test");
+        ResponseEntity<?> response = paymentService.handleStripeWebhook("{}", "t=1,v1=fake");
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verifyNoInteractions(paymentRepository, bookingRepository);
     }
 
 }

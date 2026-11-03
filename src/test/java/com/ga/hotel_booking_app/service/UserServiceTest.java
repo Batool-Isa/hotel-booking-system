@@ -15,10 +15,9 @@ import com.ga.hotel_booking_app.security.JwtUtils;
 import com.ga.hotel_booking_app.security.MyUserDetails;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +25,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.Optional;
 
@@ -33,34 +34,29 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@ActiveProfiles("test")
 class UserServiceTest {
-
-    @Mock
+    @MockitoBean
     private UserRepository userRepository;
-
-    @Mock
+    @MockitoBean
     private PasswordEncoder passwordEncoder;
-
-    @Mock
+    @MockitoBean
     private EmailService emailService;
-
-    @Mock
+    @MockitoBean
     private RoleRepository roleRepository;
-
-    @Mock
+    @MockitoBean
     private EmailVerificationTokenRepository emailVerificationTokenRepository;
-
-    @Mock
+    @MockitoBean
     private AuthenticationManager authenticationManager;
-
-    @Mock
+    @MockitoBean
     private JwtUtils jwtUtils;
-
-    @Mock
-    private MyUserDetails myUserDetails;
-
-    @InjectMocks
+    @MockitoBean
+    private AuditLogService auditLogService;
+    @MockitoBean(name = "seedData")
+    private CommandLineRunner seedData;
+    private final MyUserDetails myUserDetails = mock(MyUserDetails.class);
+    @Autowired
     private UserService userService;
 
     @Test
@@ -81,16 +77,11 @@ class UserServiceTest {
         User savedUser = new User();
         savedUser.setId(1L);
         savedUser.setEmail("test@example.com");
-        when(userRepository.existsByEmail(request.getEmail()))
-                .thenReturn(false);
-        when(passwordEncoder.encode(request.getPassword()))
-                .thenReturn("hashedPassword");
-        when(roleRepository.findByName(Role.RoleName.CUSTOMER))
-                .thenReturn(Optional.of(customerRole));
-        when(userRepository.save(any(User.class)))
-                .thenReturn(savedUser);
-        when(emailVerificationTokenRepository.save(any()))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(userRepository.existsByEmail(request.getEmail())).thenReturn(false);
+        when(passwordEncoder.encode(request.getPassword())).thenReturn("hashedPassword");
+        when(roleRepository.findByName(Role.RoleName.CUSTOMER)).thenReturn(Optional.of(customerRole));
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        when(emailVerificationTokenRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         var response = userService.register(request, image);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         verify(userRepository).save(any(User.class));
@@ -114,9 +105,7 @@ class UserServiceTest {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(myUserDetails);
         when(userRepository.findUserByEmail(request.getEmail())).thenReturn(user);
-        when(jwtUtils.generateJwtToken(myUserDetails))
-                .thenReturn("fake-jwt-token");
-
+        when(jwtUtils.generateJwtToken(myUserDetails)).thenReturn("jwt-token");
         var response = userService.loginUser(request);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
@@ -131,71 +120,61 @@ class UserServiceTest {
         request.setEmail("test@example.com");
         request.setPassword("123123");
         when(authenticationManager.authenticate(
-                any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new BadCredentialsException("Invalid credentials"));
+                any(UsernamePasswordAuthenticationToken.class))).thenThrow(new BadCredentialsException("Invalid credentials"));
         assertThrows(InvalidCredentialsException.class, () -> userService.loginUser(request)
         );
-        verify(authenticationManager)
-                .authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verifyNoInteractions(userRepository);
         verifyNoInteractions(jwtUtils);
     }
 
-        @Test
-        @DisplayName("Register with existing email throws InformationExistException")
-        void registerWithExistingEmail() {
-            RegisterRequest request = new RegisterRequest();
-            request.setUsername("testuser");
-            request.setEmail("test@example.com");
-            request.setPassword("Password123!");
-            request.setConfirmedPassword("Password123!");
-            when(userRepository.existsByEmail(request.getEmail())).thenReturn(true);
-            assertThrows(InformationExistException.class,
-                    () -> userService.register(request, null)
-            );
-            verify(userRepository).existsByEmail(request.getEmail());
-            verifyNoInteractions(passwordEncoder);
-            verifyNoInteractions(emailService);
-        }
+    @Test
+    @DisplayName("Register with existing email throws InformationExistException")
+    void registerWithExistingEmail() {
+        RegisterRequest request = new RegisterRequest();
+        request.setUsername("testuser");
+        request.setEmail("test@example.com");
+        request.setPassword("Password123!");
+        request.setConfirmedPassword("Password123!");
+        when(userRepository.existsByEmail(request.getEmail())).thenReturn(true);
+        assertThrows(InformationExistException.class, () -> userService.register(request, null)
+        );
+        verify(userRepository).existsByEmail(request.getEmail());
+        verifyNoInteractions(passwordEncoder);
+        verifyNoInteractions(emailService);
+    }
 
-        @Test
-        @DisplayName("Register with mismatched passwords throws PasswordMismatchException")
-        void registerWithMismatchedPasswords() {
-            RegisterRequest request = new RegisterRequest();
-            request.setUsername("testuser");
-            request.setEmail("test@example.com");
-            request.setPassword("Password123!");
-            request.setConfirmedPassword("Different123!");
-            when(userRepository.existsByEmail(request.getEmail())).thenReturn(false);
-            assertThrows(PasswordMismatchException.class, () -> userService.register(request, null)
-            );
-            verify(userRepository).existsByEmail(request.getEmail());
-            verifyNoInteractions(passwordEncoder);
-            verifyNoInteractions(emailService);
-        }
+    @Test
+    @DisplayName("Register with mismatched passwords throws PasswordMismatchException")
+    void registerWithMismatchedPasswords() {
+        RegisterRequest request = new RegisterRequest();
+        request.setUsername("testuser");
+        request.setEmail("test@example.com");
+        request.setPassword("Password123!");
+        request.setConfirmedPassword("Different123!");
+        when(userRepository.existsByEmail(request.getEmail())).thenReturn(false);
+        assertThrows(PasswordMismatchException.class, () -> userService.register(request, null));
+        verify(userRepository).existsByEmail(request.getEmail());
+        verifyNoInteractions(passwordEncoder);
+        verifyNoInteractions(emailService);
+    }
 
-
-
-        @Test
-        @DisplayName("Login with inactive user throws InvalidCredentialsException")
-        void loginWithInactiveUser() {
-            LoginRequest request = new LoginRequest();
-            request.setEmail("test@example.com");
-            request.setPassword("Password123!");
-            User user = new User();
-            user.setEmail("test@example.com");
-            user.setEmailVerified(true);
-            user.setStatus(User.Status.INACTIVE);
-            Authentication authentication = mock(Authentication.class);
-            when(authenticationManager.authenticate(
-                    any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
-            when(userRepository.findUserByEmail(request.getEmail()))
-                    .thenReturn(user);
-            assertThrows(InvalidCredentialsException.class, () -> userService.loginUser(request)
-            );
-            verify(userRepository)
-                    .findUserByEmail(request.getEmail());
-            verifyNoInteractions(jwtUtils);
-        }
-
+    @Test
+    @DisplayName("Login with inactive user throws InvalidCredentialsException")
+    void loginWithInactiveUser() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("test@example.com");
+        request.setPassword("Password123!");
+        User user = new User();
+        user.setEmail("test@example.com");
+        user.setEmailVerified(true);
+        user.setStatus(User.Status.INACTIVE);
+        Authentication authentication = mock(Authentication.class);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
+        when(userRepository.findUserByEmail(request.getEmail())).thenReturn(user);
+        assertThrows(InvalidCredentialsException.class, () -> userService.loginUser(request)
+        );
+        verify(userRepository).findUserByEmail(request.getEmail());
+        verifyNoInteractions(jwtUtils);
+    }
 }

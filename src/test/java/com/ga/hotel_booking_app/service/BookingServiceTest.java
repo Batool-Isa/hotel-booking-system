@@ -66,6 +66,7 @@ class BookingServiceTest {
     @AfterEach
     void clearSecurityContext() {
         // runs even when a test fails, so a login never leaks into the next test
+        SecurityContextHolder.clearContext();
     }
 
     private User loginActiveCustomer() {
@@ -385,5 +386,108 @@ class BookingServiceTest {
                 UnauthorizedActionException.class, () -> bookingService.updateBookingStatus(1L, request)
         );
         verify(bookingRepository, never()).save(any(Booking.class));
+    }
+
+    @Test
+    @DisplayName("Create booking in inactive hotel throws InvalidInformationException")
+    void createBookingInInactiveHotel() {
+        loginActiveCustomer();
+        Hotel hotel = new Hotel();
+        hotel.setId(1L);
+        hotel.setName("VibeStay-hotel");
+        hotel.setStatus(Hotel.Status.INACTIVE);
+        BookingGuestRequest guestRequest = new BookingGuestRequest();
+        guestRequest.setName("Test User");
+        guestRequest.setAge(25);
+        BookingRoomRequest roomRequest = new BookingRoomRequest();
+        roomRequest.setRoomId(1L);
+        roomRequest.setGuests(List.of(guestRequest));
+        BookingRequest request = new BookingRequest();
+        request.setHotelId(1L);
+        request.setCheckIn(LocalDate.now().plusDays(5));
+        request.setCheckOut(LocalDate.now().plusDays(7));
+        request.setRooms(List.of(roomRequest));
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
+
+        InvalidInformationException exception = assertThrows(InvalidInformationException.class,
+                () -> bookingService.createNewBooking(request));
+        assertEquals("This hotel is not available for booking", exception.getMessage());
+        verifyNoInteractions(roomRepository);
+        verify(bookingRepository, never()).save(any(Booking.class));
+    }
+
+    @Test
+    @DisplayName("Create booking with more guests than room capacity throws InvalidInformationException")
+    void createBookingExceedingRoomCapacity() {
+        loginActiveCustomer();
+        Hotel hotel = new Hotel();
+        hotel.setId(1L);
+        hotel.setName("VibeStay-hotel");
+        hotel.setStatus(Hotel.Status.ACTIVE);
+        ChildPolicy childPolicy = new ChildPolicy();
+        childPolicy.setInfantMaxAge(2);
+        childPolicy.setChildMaxAge(12);
+        childPolicy.setInfantsCountTowardOccupancy(false);
+        hotel.setChildPolicy(childPolicy);
+        Room room = new Room();
+        room.setId(1L);
+        room.setHotel(hotel);
+        room.setStatus(Room.Status.ACTIVE);
+        room.setPricePerNight(new BigDecimal("50.00"));
+        room.setMaxAdults(2);
+        room.setMaxChildren(2);
+        room.setMaxOccupancy(4);
+        BookingGuestRequest guest1 = new BookingGuestRequest();
+        guest1.setName("Adult 1");
+        guest1.setAge(25);
+        BookingGuestRequest guest2 = new BookingGuestRequest();
+        guest2.setName("Adult 2");
+        guest2.setAge(30);
+        BookingGuestRequest guest3 = new BookingGuestRequest();
+        guest3.setName("Adult 3");
+        guest3.setAge(35);
+        BookingRoomRequest roomRequest = new BookingRoomRequest();
+        roomRequest.setRoomId(1L);
+        roomRequest.setGuests(List.of(guest1, guest2, guest3));
+        BookingRequest request = new BookingRequest();
+        request.setHotelId(1L);
+        request.setCheckIn(LocalDate.now().plusDays(5));
+        request.setCheckOut(LocalDate.now().plusDays(7));
+        request.setRooms(List.of(roomRequest));
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
+        when(roomRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(room));
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
+
+        InvalidInformationException exception = assertThrows(InvalidInformationException.class,
+                () -> bookingService.createNewBooking(request));
+        assertEquals("Invalid number of guests, room can't accommodate this number of guests", exception.getMessage());
+        verify(bookingRepository, never()).save(any(Booking.class));
+    }
+
+    @Test
+    @DisplayName("Cancel completed booking throws InvalidInformationException")
+    void cancelCompletedBooking() {
+        User customer = new User();
+        customer.setId(1L);
+        customer.setEmail("test@example.com");
+        Role role = new Role();
+        role.setName(Role.RoleName.CUSTOMER);
+        customer.setRole(role);
+        Booking booking = new Booking();
+        booking.setId(1L);
+        booking.setUser(customer);
+        booking.setStatus(Booking.Status.COMPLETED);
+        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+        when(userRepository.findUserByEmail("test@example.com")).thenReturn(customer);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("test@example.com", null)
+        );
+
+        InvalidInformationException exception = assertThrows(InvalidInformationException.class,
+                () -> bookingService.cancelBooking(1L));
+        assertEquals("A completed booking can't be cancelled", exception.getMessage());
+        assertEquals(Booking.Status.COMPLETED, booking.getStatus());
+        verify(bookingRepository, never()).save(any(Booking.class));
+        verify(emailService, never()).sendBookingCancellationEmail(any());
     }
 }
