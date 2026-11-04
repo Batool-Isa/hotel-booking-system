@@ -39,6 +39,17 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
             @Param("country") String country,
             Pageable pageable);
 
+    @Query("SELECT h FROM Hotel h WHERE  (CAST(:search AS string) IS NULL OR LOWER(h.name) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))) " +
+            "AND (CAST(:name AS string) IS NULL OR LOWER(h.name) = LOWER(CAST(:name AS string))) " +
+            "AND (CAST(:city AS string) IS NULL OR LOWER(h.city) = LOWER(CAST(:city AS string))) " +
+            "AND (CAST(:country AS string) IS NULL OR LOWER(h.country) = LOWER(CAST(:country AS string)))")
+    Page<Hotel> getAllHotels(
+            @Param("search") String search,
+            @Param("name") String name,
+            @Param("city") String city,
+            @Param("country") String country,
+            Pageable pageable);
+
     @Query("SELECT h FROM Hotel h WHERE h.status = 'ACTIVE' " +
             "AND (CAST(:city AS string) IS NULL OR LOWER(h.city) = LOWER(CAST(:city AS string))) " +
             "AND EXISTS (SELECT r FROM Room r WHERE r.hotel = h AND r.status = 'ACTIVE' " +

@@ -122,6 +122,7 @@ public class HotelService {
         response.setLatitude(hotel.getLatitude());
         response.setLongitude(hotel.getLongitude());
         response.setPhone(hotel.getPhone());
+        response.setStatus(hotel.getStatus());
         response.setUpdatedAt(hotel.getUpdatedAt());
         response.setCreatedAt(hotel.getCreatedAt());
         //response.getReviewCount(hotel.getreview);
@@ -156,6 +157,23 @@ public class HotelService {
                                        String country, String city,
                                        Pageable pageable) {
         Page<Hotel> hotels = hotelRepository.findFilteredHotels(
+                search, name, city, country, pageable
+        );
+        List<HotelResponse> responses = new ArrayList<>();
+
+
+        for (Hotel hotel : hotels) {
+            HotelResponse hotelResponse = buildHotelResponse(hotel);
+            responses.add(hotelResponse);
+        }
+        return ResponseEntity.ok(responses);
+
+
+    }
+    public ResponseEntity<?> getAllHotels(String search, String name,
+                                       String country, String city,
+                                       Pageable pageable) {
+        Page<Hotel> hotels = hotelRepository.getAllHotels(
                 search, name, city, country, pageable
         );
         List<HotelResponse> responses = new ArrayList<>();

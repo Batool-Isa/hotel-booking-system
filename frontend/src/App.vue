@@ -2666,8 +2666,7 @@ async function loadPending(p = 0) {
 async function loadAdminHotels(p = 0) {
   ad.loading = true;
   try {
-    const l = await api("GET", "/api/hotels", {
-      auth: false,
+    const l = await api("GET", "/api/hotels/all", {
       query: {
         search: ad.q.search.trim(),
         city: ad.q.city.trim(),
@@ -2688,7 +2687,12 @@ async function loadAdminHotels(p = 0) {
 }
 async function setHotelStatus(h, status, after) {
   const label = {
-    ACTIVE: "approve / activate",
+    ACTIVE:
+      h.status === "INACTIVE"
+        ? "reactivate"
+        : h.status === "PENDING_APPROVAL"
+          ? "approve"
+          : "approve / activate",
     REJECTED: "reject",
     INACTIVE: "deactivate",
   }[status];
@@ -2710,7 +2714,10 @@ async function setHotelStatus(h, status, after) {
     });
     toast(
       {
-        ACTIVE: "Hotel approved and live.",
+        ACTIVE:
+          h.status === "INACTIVE"
+            ? "Hotel reactivated."
+            : "Hotel approved and live.",
         REJECTED: "Hotel rejected.",
         INACTIVE: "Hotel deactivated.",
       }[status] ||
@@ -6131,47 +6138,61 @@ const printPage = () => window.print();
                 ><icon name="plus" :size="15"></icon>Create hotel</a
               >
             </div>
-            <alert-box type="info"
-              >This list shows <b>live</b> hotels only (that’s all the API
-              returns). To bring back a deactivated hotel use the
-              <a href="#/admin?tab=status">Hotel status</a> tab.</alert-box
-            >
             <div v-if="ad.loading" class="skel" style="height: 140px"></div>
             <div v-else-if="!ad.hotels.length" class="card empty">
-              <p>No live hotels match.</p>
+              <p>No hotels match.</p>
             </div>
             <div v-else class="card scroll-x">
               <table class="t plain">
                 <thead>
                   <tr>
-                    <th>ID</th>
+                    <th style="width: 56px">ID</th>
                     <th>Hotel</th>
-                    <th>City</th>
                     <th>Phone</th>
-                    <th style="min-width: 300px">Actions</th>
+                    <th>Status</th>
+                    <th style="text-align: right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="h in ad.hotels" :key="h.id">
-                    <td>{{ h.id }}</td>
+                    <td style="white-space: nowrap; color: #6b7280">
+                      #{{ h.id }}
+                    </td>
                     <td>
                       <b>{{ h.name }}</b>
+                      <div style="font-size: 0.85em; color: #6b7280">
+                        {{ h.city }}, {{ h.country }}
+                      </div>
                     </td>
-                    <td>{{ h.city }}, {{ h.country }}</td>
-                    <td>{{ h.phone }}</td>
+                    <td style="white-space: nowrap">{{ h.phone }}</td>
+                    <td style="white-space: nowrap">
+                      <span class="badge" :class="statusClass(h.status)">{{
+                        statusLabel(h.status)
+                      }}</span>
+                    </td>
                     <td>
-                      <div class="row" style="gap: 6px">
+                      <div
+                        class="row"
+                        style="
+                          gap: 6px;
+                          flex-wrap: nowrap;
+                          justify-content: flex-end;
+                        "
+                      >
                         <a
                           class="btn btn-outline btn-sm"
                           :href="'#/manage/hotel/' + h.id"
                           >Open</a
                         ><button
                           class="btn btn-outline btn-sm"
+                          style="white-space: nowrap"
                           @click="openAssign(h)"
                         >
                           Assign manager</button
                         ><button
+                          v-if="h.status === 'ACTIVE'"
                           class="btn btn-danger-o btn-sm"
+                          style="min-width: 120px; white-space: nowrap; justify-content: center"
                           @click="
                             setHotelStatus(h, 'INACTIVE', () =>
                               loadAdminHotels(ad.hPage),
@@ -6179,6 +6200,30 @@ const printPage = () => window.print();
                           "
                         >
                           Deactivate
+                        </button>
+                        <button
+                          v-else-if="h.status === 'PENDING_APPROVAL'"
+                          class="btn btn-green btn-sm"
+                          style="min-width: 120px; white-space: nowrap; justify-content: center"
+                          @click="
+                            setHotelStatus(h, 'ACTIVE', () =>
+                              loadAdminHotels(ad.hPage),
+                            )
+                          "
+                        >
+                          <icon name="check" :size="15"></icon>Approve
+                        </button>
+                        <button
+                          v-else-if="h.status === 'INACTIVE'"
+                          class="btn btn-green btn-sm"
+                          style="min-width: 120px; white-space: nowrap; justify-content: center"
+                          @click="
+                            setHotelStatus(h, 'ACTIVE', () =>
+                              loadAdminHotels(ad.hPage),
+                            )
+                          "
+                        >
+                          Reactivate
                         </button>
                       </div>
                     </td>

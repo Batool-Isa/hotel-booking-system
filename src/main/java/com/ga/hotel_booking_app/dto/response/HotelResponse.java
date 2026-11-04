@@ -1,6 +1,7 @@
 package com.ga.hotel_booking_app.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.ga.hotel_booking_app.model.Hotel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @JsonPropertyOrder({"id", "name",
-        "description", "address", "city", "country", "phone", "latitude", "longitude", "images", "amenities", "averageRating", "reviewCount", "createdAt", "updatedAt"
+        "description", "address", "city", "country", "phone", "status", "latitude", "longitude", "images", "amenities", "averageRating", "reviewCount", "createdAt", "updatedAt"
 })
 public class HotelResponse {
     private Long id;
@@ -23,6 +24,7 @@ public class HotelResponse {
     private BigDecimal latitude;
     private BigDecimal longitude;
     private String phone;
+    private Hotel.Status status;
     private List<HotelImageResponse> images;
     private List<AmenityResponse> amenities;
     private Double averageRating;

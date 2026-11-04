@@ -64,6 +64,19 @@ public class HotelController {
         return hotelService.getHotels(search, name, country, city, pageable);
     }
 
+    @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_MANAGER')")
+    @Operation(summary = "Get all hotels", description = "Fetches all hotels (active, pending , inactive) with its information")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List all hotels with its details"),
+    })
+    public ResponseEntity<?> getAllHotels(@RequestParam(required = false) String search,
+                                       @RequestParam(required = false) String name,
+                                       @RequestParam(required = false) String country,
+                                       @RequestParam(required = false) String city,
+                                       Pageable pageable) {
+        return hotelService.getAllHotels(search, name, country, city, pageable);
+    }
     @GetMapping("/pending")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get all pending hotels ", description = "Fetches all hotels that is need approval")
