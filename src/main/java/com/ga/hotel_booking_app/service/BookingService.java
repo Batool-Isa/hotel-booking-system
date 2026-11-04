@@ -312,8 +312,9 @@ public class BookingService {
         return response;
     }
 
+    @Transactional
     public ResponseEntity<?> cancelBooking(Long bookingId) {
-        Booking booking = bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findByIdForUpdate(bookingId)
                 .orElseThrow(() -> new InformationNotFoundException("Booking with id " + bookingId + " not found"));
         User user = getCurrentLoggedInUser();
         if (user.getRole().getName().equals(Role.RoleName.CUSTOMER) && !booking.getUser().getId().equals(user.getId())) {

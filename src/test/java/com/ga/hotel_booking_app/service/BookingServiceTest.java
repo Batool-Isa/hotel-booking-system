@@ -240,7 +240,7 @@ class BookingServiceTest {
         booking.setUser(customer);
         booking.setHotel(hotel);
         booking.setStatus(Booking.Status.CONFIRMED);
-        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+        when(bookingRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(booking));
         when(userRepository.findUserByEmail("test@example.com")).thenReturn(customer);
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
                 "test@example.com", null)
@@ -272,7 +272,7 @@ class BookingServiceTest {
         booking.setId(1L);
         booking.setUser(customer);
         booking.setStatus(Booking.Status.CANCELLED);
-        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+        when(bookingRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(booking));
         when(userRepository.findUserByEmail("test@example.com")).thenReturn(customer);
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("test@example.com", null
@@ -301,7 +301,7 @@ class BookingServiceTest {
         booking.setId(1L);
         booking.setUser(bookingOwner);
         booking.setStatus(Booking.Status.CONFIRMED);
-        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+        when(bookingRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(booking));
         when(userRepository.findUserByEmail("test@example.com")).thenReturn(customer);
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(
@@ -477,7 +477,7 @@ class BookingServiceTest {
         booking.setId(1L);
         booking.setUser(customer);
         booking.setStatus(Booking.Status.COMPLETED);
-        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+        when(bookingRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(booking));
         when(userRepository.findUserByEmail("test@example.com")).thenReturn(customer);
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("test@example.com", null)

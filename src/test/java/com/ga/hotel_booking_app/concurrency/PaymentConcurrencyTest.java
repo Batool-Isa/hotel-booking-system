@@ -2,10 +2,7 @@ package com.ga.hotel_booking_app.concurrency;
 
 import com.ga.hotel_booking_app.model.*;
 import com.ga.hotel_booking_app.repository.*;
-import com.ga.hotel_booking_app.service.EmailService;
-import com.ga.hotel_booking_app.service.NotificationService;
-import com.ga.hotel_booking_app.service.PaymentService;
-import com.ga.hotel_booking_app.service.StripeGateway;
+import com.ga.hotel_booking_app.service.*;
 import com.stripe.Stripe;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
@@ -61,7 +58,10 @@ public class PaymentConcurrencyTest {
     EmailService emailService;
     @MockitoBean
     NotificationService notificationService;
-
+    @Autowired
+    BookingService bookingService;
+    @Autowired
+    RoleRepository roleRepository;
     @Value("${stripe.webhook.secret}")
     String webhookSecret;
 
@@ -257,6 +257,64 @@ public class PaymentConcurrencyTest {
         assertEquals(Booking.Status.PENDING, updated.getStatus(), "expired booking must not be confirmed");
         verify(emailService, never()).sendBookingConfirmationEmail(any());
         verify(notificationService, never()).sendBookingNotification(any());
+    }
+
+    @Test
+    void CancelAndWebhookAtSameTimeLeaveConsistentState() throws Exception {
+        User owner = users.get(0);
+        owner.setRole(roleRepository.findByName(Role.RoleName.CUSTOMER).orElseThrow());
+        userRepository.save(owner);
+        Booking booking = createPendingBooking(owner, 0);
+        String sessionId = "cs_cancel_" + uniqueId;
+        createPendingPayment(booking, sessionId);
+        String payload = checkoutCompletedPayload(sessionId);
+        String signature = signatureHeader(payload);
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        CountDownLatch startGate = new CountDownLatch(1);
+        AtomicInteger cancelled = new AtomicInteger();
+        AtomicInteger accepted = new AtomicInteger();
+        AtomicInteger errors = new AtomicInteger();
+        executor.execute(() -> {
+            try {
+                SecurityContextHolder.getContext().setAuthentication(
+                        new UsernamePasswordAuthenticationToken(owner.getEmail(), null));
+                startGate.await();
+                bookingService.cancelBooking(booking.getId());
+                cancelled.incrementAndGet();
+            } catch (Exception e) {
+                errors.incrementAndGet();
+                e.printStackTrace();
+            } finally {
+                SecurityContextHolder.clearContext();
+            }
+        });
+        for (int i = 0; i < 3; i++) {
+            executor.execute(() -> {
+                try {
+                    startGate.await();
+                    ResponseEntity<?> response = transactionTemplate.execute(
+                            status -> paymentService.handleStripeWebhook(payload, signature));
+                    if (response != null && response.getStatusCode() == HttpStatus.OK) {
+                        accepted.incrementAndGet();
+                    }
+                } catch (Exception e) {
+                    errors.incrementAndGet();
+                    e.printStackTrace();
+                }
+            });
+        }
+        startGate.countDown();
+        executor.shutdown();
+        executor.awaitTermination(5, TimeUnit.MINUTES);
+        Booking updated = bookingRepository.findById(booking.getId()).orElseThrow();
+        Payment payment = paymentRepository.findByProviderReference(sessionId);
+        assertEquals(0, errors.get(), "unexpected errors");
+        assertEquals(1, cancelled.get(), "the cancel request must succeed");
+        assertEquals(3, accepted.get(), "every webhook delivery must be acknowledged");
+        assertEquals(Booking.Status.CANCELLED, updated.getStatus(), "booking must end cancelled");
+        assertEquals(Payment.STATUS.SUCCEED, payment.getStatus(), "payment must be recorded as succeeded");
+        verify(emailService, times(1)).sendBookingCancellationEmail(any());
+        verify(emailService, atMost(1)).sendBookingConfirmationEmail(any());
     }
 
     private Booking createPendingBooking(User owner, int offset) {
