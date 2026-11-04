@@ -43,6 +43,15 @@ public class BookingController {
         System.out.println("Booking controller calling --> get my bookings");
         return bookingService.getMyBookings(pageable);
     }
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Get all app's booking", description = "Fetch all application's booking records")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Get all bookings"),
+    })
+    public ResponseEntity<?> getAllAppBookings(Pageable pageable){
+        return bookingService.getAllAppBookings(pageable);
+    }
 
     @PatchMapping("/{bookingId}/cancel")
     @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN', 'HOTEL_MANAGER')")

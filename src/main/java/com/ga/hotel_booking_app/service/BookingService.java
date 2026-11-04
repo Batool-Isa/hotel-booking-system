@@ -443,4 +443,11 @@ public class BookingService {
                     "You are not authorized to manage this hotel's child policy");
         }
     }
+
+    public ResponseEntity<?> getAllAppBookings(Pageable pageable) {
+        Page<Booking> bookings = bookingRepository.findAll(pageable);
+        List<BookingResponse> responses = bookings.stream()
+                .map(this::mapToBookingResponse).toList();
+        return ResponseEntity.ok(responses);
+    }
 }

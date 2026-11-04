@@ -1650,7 +1650,7 @@ async function lookupBooking() {
     lk.loading = false;
   }
 }
-async function completeBooking(b) {
+async function completeBooking(b, after = lookupBooking) {
   const ok = await ask({
     title: "Mark booking as completed?",
     message: `Booking ${b.bookingReference} will be marked as completed (the guest has stayed). This can’t be undone.`,
@@ -1663,10 +1663,10 @@ async function completeBooking(b) {
     });
     quiet(b.bookingReference);
     toast((r && r.message) || "Booking completed.");
-    await lookupBooking();
+    await after();
   } catch (e) {
     toast(e.message, "error");
-    if (e.status === 400 || e.status === 409) await lookupBooking(); // changed by someone else meanwhile
+    if (e.status === 400 || e.status === 409) await after(); // changed by someone else meanwhile
   }
 }
 const cancelFromLookup = (b) => cancelBooking(b, lookupBooking);
@@ -2536,6 +2536,10 @@ const ad = reactive({
   hPage: 0,
   hNext: false,
   q: { search: "", city: "", country: "" },
+  bookings: [],
+  bPage: 0,
+  bNext: false,
+  bFilter: "ALL",
   counts: { pending: null, hotels: null, types: null, users: null },
   loading: false,
   error: "",
@@ -2577,6 +2581,7 @@ async function loadAdmin(tab) {
     if (ad.tab === "users") await loadAdminUsers(0);
     if (ad.tab === "types") await loadRoomTypes();
     if (ad.tab === "amenities") await loadAmenityCatalog();
+    if (ad.tab === "bookings") await loadAdminBookings(0);
   } catch (e) {
     ad.error = e.message;
   }
@@ -2663,6 +2668,28 @@ async function loadPending(p = 0) {
     ad.loading = false;
   }
 }
+async function loadAdminBookings(p = 0) {
+  ad.loading = true;
+  try {
+    const l = await api("GET", "/api/bookings/all", {
+      query: { page: p, size: 10, sort: "id,desc" },
+    });
+    ad.bookings = Array.isArray(l) ? l : [];
+    ad.bPage = p;
+    ad.bNext = ad.bookings.length === 10;
+  } catch (e) {
+    ad.bookings = [];
+    ad.error = e.message;
+  } finally {
+    ad.loading = false;
+  }
+}
+const adBookingsShown = computed(() =>
+  ad.bFilter === "ALL"
+    ? ad.bookings
+    : ad.bookings.filter((b) => b.status === ad.bFilter),
+);
+const reloadAdminBookings = () => loadAdminBookings(ad.bPage);
 async function loadAdminHotels(p = 0) {
   ad.loading = true;
   try {
@@ -6609,13 +6636,129 @@ const printPage = () => window.print();
             </form>
           </div>
 
-          <div v-if="ad.tab === 'bookings'" class="card pad">
-            <lookup-panel
-              :lk="lk"
-              @find="lookupBooking"
-              @complete="completeBooking"
-              @cancel="cancelFromLookup"
-            ></lookup-panel>
+          <div v-if="ad.tab === 'bookings'">
+            <div class="row between mb" style="gap: 10px">
+              <div class="row" style="gap: 6px">
+                <button
+                  v-for="f in ['ALL', 'PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED']"
+                  :key="f"
+                  class="btn btn-sm"
+                  :class="ad.bFilter === f ? 'btn-primary' : 'btn-outline'"
+                  @click="ad.bFilter = f"
+                >
+                  {{ f === "ALL" ? "All" : statusLabel(f) }}
+                </button>
+              </div>
+              <button class="btn btn-outline btn-sm" @click="reloadAdminBookings">
+                Refresh
+              </button>
+            </div>
+            <div v-if="ad.loading" class="skel" style="height: 140px"></div>
+            <div v-else-if="!adBookingsShown.length" class="card empty">
+              <p>
+                {{
+                  ad.bookings.length
+                    ? "No bookings with this status on this page."
+                    : "No bookings yet."
+                }}
+              </p>
+            </div>
+            <div v-else class="card" style="overflow-x: auto">
+              <table class="t plain">
+                <thead>
+                  <tr>
+                    <th>Reference</th>
+                    <th>Hotel</th>
+                    <th>Stay</th>
+                    <th>Guests</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th style="text-align: right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="b in adBookingsShown" :key="b.id">
+                    <td style="white-space: nowrap">
+                      <span class="ref">{{ b.bookingReference }}</span>
+                      <div style="font-size: 0.85em; color: #6b7280">
+                        #{{ b.id }}
+                      </div>
+                    </td>
+                    <td>
+                      <a :href="'#/hotel/' + b.hotelId"
+                        ><b>{{ b.hotelName }}</b></a
+                      >
+                    </td>
+                    <td style="white-space: nowrap">
+                      {{ fmtDate(b.checkIn) }} → {{ fmtDate(b.checkOut) }}
+                      <div style="font-size: 0.85em; color: #6b7280">
+                        {{ plural(nightsBetween(b.checkIn, b.checkOut), "night") }}
+                        ·
+                        {{ plural((b.rooms || []).length, "room") }}
+                      </div>
+                    </td>
+                    <td style="white-space: nowrap">
+                      {{ plural(b.adults, "adult") }}<span v-if="b.children"
+                        >, {{ plural(b.children, "child", "children") }}</span
+                      >
+                    </td>
+                    <td style="white-space: nowrap">
+                      <b>{{ money(b.totalAmount) }}</b>
+                    </td>
+                    <td style="white-space: nowrap">
+                      <span class="badge" :class="statusClass(b.status)">{{
+                        statusLabel(b.status)
+                      }}</span>
+                    </td>
+                    <td>
+                      <div
+                        class="row"
+                        style="gap: 6px; flex-wrap: nowrap; justify-content: flex-end"
+                      >
+                        <button
+                          class="btn btn-outline btn-sm"
+                          @click="openBooking(b.id)"
+                        >
+                          Details
+                        </button>
+                        <button
+                          v-if="b.status === 'CONFIRMED'"
+                          class="btn btn-green btn-sm"
+                          style="white-space: nowrap"
+                          @click="completeBooking(b, reloadAdminBookings)"
+                        >
+                          Complete
+                        </button>
+                        <button
+                          v-if="b.status === 'CONFIRMED' || b.status === 'PENDING'"
+                          class="btn btn-danger-o btn-sm"
+                          @click="cancelBooking(b, reloadAdminBookings)"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pager" v-if="ad.bPage > 0 || ad.bNext">
+              <button
+                class="btn btn-outline btn-sm"
+                :disabled="ad.bPage === 0"
+                @click="loadAdminBookings(ad.bPage - 1)"
+              >
+                Previous
+              </button>
+              <span class="small muted">Page {{ ad.bPage + 1 }}</span>
+              <button
+                class="btn btn-outline btn-sm"
+                :disabled="!ad.bNext"
+                @click="loadAdminBookings(ad.bPage + 1)"
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </section>
