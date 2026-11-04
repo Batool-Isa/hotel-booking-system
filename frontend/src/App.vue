@@ -973,6 +973,8 @@ const hp = reactive({
   sel: [],
   q: null,
   lightbox: -1,
+  view: null,
+  viewImg: 0,
   reviews: [],
   reviewsShown: 3,
   rating: 0, // average from GET /api/hotels/{id}/reviews (0 = no reviews)
@@ -1003,6 +1005,8 @@ async function loadHotel(id, q) {
     sel: [],
     q: null,
     lightbox: -1,
+    view: null,
+    viewImg: 0,
   });
   const [h, pol, imgs] = await Promise.all([
     api("GET", `/api/hotels/${id}`, { auth: false }),
@@ -1083,12 +1087,35 @@ const hpTotal = computed(
     hpSelected.value.reduce((s, r) => s + Number(r.pricePerNight), 0) *
     hpNights.value,
 );
-function toggleRoom(id) {
-  const i = hp.sel.indexOf(id);
-  if (i >= 0) hp.sel.splice(i, 1);
-  else hp.sel.push(id);
+const roomGroupKey = (r) => [r.roomTypeName, Number(r.pricePerNight), r.maxAdults, r.maxChildren, r.maxOccupancy].join("|");
+const hpGroups = computed(() => {
+  const map = new Map();
+  (hp.rooms || []).forEach((r) => {
+    const k = roomGroupKey(r);
+    if (!map.has(k)) map.set(k, { key: k, room: r, rooms: [] });
+    map.get(k).rooms.push(r);
+    if (!map.get(k).room.imageUrl && r.imageUrl) map.get(k).room = r;
+  });
+  return [...map.values()];
+});
+const canBook = computed(() => !auth.user || isCustomer.value);
+const groupPhotos = (g) => [...new Set(g.rooms.flatMap((r) => (r.imageUrls && r.imageUrls.length ? r.imageUrls : r.imageUrl ? [r.imageUrl] : [])))];
+function openRoomView(g) {
+  hp.view = g;
+  hp.viewImg = 0;
 }
+function stepRoomPhoto(d) {
+  const n = groupPhotos(hp.view).length;
+  if (n) hp.viewImg = (hp.viewImg + d + n) % n;
+}
+const groupQty = (g) => g.rooms.filter((r) => hp.sel.includes(r.id)).length;
+function setGroupQty(g, n) {
+  const ids = g.rooms.map((r) => r.id);
+  hp.sel = hp.sel.filter((id) => !ids.includes(id)).concat(ids.slice(0, Math.max(0, Math.min(n, ids.length))));
+}
+const hpSelGroups = computed(() => hpGroups.value.map((g) => ({ ...g, qty: groupQty(g) })).filter((g) => g.qty));
 function reserve() {
+  if (!canBook.value) return;
   if (!hp.sel.length) {
     toast("Select at least one room first.", "warn");
     return;
@@ -1346,6 +1373,7 @@ const isRoomConflict = (e) =>
 async function markTakenRooms(e) {
   const fromMsg = Number(((e.message || "").match(/Room (?:with id )?(\d+)/) || [])[1]);
   let free = null;
+  let freeRooms = [];
   try {
     const data = await api("POST", "/api/availability/search", {
       auth: false,
@@ -1354,15 +1382,29 @@ async function markTakenRooms(e) {
     const mine = (Array.isArray(data) ? data : []).find(
       (x) => Number(x.hotelId) === Number(bk.hotel.id),
     );
-    free = new Set((mine ? mine.rooms : []).map((r) => r.id));
+    freeRooms = mine ? mine.rooms : [];
+    free = new Set(freeRooms.map((r) => r.id));
   } catch {}
   // the search only hides CONFIRMED bookings, so a room on a 15-min payment hold still looks free: trust the error too
   bk.rooms.forEach((r) => {
     r.taken = r.id === fromMsg || (free !== null && !free.has(r.id));
   });
+  let swapped = 0;
+  bk.rooms.filter((r) => r.taken).forEach((r) => {
+    const alt = freeRooms.find((x) => x.id !== fromMsg && roomGroupKey(x) === roomGroupKey(r) && !bk.rooms.some((b) => b.id === x.id));
+    if (alt) {
+      Object.assign(r, { ...alt, guests: r.guests, taken: false });
+      swapped++;
+    }
+  });
   const taken = bk.rooms.filter((r) => r.taken);
+  if (swapped && !taken.length) {
+    bk.banner = "";
+    toast(`The room you picked was just booked by someone else, so we switched you to another room of the same type. Please confirm your booking again.`, "info");
+    return;
+  }
   bk.banner = taken.length
-    ? `Sorry – ${taken.map((r) => `${r.roomTypeName} (room ${r.roomNumber})`).join(", ")} ${taken.length === 1 ? "was" : "were"} just booked by someone else while you were filling in the form.`
+    ? `Sorry – no more ${[...new Set(taken.map((r) => r.roomTypeName))].join(", ")} rooms are free for these dates. Someone else booked the last one while you were filling in the form.`
     : "Sorry – one of these rooms was just booked by someone else. Please choose another room or different dates.";
 }
 function removeTakenRooms() {
@@ -1438,6 +1480,16 @@ async function startPayment(bookingId) {
   } finally {
     pay.busy = false;
   }
+}
+const nowMs = ref(Date.now());
+setInterval(() => (nowMs.value = Date.now()), 1000);
+function holdLeft(b) {
+  if (!b || b.status !== "PENDING" || !b.holdExpiresAt) return 0;
+  return Math.max(0, new Date(b.holdExpiresAt).getTime() - nowMs.value);
+}
+function holdText(b) {
+  const ms = holdLeft(b);
+  return `${Math.floor(ms / 60000)}:${String(Math.floor((ms % 60000) / 1000)).padStart(2, "0")}`;
 }
 /** "Try payment again": if the hold expired or the booking was cancelled meanwhile, show that instead. */
 async function retryPayment() {
@@ -2945,7 +2997,7 @@ const printPage = () => window.print();
     <!-- ================= HEADER ================= -->
     <header class="topbar no-print">
       <div class="wrap topbar-in">
-        <a class="brand" href="#/"><span class="logo-mark">V</span>VibeStay</a>
+        <a class="brand" href="#/"><brand-logo :size="36"></brand-logo>VibeStay</a>
         <div class="spacer"></div>
         <template v-if="auth.user">
           <div class="rel" @click.stop>
@@ -3399,13 +3451,8 @@ const printPage = () => window.print();
                     </div>
                   </div>
                   <div class="hc-price">
-                    <span
-                      v-if="hc[h.hotelId] && hc[h.hotelId].averageRating"
-                      class="score"
-                      >{{
-                        Number(hc[h.hotelId].averageRating).toFixed(1)
-                      }}</span
-                    ><span v-else></span>
+                    <div v-if="hc[h.hotelId] && hc[h.hotelId].averageRating" class="row" style="gap: 8px; justify-content: flex-end"><span class="star-row sm" :style="{ '--pct': (hc[h.hotelId].averageRating / 5) * 100 + '%' }" :aria-label="Number(hc[h.hotelId].averageRating).toFixed(1) + ' out of 5 stars'">★★★★★</span><span class="score">{{ Number(hc[h.hotelId].averageRating).toFixed(1) }}</span></div>
+                    <span v-else class="xs muted">No reviews yet</span>
                     <div>
                       <div class="muted xs">
                         {{ plural(srNights, "night") }}, from
@@ -3656,11 +3703,10 @@ const printPage = () => window.print();
                 >
                   <span class="score">{{
                     Number(hp.rating).toFixed(1)
-                  }}</span
-                  ><span class="small muted" v-if="hp.reviews.length">{{
-                    plural(hp.reviews.length, "review")
                   }}</span>
+                  <div class="rating-box"><span class="star-row" :style="{ '--pct': (hp.rating / 5) * 100 + '%' }" :aria-label="Number(hp.rating).toFixed(1) + ' out of 5 stars'">★★★★★</span><span class="xs muted"><b>{{ ratingLabel(hp.rating) }}</b> · {{ plural(hp.reviews.length, "review") }}</span></div>
                 </div>
+                <span v-else class="chip" style="margin: 0"><icon name="star" :size="14"></icon>New – no reviews yet</span>
                 <button class="btn btn-primary" @click="scrollToRooms">
                   See availability
                 </button>
@@ -3816,85 +3862,25 @@ const printPage = () => window.print();
                       {{ fmtDate(hp.q.checkOut) }}.
                     </p>
                   </div>
-                  <div v-else-if="hp.rooms" class="scroll-x mt">
-                    <table class="t">
-                      <thead>
-                        <tr>
-                          <th>Room type</th>
-                          <th>Sleeps</th>
-                          <th>Price per night</th>
-                          <th>Total ({{ plural(hpNights, "night") }})</th>
-                          <th style="width: 130px"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="r in hp.rooms"
-                          :key="r.id"
-                          :class="{ sel: hp.sel.includes(r.id) }"
-                        >
-                          <td>
-                            <b style="color: var(--blue)">{{
-                              r.roomTypeName
-                            }}</b>
-                            <div class="xs muted">
-                              Room {{ r.roomNumber }} · Floor
-                              {{ r.floorNumber }}
-                            </div>
-                            <span
-                              v-if="roomFits(r, hp.q.adults, hp.q.children)"
-                              class="badge b-green"
-                              ><icon name="check" :size="12"></icon>Fits your
-                              group</span
-                            >
-                            <span v-else class="badge b-yellow"
-                              >Smaller than your group ({{ hp.q.adults }}+{{
-                                hp.q.children
-                              }})</span
-                            >
-                          </td>
-                          <td class="small">
-                            <div>
-                              <icon name="user" :size="14"></icon> up to
-                              {{ plural(r.maxAdults, "adult") }}
-                            </div>
-                            <div>
-                              <icon name="baby" :size="14"></icon> up to
-                              {{ plural(r.maxChildren, "child", "children") }}
-                            </div>
-                            <div class="muted">
-                              max {{ r.maxOccupancy }} guests
-                            </div>
-                          </td>
-                          <td>
-                            <b>{{ money(r.pricePerNight) }}</b>
-                          </td>
-                          <td>
-                            <b>{{ money(r.pricePerNight * hpNights) }}</b>
-                            <div class="xs muted">taxes may apply</div>
-                          </td>
-                          <td>
-                            <button
-                              class="btn btn-sm"
-                              :class="
-                                hp.sel.includes(r.id)
-                                  ? 'btn-green'
-                                  : 'btn-outline'
-                              "
-                              @click="toggleRoom(r.id)"
-                            >
-                              <icon
-                                :name="hp.sel.includes(r.id) ? 'check' : 'plus'"
-                                :size="15"
-                              ></icon
-                              >{{
-                                hp.sel.includes(r.id) ? "Selected" : "Select"
-                              }}
-                            </button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <div v-else-if="hp.rooms" class="mt">
+                    <div class="row between rooms-head"><b>{{ plural(hpGroups.length, "room type") }} available</b><span class="small muted">{{ fmtDate(hp.q.checkIn) }} → {{ fmtDate(hp.q.checkOut) }} · {{ plural(hpNights, "night") }}</span></div>
+                    <article v-for="g in hpGroups" :key="g.key" class="hcard rcard" :class="{ sel: groupQty(g) }">
+                      <button class="hc-img rv-open" @click="openRoomView(g)" :aria-label="'View ' + g.room.roomTypeName"><hotel-img :src="g.room.imageUrl" :name="g.room.roomTypeName" :alt="g.room.roomTypeName + ' photo'"></hotel-img><span v-if="groupPhotos(g).length > 1" class="rv-count"><icon name="image" :size="13"></icon>{{ groupPhotos(g).length }}</span></button>
+                      <div class="hc-body">
+                        <h3>{{ g.room.roomTypeName }}</h3>
+                        <div class="loc" :class="{ 'few-left': g.rooms.length <= 2 }"><icon name="building" :size="15"></icon>{{ g.rooms.length <= 2 ? "Only " + g.rooms.length + " left" : g.rooms.length + " rooms left" }}</div>
+                        <div class="room-chips"><span class="chip"><icon name="user" :size="14"></icon>Up to {{ plural(g.room.maxAdults, "adult") }}</span><span class="chip"><icon name="baby" :size="14"></icon>Up to {{ plural(g.room.maxChildren, "child", "children") }}</span><span class="chip"><icon name="users" :size="14"></icon>Sleeps {{ g.room.maxOccupancy }}</span></div>
+                        <span v-if="roomFits(g.room, hp.q.adults, hp.q.children)" class="badge b-green"><icon name="check" :size="12"></icon>Fits your group</span>
+                        <span v-else class="badge b-yellow">Smaller than your group ({{ hp.q.adults }}+{{ hp.q.children }}) – add another room</span>
+                        <button class="link-btn rv-link" @click="openRoomView(g)">View room details<icon name="right" :size="14"></icon></button>
+                      </div>
+                      <div class="hc-price">
+                        <span class="xs muted">{{ plural(hpNights, "night") }}</span>
+                        <div><strong>{{ money(g.room.pricePerNight * hpNights) }}</strong><div class="muted xs">{{ money(g.room.pricePerNight) }} per night · taxes may apply</div></div>
+                        <template v-if="canBook"><button v-if="!groupQty(g)" class="btn btn-primary" @click="setGroupQty(g, 1)"><icon name="plus" :size="16"></icon>Select room</button>
+                        <div v-else class="qty-step" role="group" :aria-label="'Number of ' + g.room.roomTypeName + ' rooms'"><button class="btn btn-ghost btn-sm" @click="setGroupQty(g, groupQty(g) - 1)" aria-label="One room less">−</button><b>{{ plural(groupQty(g), "room") }}</b><button class="btn btn-ghost btn-sm" :disabled="groupQty(g) >= g.rooms.length" @click="setGroupQty(g, groupQty(g) + 1)" aria-label="One room more">+</button></div></template>
+                      </div>
+                    </article>
                   </div>
                 </div>
 
@@ -3906,12 +3892,7 @@ const printPage = () => window.print();
                       <span class="score">{{
                         Number(hp.rating).toFixed(1)
                       }}</span>
-                      <div>
-                        <b>{{ ratingLabel(hp.rating) }}</b>
-                        <div class="xs muted">
-                          {{ plural(hp.reviews.length, "review") }}
-                        </div>
-                      </div>
+                      <div class="rating-box"><span class="star-row" :style="{ '--pct': (hp.rating / 5) * 100 + '%' }" :aria-label="Number(hp.rating).toFixed(1) + ' out of 5 stars'">★★★★★</span><span class="xs muted"><b>{{ ratingLabel(hp.rating) }}</b> · {{ plural(hp.reviews.length, "review") }}</span></div>
                     </div>
                   </div>
                   <p v-if="!hp.reviews.length" class="muted small mt" style="margin-bottom: 0">
@@ -3949,25 +3930,14 @@ const printPage = () => window.print();
               </div>
 
               <aside class="stack sticky">
-                <div class="card pad" v-if="hp.rooms && hp.rooms.length">
+                <div class="card pad" v-if="hp.rooms && hp.rooms.length && !canBook"><h3>Booking</h3><p class="muted small" style="margin: 0">You are signed in as {{ isAdmin ? "an admin" : "a manager" }}. Only customer accounts can book rooms.</p></div>
+                <div class="card pad" v-if="hp.rooms && hp.rooms.length && canBook">
                   <h3>Your selection</h3>
                   <div v-if="!hp.sel.length" class="muted small">
-                    No rooms selected yet. Pick one or more rooms from the list.
+                    No rooms selected yet. Pick a room type from the list.
                   </div>
                   <template v-else>
-                    <div
-                      v-for="r in hpSelected"
-                      :key="r.id"
-                      class="row between small"
-                      style="margin-bottom: 6px"
-                    >
-                      <span
-                        >{{ r.roomTypeName }}
-                        <span class="muted"
-                          >· Room {{ r.roomNumber }}</span
-                        ></span
-                      ><b>{{ money(r.pricePerNight) }}</b>
-                    </div>
+                    <div v-for="g in hpSelGroups" :key="g.key" class="row between small" style="margin-bottom: 6px"><span>{{ g.qty }} × {{ g.room.roomTypeName }}</span><b>{{ money(g.room.pricePerNight * g.qty) }}</b></div>
                     <hr style="border: 0; border-top: 1px solid var(--line)" />
                     <div class="small muted">
                       {{ fmtDate(hp.q.checkIn) }} →
@@ -4226,7 +4196,7 @@ const printPage = () => window.print();
                         >
                       </h3>
                       <div class="xs muted">
-                        Room {{ r.roomNumber }} · up to
+                        Up to
                         {{ r.maxAdults }} adults, {{ r.maxChildren }} children,
                         {{ r.maxOccupancy }} guests in total
                       </div>
@@ -5107,7 +5077,10 @@ const printPage = () => window.print();
                   {{ plural((b.rooms || []).length, "room") }}</span
                 >
               </div>
+              <div v-if="holdLeft(b) > 0" class="hold-note"><icon name="clock" :size="16"></icon><span>Your rooms are held for <b>{{ holdText(b) }}</b>. Pay now to confirm your booking.</span></div>
+              <div v-else-if="b.status === 'PENDING'" class="hold-note expired"><icon name="alert" :size="16"></icon><span>The payment time ran out, so these rooms will be released shortly. You can book again.</span></div>
               <div class="row">
+                <button v-if="holdLeft(b) > 0" class="btn btn-primary btn-sm" :class="{ 'is-loading': pay.busy }" @click="startPayment(b.id)"><icon name="card" :size="15"></icon>Pay now</button>
                 <button
                   class="btn btn-outline btn-sm"
                   @click="openBooking(b.id)"
@@ -6644,8 +6617,9 @@ const printPage = () => window.print();
               <div class="pay-icon warn"><icon name="x" :size="38"></icon></div>
               <h2>Payment cancelled</h2>
               <p class="muted">
-                You weren’t charged. Your rooms are held for 15 minutes after booking –
-                pay before then to keep them.
+                You weren’t charged.
+                <template v-if="holdLeft(pay.booking) > 0">Your rooms are still held for <b>{{ holdText(pay.booking) }}</b> – pay before then to keep them.</template>
+                <template v-else>The payment time has run out, so these rooms will be released shortly.</template>
               </p>
             </template>
 
@@ -6664,6 +6638,7 @@ const printPage = () => window.print();
             <div class="row" style="justify-content: center">
               <template v-if="pay.state === 'pending' && route.name === 'payment-cancel'">
                 <button
+                  v-if="holdLeft(pay.booking) > 0"
                   class="btn btn-primary"
                   :class="{ 'is-loading': pay.busy }"
                   @click="retryPayment"
@@ -6709,7 +6684,7 @@ const printPage = () => window.print();
 
     <footer class="site no-print">
       <div class="wrap row between">
-        <div><b style="color: #fff">VibeStay</b> – your stay starts here.</div>
+        <div class="row" style="gap: 10px"><brand-logo :size="28"></brand-logo><span><b style="color: #fff">VibeStay</b> – your stay starts here.</span></div>
         <div class="row">
           <a href="#/explore">Explore hotels</a
           ><a href="#/register">Create account</a>
@@ -6807,6 +6782,26 @@ const printPage = () => window.print();
         </form>
       </div>
     </div>
+    <div v-if="hp.view" class="modal-bg" @click.self="hp.view = null" @keydown.esc="hp.view = null">
+      <div class="modal lg" role="dialog" aria-modal="true" :aria-label="hp.view.room.roomTypeName">
+        <div class="modal-h">
+          <h3>{{ hp.view.room.roomTypeName }}</h3>
+          <button class="x-btn" @click="hp.view = null" aria-label="Close"><icon name="x"></icon></button>
+        </div>
+        <div class="modal-b">
+          <div class="rv-main"><hotel-img :src="groupPhotos(hp.view)[hp.viewImg]" :name="hp.view.room.roomTypeName" :alt="hp.view.room.roomTypeName + ' photo ' + (hp.viewImg + 1)"></hotel-img><template v-if="groupPhotos(hp.view).length > 1"><button class="rv-nav prev" @click="stepRoomPhoto(-1)" aria-label="Previous photo">‹</button><button class="rv-nav next" @click="stepRoomPhoto(1)" aria-label="Next photo">›</button><span class="rv-count">{{ hp.viewImg + 1 }} / {{ groupPhotos(hp.view).length }}</span></template></div>
+          <div v-if="groupPhotos(hp.view).length > 1" class="rv-thumbs"><button v-for="(u, i) in groupPhotos(hp.view)" :key="u" :class="{ on: i === hp.viewImg }" @click="hp.viewImg = i" :aria-label="'Photo ' + (i + 1)"><img :src="imgUrl(u)" alt="" loading="lazy" /></button></div>
+          <p v-if="hp.view.room.roomTypeDescription" class="mt" style="margin-bottom: 8px">{{ hp.view.room.roomTypeDescription }}</p>
+          <div class="room-chips"><span class="chip"><icon name="user" :size="14"></icon>Up to {{ plural(hp.view.room.maxAdults, "adult") }}</span><span class="chip"><icon name="baby" :size="14"></icon>Up to {{ plural(hp.view.room.maxChildren, "child", "children") }}</span><span class="chip"><icon name="users" :size="14"></icon>Sleeps {{ hp.view.room.maxOccupancy }}</span><span class="chip"><icon name="building" :size="14"></icon>{{ plural(hp.view.rooms.length, "room") }} left for your dates</span></div>
+          <div v-if="hp.hotel && hp.hotel.amenities && hp.hotel.amenities.length" class="mt"><b class="small">Hotel facilities</b><div class="room-chips" style="margin-top: 6px"><span v-for="a in hp.hotel.amenities.slice(0, 8)" :key="a.id" class="chip">{{ amenityIcon(a.name) }} {{ a.name }}</span></div></div>
+        </div>
+        <div class="modal-f">
+          <div class="rv-price"><strong>{{ money(hp.view.room.pricePerNight * hpNights) }}</strong><span class="xs muted">{{ money(hp.view.room.pricePerNight) }} per night · {{ plural(hpNights, "night") }}</span></div>
+          <template v-if="canBook"><button v-if="!groupQty(hp.view)" class="btn btn-primary" @click="setGroupQty(hp.view, 1)"><icon name="plus" :size="16"></icon>Select room</button><div v-else class="qty-step" role="group" :aria-label="'Number of ' + hp.view.room.roomTypeName + ' rooms'"><button class="btn btn-ghost btn-sm" @click="setGroupQty(hp.view, groupQty(hp.view) - 1)" aria-label="One room less">−</button><b>{{ plural(groupQty(hp.view), "room") }}</b><button class="btn btn-ghost btn-sm" :disabled="groupQty(hp.view) >= hp.view.rooms.length" @click="setGroupQty(hp.view, groupQty(hp.view) + 1)" aria-label="One room more">+</button></div></template>
+          <button class="btn btn-ghost" @click="hp.view = null">Close</button>
+        </div>
+      </div>
+    </div>
     <div v-if="bd.open" class="modal-bg" @click.self="bd.open = false">
       <div class="modal lg" role="dialog" aria-modal="true">
         <div class="modal-h">
@@ -6821,8 +6816,9 @@ const printPage = () => window.print();
           ><booking-detail v-else-if="bd.data" :b="bd.data"></booking-detail>
         </div>
         <div class="modal-f" v-if="bd.data">
+          <button v-if="holdLeft(bd.data) > 0" class="btn btn-primary" :class="{ 'is-loading': pay.busy }" @click="startPayment(bd.data.id)"><icon name="card" :size="16"></icon>Pay now · {{ holdText(bd.data) }}</button>
           <button
-            v-if="bd.data.status === 'CONFIRMED'"
+            v-if="bd.data.status === 'CONFIRMED' || bd.data.status === 'PENDING'"
             class="btn btn-danger-o"
             @click="cancelBooking(bd.data, () => loadBookings(mb.page))"
           >

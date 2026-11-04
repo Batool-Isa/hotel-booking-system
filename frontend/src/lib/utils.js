@@ -29,7 +29,7 @@ export const phStyle = seed => { let h=0; for(const c of String(seed||'x')) h=(h
 const AMENITY_ICON = {'wi-fi':'📶','wifi':'📶','swimming pool':'🏊','pool':'🏊','gym':'🏋️','parking':'🅿️','restaurant':'🍽️','spa':'💆','breakfast':'🥐','beach access':'🏖️','room service':'🛎️','air conditioning':'❄️'};
 export const amenityIcon = n => AMENITY_ICON[String(n||'').toLowerCase()] || '✔️';
 const STATUS = {
-  CONFIRMED:['Confirmed','b-green'], COMPLETED:['Completed','b-blue'], CANCELLED:['Cancelled','b-red'], PENDING:['Pending','b-yellow'],
+  CONFIRMED:['Confirmed','b-green'], COMPLETED:['Completed','b-blue'], CANCELLED:['Cancelled','b-red'], PENDING:['Awaiting payment','b-yellow'],
   ACTIVE:['Active','b-green'], INACTIVE:['Inactive','b-gray'], PENDING_APPROVAL:['Waiting for approval','b-yellow'], REJECTED:['Rejected','b-red'], UNDER_MAINTENANCE:['Maintenance','b-yellow']
 };
 export const statusLabel = s => (STATUS[s]||[s])[0];

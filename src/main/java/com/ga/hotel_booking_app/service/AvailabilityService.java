@@ -7,6 +7,7 @@ import com.ga.hotel_booking_app.exception.custom.InvalidInformationException;
 import com.ga.hotel_booking_app.model.Booking;
 import com.ga.hotel_booking_app.model.Hotel;
 import com.ga.hotel_booking_app.model.Room;
+import com.ga.hotel_booking_app.model.RoomImage;
 import com.ga.hotel_booking_app.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -86,6 +88,10 @@ public class AvailabilityService {
         roomResponse.setMaxOccupancy(room.getMaxOccupancy());
         roomResponse.setRoomNumber(room.getRoomNumber());
         roomResponse.setFloorNumber(room.getFloorNumber());
+        List<String> imageUrls = room.getImages().stream().sorted(Comparator.comparing(RoomImage::getId)).map(RoomImage::getImageURL).toList();
+        roomResponse.setImageUrls(imageUrls);
+        roomResponse.setImageUrl(imageUrls.isEmpty() ? null : imageUrls.get(0));
+        roomResponse.setRoomTypeDescription(room.getRoomType().getDescription());
         return roomResponse;
     }
 }

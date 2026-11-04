@@ -1,5 +1,4 @@
 package com.ga.hotel_booking_app.model;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
@@ -44,15 +43,11 @@ public class Payment {
     private LocalDateTime updatedAt;
     @Column(length = 100)
     private String paymentIntent;
-    @JsonIgnore
-    @OneToOne(mappedBy = "payment")
-    private Refund refund;
 
     public enum STATUS{
         PENDING,
         FAILED,
-        SUCCEED,
-        REFUNDED
+        SUCCEED
     }
     public enum METHOD{
         CARD,

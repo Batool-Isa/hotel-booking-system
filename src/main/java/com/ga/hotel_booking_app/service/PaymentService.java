@@ -199,7 +199,7 @@ public class PaymentService {
             bookingRepository.save(booking);
             logger.info("Booking {} is confirmed after payment paid", booking.getId());
         } else {
-            logger.warn("Payment {} succeeded but booking {} is {}: refund needed",
+            logger.warn("Payment {} succeeded but booking {} is {}",
                     payment.getId(), booking.getBookingReference(), booking.getStatus());
 
         }

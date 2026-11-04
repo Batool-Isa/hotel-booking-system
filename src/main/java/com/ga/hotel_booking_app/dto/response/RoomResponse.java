@@ -3,6 +3,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,4 +35,7 @@ public class RoomResponse {
     private Long roomTypeId;
     private String roomTypeName;
     private Long hotelId;
+    private String imageUrl;
+    private List<String> imageUrls;
+    private String roomTypeDescription;
 }

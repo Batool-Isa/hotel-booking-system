@@ -2015,3 +2015,138 @@ video {
 .star-pick button.on { color: var(--yellow); }
 .star-pick button:hover { transform: scale(1.12); }
 .star-pick span { margin-left: 10px; }
+.brand-logo {
+  display: block;
+  flex: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+.hold-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff8e1;
+  border: 1px solid #ffe08a;
+  color: #7a5200;
+  font-size: 0.92rem;
+}
+.hold-note.expired {
+  background: #fdecec;
+  border-color: #f5b5b5;
+  color: #8a1f1f;
+}
+.hold-note .ic {
+  flex: none;
+}
+.searchbar.compact {
+  gap: 8px;
+  padding: 8px;
+  margin: 16px 0 8px;
+}
+.searchbar.compact > * {
+  margin: 0;
+}
+.searchbar.compact .sb-field {
+  padding: 12px 16px;
+}
+.searchbar.compact .sb-btn {
+  min-height: 60px;
+}
+#rooms > h3 {
+  margin-bottom: 6px;
+}
+#rooms > p {
+  margin: 0;
+}
+#rooms .empty {
+  padding: 36px 16px 20px;
+}
+.rating-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.star-row {
+  position: relative;
+  display: inline-block;
+  font-size: 1.15rem;
+  line-height: 1;
+  letter-spacing: 2px;
+  color: #d6dbe1;
+  white-space: nowrap;
+}
+.star-row::before {
+  content: "★★★★★";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--pct, 0%);
+  overflow: hidden;
+  color: var(--yellow);
+}
+.star-row.sm {
+  font-size: 0.95rem;
+}
+.rooms-head {
+  margin-bottom: 12px;
+  gap: 8px;
+}
+.rcard {
+  grid-template-columns: 220px 1fr 220px;
+  margin-bottom: 14px;
+  border-width: 2px;
+}
+.rcard .hc-img,
+.rcard .hc-img img,
+.rcard .hc-img .ph {
+  min-height: 180px;
+  height: 100%;
+}
+.rcard .hc-body h3 {
+  margin: 0 0 4px;
+  color: var(--navy);
+}
+.rcard .room-chips {
+  margin: 10px 0 6px;
+}
+.rcard.sel {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(0, 128, 9, 0.12);
+}
+.rcard .hc-price .btn {
+  width: 100%;
+  justify-content: center;
+}
+@media (max-width: 760px) {
+  .rcard {
+    grid-template-columns: 1fr;
+  }
+  .rcard .hc-img,
+  .rcard .hc-img img,
+  .rcard .hc-img .ph {
+    height: 180px;
+  }
+}
+.rcard .loc.few-left { color: #c2410c; font-weight: 600; }
+.qty-step { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 4px; background: #fff; }
+.qty-step .btn { min-width: 34px; justify-content: center; font-size: 1.1rem; padding: 4px 8px; }
+.qty-step b { min-width: 64px; text-align: center; font-size: 0.9rem; }
+.rv-open { position: relative; padding: 0; border: 0; background: none; cursor: zoom-in; }
+.rv-count { position: absolute; right: 8px; bottom: 8px; display: inline-flex; align-items: center; gap: 4px; background: rgba(15, 23, 42, 0.72); color: #fff; font-size: 0.75rem; font-weight: 600; padding: 3px 8px; border-radius: 999px; }
+.link-btn { background: none; border: 0; padding: 0; color: var(--blue); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-size: 0.88rem; }
+.link-btn:hover { text-decoration: underline; }
+.rv-link { margin-top: 8px; }
+.rv-main { position: relative; aspect-ratio: 3 / 2; border-radius: 12px; overflow: hidden; background: #e2e8f0; }
+.rv-main img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rv-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.9); font-size: 1.5rem; line-height: 1; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); }
+.rv-nav.prev { left: 10px; }
+.rv-nav.next { right: 10px; }
+.rv-thumbs { display: flex; gap: 8px; margin-top: 8px; overflow-x: auto; }
+.rv-thumbs button { flex: 0 0 76px; height: 52px; padding: 0; border: 2px solid transparent; border-radius: 8px; overflow: hidden; cursor: pointer; opacity: 0.7; background: none; }
+.rv-thumbs button.on { border-color: var(--blue); opacity: 1; }
+.rv-thumbs img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rv-price { margin-right: auto; display: flex; flex-direction: column; }
+.rv-price strong { font-size: 1.25rem; }

@@ -273,6 +273,7 @@ public class BookingService {
         response.setCheckIn(booking.getCheckIn());
         response.setCheckOut(booking.getCheckOut());
         response.setStatus(booking.getStatus().name());
+        response.setHoldExpiresAt(booking.getHoldExpiresAt());
         response.setAdults(booking.getAdults());
         response.setChildren(booking.getChildren());
         response.setTotalAmount(booking.getTotalAmount());

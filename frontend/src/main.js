@@ -11,6 +11,7 @@ import AlertBox from './components/AlertBox.vue'
 import SearchBar from './components/SearchBar.vue'
 import BookingDetail from './components/BookingDetail.vue'
 import LookupPanel from './components/LookupPanel.vue'
+import BrandLogo from './components/BrandLogo.vue'
 import { fmtDate, fmtDateTime, money, imgUrl, nightsBetween, statusLabel, statusClass, plural, amenityIcon, initials, roleLabel } from './lib/utils'
 
 const app = createApp(App)
@@ -27,5 +28,9 @@ app.component('alert-box', AlertBox)
 app.component('search-bar', SearchBar)
 app.component('booking-detail', BookingDetail)
 app.component('lookup-panel', LookupPanel)
+app.component('brand-logo', BrandLogo)
 
 app.mount('#app')
+
+const splash = document.getElementById('splash')
+if (splash) setTimeout(() => { splash.classList.add('hide'); setTimeout(() => splash.remove(), 500) }, Math.max(300, 1400 - performance.now()))

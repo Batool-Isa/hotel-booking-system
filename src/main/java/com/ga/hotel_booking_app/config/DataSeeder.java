@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Configuration
@@ -34,6 +35,8 @@ public class DataSeeder {
     private final BookingRepository bookingRepository;
     private final HotelImageRepository hotelImageRepository;
     private final RoomImageRepository roomImageRepository;
+    private final PaymentRepository paymentRepository;
+    private final ReviewRepository reviewRepository;
 
     @Bean
     CommandLineRunner seedData() {
@@ -309,7 +312,7 @@ public class DataSeeder {
             room.setHotel(hotel);
             room.setRoomType(types.get(r[2]));
             room = roomRepository.save(room);
-            createRoomImage(room, r[2]);
+            createRoomImages(room, r[2]);
         }
         Room maintenance = roomRepository.findByHotelId(hotel.getId()).stream()
                 .filter(r -> r.getRoomNumber().equals("104")).findFirst().orElse(null);
@@ -320,24 +323,17 @@ public class DataSeeder {
         }
     }
 
-    private static final String UNSPLASH = "https://images.unsplash.com/photo-";
-    private static final String UNSPLASH_SIZE = "?auto=format&fit=crop&w=1200&q=75";
-    private static final String[] HOTEL_PHOTOS = {
-            "1566073771259-6a8506099945", "1551882547-ff40c63fe5fa", "1445019980597-93fa8acb246c"
-    };
-    private static final String[] ROOM_PHOTOS = {
-            "1611892440504-42a792e24d32", "1631049307264-da0ec9d70304", "1582719478250-c89cae4dc85b"
-    };
+    private static final Map<String, List<String>> HOTEL_PHOTOS = Map.ofEntries(Map.entry("VibeStay Manama Grand", List.of("hotel-manama-grand", "extra-lobby-reception", "extra-restaurant-2", "extra-gym-1")), Map.entry("VibeStay Beach Resort", List.of("hotel-beach-resort", "extra-infinity-beach", "extra-cabanas", "extra-spa-2")), Map.entry("VibeStay Desert Lodge", List.of("hotel-desert-lodge", "extra-desert-view", "extra-lodge-pool")), Map.entry("VibeStay Riffa Heights", List.of("hotel-riffa-heights", "extra-garden-pool-2", "extra-garden-pool")), Map.entry("VibeStay Dubai Marina", List.of("hotel-dubai-marina", "extra-pool-aerial", "extra-pool-night", "extra-lobby-lounge")), Map.entry("VibeStay Abu Dhabi Corniche", List.of("hotel-abu-dhabi-corniche", "extra-loungers", "extra-lobby", "extra-spa-1")), Map.entry("VibeStay Doha Pearl", List.of("hotel-doha-pearl", "extra-pool-dusk", "extra-lobby-entrance")), Map.entry("VibeStay Riyadh Tower", List.of("hotel-riyadh-tower", "extra-gym-2", "extra-corridor")), Map.entry("VibeStay Muscat Bay", List.of("hotel-muscat-bay", "extra-tropical-pool", "extra-palms", "extra-resort-sunset")), Map.entry("VibeStay Kuwait Gate", List.of("hotel-kuwait-gate", "extra-courtyard-pool", "extra-umbrellas")), Map.entry("VibeStay Old Town Inn", List.of("hotel-old-town-inn", "extra-restaurant-1")));
+    private static final Map<String, List<String>> ROOM_PHOTOS = Map.of("Standard Room", List.of("room-standard-1", "room-standard-2", "room-standard-3", "room-standard-4", "room-standard-5", "room-standard-6"), "Twin Room", List.of("room-twin-1", "room-twin-2", "room-twin-3", "room-twin-4"), "Deluxe Room", List.of("room-deluxe-1", "room-deluxe-2", "room-deluxe-3", "room-deluxe-4", "room-deluxe-5", "room-deluxe-6", "room-deluxe-7"), "Executive Suite", List.of("room-executive-1", "room-executive-2", "room-executive-3", "room-executive-4", "room-executive-5", "room-executive-6"), "Family Suite", List.of("room-family-1", "room-family-2", "room-family-3", "room-family-4", "room-family-5"), "Presidential Suite", List.of("room-presidential-1", "room-presidential-2", "room-presidential-3"));
+    private static final List<String> SUITES = List.of("Executive Suite", "Family Suite", "Presidential Suite");
+    private static final int LOUNGE_PHOTOS = 12;
+    private static final int BATH_PHOTOS = 6;
     private final Map<String, byte[]> imageCache = new HashMap<>();
-    private final java.net.http.HttpClient http = java.net.http.HttpClient.newBuilder()
-            .followRedirects(java.net.http.HttpClient.Redirect.NORMAL)
-            .connectTimeout(java.time.Duration.ofSeconds(5)).build();
 
     private void createHotelImages(Hotel hotel) {
-        for (int i = 0; i < 3; i++) {
-            int pick = (int) ((hotel.getId() + i) % 3);
-            String path = saveSeedImage(HOTEL_PHOTOS[pick], "hotel-" + (pick + 1) + ".jpg",
-                    "uploads/hotels/" + hotel.getId(), "seed-" + (i + 1) + ".jpg");
+        List<String> photos = HOTEL_PHOTOS.getOrDefault(hotel.getName(), List.of("hotel-manama-grand"));
+        for (int i = 0; i < photos.size(); i++) {
+            String path = saveSeedImage(photos.get(i) + ".jpg", "uploads/hotels/" + hotel.getId(), "seed-" + (i + 1) + ".jpg");
             if (path != null) {
                 HotelImage image = new HotelImage();
                 image.setImageURL(path);
@@ -348,23 +344,28 @@ public class DataSeeder {
         }
     }
 
-    private void createRoomImage(Room room, String typeName) {
-        int pick = typeName.contains("Suite") ? 2 : typeName.contains("Deluxe") ? 1 : 0;
-        String path = saveSeedImage(ROOM_PHOTOS[pick], "room-" + (pick + 1) + ".jpg",
-                "uploads/rooms/" + room.getHotel().getId() + "/" + room.getId(), "seed.jpg");
-        if (path != null) {
-            RoomImage image = new RoomImage();
-            image.setImageURL(path);
-            image.setRoom(room);
-            roomImageRepository.save(image);
+    private void createRoomImages(Room room, String typeName) {
+        int h = room.getHotel().getId().intValue();
+        int t = Arrays.stream(ROOM_TYPES).map(x -> x[0]).toList().indexOf(typeName);
+        List<String> beds = ROOM_PHOTOS.getOrDefault(typeName, ROOM_PHOTOS.get("Standard Room"));
+        List<String> photos = new ArrayList<>(List.of(beds.get(h % beds.size()), beds.get((h + 1) % beds.size())));
+        if (SUITES.contains(typeName)) {
+            photos.add("room-lounge-" + ((h * 3 + t) % LOUNGE_PHOTOS + 1));
+        }
+        photos.add("room-bath-" + ((h + t) % BATH_PHOTOS + 1));
+        for (int i = 0; i < photos.size(); i++) {
+            String path = saveSeedImage(photos.get(i) + ".jpg", "uploads/rooms/" + h + "/" + room.getId(), "seed-" + (i + 1) + ".jpg");
+            if (path != null) {
+                RoomImage image = new RoomImage();
+                image.setImageURL(path);
+                image.setRoom(room);
+                roomImageRepository.save(image);
+            }
         }
     }
 
-    private String saveSeedImage(String unsplashId, String fallbackName, String directory, String fileName) {
-        byte[] data = cached("web:" + unsplashId, () -> download(UNSPLASH + unsplashId + UNSPLASH_SIZE));
-        if (data.length == 0) {
-            data = cached("local:" + fallbackName, () -> readBundled(fallbackName));
-        }
+    private String saveSeedImage(String bundledName, String directory, String fileName) {
+        byte[] data = imageCache.computeIfAbsent(bundledName, this::readBundled);
         if (data.length == 0) {
             return null;
         }
@@ -378,39 +379,11 @@ public class DataSeeder {
         }
     }
 
-    private byte[] cached(String key, java.util.function.Supplier<byte[]> loader) {
-        byte[] data = imageCache.get(key);
-        if (data == null) {
-            data = loader.get();
-            if (data == null) {
-                data = new byte[0];
-            }
-            imageCache.put(key, data);
-        }
-        return data;
-    }
-
-    private byte[] download(String url) {
-        try {
-            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder(java.net.URI.create(url))
-                    .timeout(java.time.Duration.ofSeconds(10)).header("User-Agent", "VibeStay-Seeder").GET().build();
-            java.net.http.HttpResponse<byte[]> response = http.send(request,
-                    java.net.http.HttpResponse.BodyHandlers.ofByteArray());
-            String type = response.headers().firstValue("Content-Type").orElse("");
-            byte[] body = response.body();
-            if (response.statusCode() == 200 && type.startsWith("image/") && body.length > 5_000 && body.length < 1_000_000) {
-                return body;
-            }
-        } catch (Exception ignored) {
-        }
-        return null;
-    }
-
     private byte[] readBundled(String name) {
         try (InputStream in = new ClassPathResource("seed-images/" + name).getInputStream()) {
             return in.readAllBytes();
         } catch (IOException e) {
-            return null;
+            return new byte[0];
         }
     }
 
@@ -447,6 +420,27 @@ public class DataSeeder {
                 new BookingSeed(a, "101", 8, -12, 3, 2, 1, D, null),
                 new BookingSeed(q, "301", 4, -60, 4, 3, 2, D, null),
                 new BookingSeed(u, "201", 16, -9, 2, 2, 0, D, null),
+                new BookingSeed(m, "202", 7, -40, 2, 2, 0, D, null),
+                new BookingSeed(m, "302", 9, -50, 3, 2, 1, D, null),
+                new BookingSeed(m, "103", 10, -14, 2, 1, 0, D, null),
+                new BookingSeed(b, "101", 11, -25, 3, 2, 0, D, null),
+                new BookingSeed(b, "202", 12, -35, 4, 2, 1, D, null),
+                new BookingSeed(b, "401", 13, -70, 3, 2, 0, D, null),
+                new BookingSeed(r, "101", 14, -20, 2, 2, 0, D, null),
+                new BookingSeed(r, "201", 15, -33, 3, 2, 0, D, null),
+                new BookingSeed(r, "302", 16, -48, 2, 2, 0, D, null),
+                new BookingSeed(r, "301", 1, -65, 4, 4, 2, D, null),
+                new BookingSeed(d, "101", 2, -28, 2, 2, 0, D, null),
+                new BookingSeed(d, "302", 4, -40, 3, 2, 1, D, null),
+                new BookingSeed(a, "201", 5, -22, 4, 2, 0, D, null),
+                new BookingSeed(a, "301", 6, -55, 5, 3, 2, D, null),
+                new BookingSeed(q, "101", 7, -15, 2, 2, 0, D, null),
+                new BookingSeed(q, "202", 8, -30, 3, 2, 0, D, null),
+                new BookingSeed(y, "101", 9, -11, 2, 1, 0, D, null),
+                new BookingSeed(y, "201", 10, -24, 3, 2, 0, D, null),
+                new BookingSeed(y, "302", 11, -38, 2, 2, 0, D, null),
+                new BookingSeed(u, "101", 12, -19, 3, 2, 0, D, null),
+                new BookingSeed(u, "302", 13, -42, 4, 2, 1, D, null),
                 new BookingSeed(m, "301", 6, 7, 3, 2, 0, X, "Cancelled - plans changed"),
                 new BookingSeed(b, "201", 9, 10, 2, 2, 0, X, "Cancelled - found a different date"),
                 new BookingSeed(d, "401", 12, 25, 2, 2, 0, X, "Cancelled by guest"),
@@ -461,11 +455,11 @@ public class DataSeeder {
         }
         List<BookingSeed> seeds = bookingSeeds();
         for (int i = 0; i < seeds.size(); i++) {
-            createBooking(String.format("SEED-%04d", i + 1), seeds.get(i), hotels);
+            createBooking(String.format("SEED-%04d", i + 1), seeds.get(i), hotels, i);
         }
     }
 
-    private void createBooking(String reference, BookingSeed seed, Map<String, Hotel> hotels) {
+    private void createBooking(String reference, BookingSeed seed, Map<String, Hotel> hotels, int index) {
         if (bookingRepository.existsByBookingReference(reference)) {
             return;
         }
@@ -512,7 +506,56 @@ public class DataSeeder {
                     5 + c * 3, BookingGuest.GuestType.CHILD));
         }
         booking.getBookingRooms().add(bookingRoom);
-        bookingRepository.save(booking);
+        if (seed.status() == Booking.Status.PENDING) {
+            booking.setHoldExpiresAt(LocalDateTime.now().plusMinutes(15));
+        }
+        booking = bookingRepository.save(booking);
+        if (seed.status() == Booking.Status.CONFIRMED || seed.status() == Booking.Status.COMPLETED) {
+            createPayment(booking);
+        }
+        if (seed.status() == Booking.Status.COMPLETED) {
+            createReview(booking, index);
+        }
+    }
+
+    private void createPayment(Booking booking) {
+        Payment payment = new Payment();
+        payment.setBooking(booking);
+        payment.setAmount(booking.getTotalAmount());
+        payment.setMethod(Payment.METHOD.CARD);
+        payment.setStatus(Payment.STATUS.SUCCEED);
+        payment.setProviderReference("cs_seed_" + booking.getBookingReference());
+        payment.setIdempotencyKey("seed-" + booking.getBookingReference());
+        payment.setPaymentIntent("pi_seed_" + booking.getBookingReference());
+        paymentRepository.save(payment);
+    }
+
+    private static final Object[][] REVIEWS = {
+            {5.0, "Amazing stay, the staff were friendly and the room was spotless."},
+            {4.0, "Great location and comfortable beds. Breakfast could have more choice."},
+            {5.0, "Perfect for families, the kids loved the pool. We will come back!"},
+            {3.0, "Good value for money, but check-in took longer than expected."},
+            {4.0, "Lovely view and quiet rooms. Parking was easy to find."},
+            {5.0, "Everything was excellent from arrival to check-out."},
+            {4.0, "Clean, modern and close to everything. Wi-Fi was fast."},
+            {2.0, "The room was fine but the air conditioning was noisy at night."},
+            {5.0, "Best hotel breakfast I have had in a long time. Very helpful reception team."},
+            {4.0, "Spacious room and a great shower. The gym was small but well equipped."},
+            {3.0, "Nice hotel, but the pool area was crowded on the weekend."},
+            {5.0, "We celebrated our anniversary here and the staff made it really special."},
+            {4.0, "Easy check-in, comfortable bed and good value. Would stay again."},
+            {3.0, "Room was clean, but the view was of the parking lot."},
+            {5.0, "Quiet, calm and beautifully designed. Housekeeping was excellent."},
+            {4.0, "Good for a business trip. Fast Wi-Fi and a proper desk in the room."}
+    };
+
+    private void createReview(Booking booking, int index) {
+        Object[] data = REVIEWS[index % REVIEWS.length];
+        Review review = new Review();
+        review.setRating((Double) data[0]);
+        review.setComment((String) data[1]);
+        review.setBooking(booking);
+        reviewRepository.save(review);
     }
 
     private BookingGuest guest(BookingRoom bookingRoom, String name, int age, BookingGuest.GuestType type) {
