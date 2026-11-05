@@ -26,8 +26,8 @@ export const imgUrl = u => {
 };
 const GRADS = [['#0a3d91','#3b8cff'],['#0b5d57','#2bb5a0'],['#5b2a86','#a06bd6'],['#8a3b12','#e8913a'],['#1f4e79','#5aa9e6'],['#7a1f3d','#d6567e']];
 export const phStyle = seed => { let h=0; for(const c of String(seed||'x')) h=(h*31+c.charCodeAt(0))>>>0; const g=GRADS[h%GRADS.length]; return `background:linear-gradient(135deg,${g[0]},${g[1]})`; };
-const AMENITY_ICON = {'wi-fi':'📶','wifi':'📶','swimming pool':'🏊','pool':'🏊','gym':'🏋️','parking':'🅿️','restaurant':'🍽️','spa':'💆','breakfast':'🥐','beach access':'🏖️','room service':'🛎️','air conditioning':'❄️'};
-export const amenityIcon = n => AMENITY_ICON[String(n||'').toLowerCase()] || '✔️';
+const AMENITY_ICON = [[/wi-?fi|internet/,'wifi'],[/pool|swim/,'pool'],[/gym|fitness/,'dumbbell'],[/park/,'parking'],[/restaurant|dining|bar/,'utensils'],[/spa|massage|sauna/,'leaf'],[/breakfast|coffee|cafe/,'coffee'],[/beach/,'umbrella'],[/air.?cond|a\/c|cooling/,'snowflake'],[/room service|concierge|reception/,'service']];
+export const amenityIcon = n => { const s = String(n||'').toLowerCase(); const m = AMENITY_ICON.find(([r]) => r.test(s)); return m ? m[1] : 'check'; };
 const STATUS = {
   CONFIRMED:['Confirmed','b-green'], COMPLETED:['Completed','b-blue'], CANCELLED:['Cancelled','b-red'], PENDING:['Awaiting payment','b-yellow'],
   ACTIVE:['Active','b-green'], INACTIVE:['Inactive','b-gray'], PENDING_APPROVAL:['Waiting for approval','b-yellow'], REJECTED:['Rejected','b-red'], UNDER_MAINTENANCE:['Maintenance','b-yellow']

@@ -26,6 +26,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -270,6 +274,17 @@ public class BookingService {
         response.setBookingReference(booking.getBookingReference());
         response.setHotelId(booking.getHotel().getId());
         response.setHotelName(booking.getHotel().getName());
+        User guest = booking.getUser();
+        if (guest != null) {
+            UserProfile profile = guest.getUserProfile();
+            String name = profile == null ? "" :
+                    ((profile.getFirstName() == null ? "" : profile.getFirstName()) + " "
+                            + (profile.getLastName() == null ? "" : profile.getLastName())).trim();
+            response.setGuestName(name.isEmpty() ? guest.getUsername() : name);
+            response.setGuestEmail(guest.getEmail());
+            response.setGuestPhone(profile == null ? null : profile.getPhone());
+        }
+        response.setCreatedAt(booking.getCreatedAt());
         response.setCheckIn(booking.getCheckIn());
         response.setCheckOut(booking.getCheckOut());
         response.setStatus(booking.getStatus().name());
@@ -444,10 +459,78 @@ public class BookingService {
         }
     }
 
-    public ResponseEntity<?> getAllAppBookings(Pageable pageable) {
-        Page<Booking> bookings = bookingRepository.findAll(pageable);
-        List<BookingResponse> responses = bookings.stream()
-                .map(this::mapToBookingResponse).toList();
-        return ResponseEntity.ok(responses);
+    /** Bookings for every hotel the logged-in manager runs, with optional filters (see bookingFilter). */
+    public ResponseEntity<?> getManagerBookings(Long hotelId, Booking.Status status, String when,
+                                                String q, Pageable pageable) {
+        User manager = getCurrentLoggedInUser();
+        List<Long> hotelIds = hotelRepository.findByManagers_Id(manager.getId())
+                .stream().map(Hotel::getId).toList();
+        if (hotelId != null && !hotelIds.contains(hotelId)) {
+            throw new UnauthorizedActionException("You are not authorized to view this hotel's bookings");
+        }
+        if (hotelIds.isEmpty()) {
+            return ResponseEntity.ok(pageBody(Page.empty(pageable)));
+        }
+        return ResponseEntity.ok(pageBody(bookingRepository.findAll(
+                bookingFilter(hotelIds, hotelId, status, when, q), pageable)));
     }
+
+    /** Every booking in the app, with the same optional filters as the manager list. */
+    public ResponseEntity<?> getAllAppBookings(Long hotelId, Booking.Status status, String when,
+                                               String q, Pageable pageable) {
+        return ResponseEntity.ok(pageBody(bookingRepository.findAll(
+                bookingFilter(null, hotelId, status, when, q), pageable)));
+    }
+
+    /**
+     * allowedHotelIds: limits the search to these hotels (null = all hotels).
+     * when: "upcoming" (check-in today or later), "current" (in house today), "past" (checked out).
+     * q: matches the booking reference, guest name or guest email.
+     */
+    private Specification<Booking> bookingFilter(List<Long> allowedHotelIds, Long hotelId, Booking.Status status,
+                                                 String when, String q) {
+        LocalDate today = LocalDate.now();
+        return (root, query, cb) -> {
+            List<Predicate> filters = new ArrayList<>();
+            if (hotelId != null) {
+                filters.add(cb.equal(root.get("hotel").get("id"), hotelId));
+            } else if (allowedHotelIds != null) {
+                filters.add(root.get("hotel").get("id").in(allowedHotelIds));
+            }
+            if (status != null) {
+                filters.add(cb.equal(root.get("status"), status));
+            }
+            if ("upcoming".equalsIgnoreCase(when)) {
+                filters.add(cb.greaterThanOrEqualTo(root.get("checkIn"), today));
+            } else if ("current".equalsIgnoreCase(when)) {
+                filters.add(cb.lessThanOrEqualTo(root.get("checkIn"), today));
+                filters.add(cb.greaterThan(root.get("checkOut"), today));
+            } else if ("past".equalsIgnoreCase(when)) {
+                filters.add(cb.lessThanOrEqualTo(root.get("checkOut"), today));
+            }
+            if (q != null && !q.isBlank()) {
+                String like = "%" + q.trim().toLowerCase() + "%";
+                Join<Booking, User> user = root.join("user");
+                Join<User, UserProfile> profile = user.join("userProfile", JoinType.LEFT);
+                filters.add(cb.or(
+                        cb.like(cb.lower(root.get("bookingReference")), like),
+                        cb.like(cb.lower(user.get("email")), like),
+                        cb.like(cb.lower(cb.concat(cb.concat(cb.coalesce(profile.get("firstName"), ""), " "),
+                                cb.coalesce(profile.get("lastName"), ""))), like)
+                ));
+            }
+            return cb.and(filters.toArray(new Predicate[0]));
+        };
+    }
+
+    private Map<String, Object> pageBody(Page<Booking> page) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("content", page.getContent().stream().map(this::mapToBookingResponse).toList());
+        body.put("page", page.getNumber());
+        body.put("size", page.getSize());
+        body.put("totalElements", page.getTotalElements());
+        body.put("totalPages", page.getTotalPages());
+        return body;
+    }
+
 }

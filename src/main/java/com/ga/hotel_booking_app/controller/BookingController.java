@@ -2,6 +2,7 @@ package com.ga.hotel_booking_app.controller;
 
 import com.ga.hotel_booking_app.dto.request.BookingRequest;
 import com.ga.hotel_booking_app.dto.request.BookingStatusRequest;
+import com.ga.hotel_booking_app.model.Booking;
 import com.ga.hotel_booking_app.service.BookingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -45,12 +46,34 @@ public class BookingController {
     }
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Get all app's booking", description = "Fetch all application's booking records")
+    @Operation(summary = "Get all app's booking",
+            description = "Every booking in the app. Optional filters: hotelId, status, "
+                    + "when (upcoming | current | past) and q (reference, guest name or email)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Get all bookings"),
+            @ApiResponse(responseCode = "200", description = "A page of bookings"),
     })
-    public ResponseEntity<?> getAllAppBookings(Pageable pageable){
-        return bookingService.getAllAppBookings(pageable);
+    public ResponseEntity<?> getAllAppBookings(@RequestParam(required = false) Long hotelId,
+                                               @RequestParam(required = false) Booking.Status status,
+                                               @RequestParam(required = false) String when,
+                                               @RequestParam(required = false) String q,
+                                               Pageable pageable){
+        return bookingService.getAllAppBookings(hotelId, status, when, q, pageable);
+    }
+
+    @GetMapping("/managed")
+    @PreAuthorize("hasRole('HOTEL_MANAGER')")
+    @Operation(summary = "Get manager's bookings",
+            description = "List all bookings across the hotels the logged-in manager runs")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "A page of bookings"),
+            @ApiResponse(responseCode = "403", description = "The hotel is not managed by this user"),
+    })
+    public ResponseEntity<?> getManagerBookings(@RequestParam(required = false) Long hotelId,
+                                                @RequestParam(required = false) Booking.Status status,
+                                                @RequestParam(required = false) String when,
+                                                @RequestParam(required = false) String q,
+                                                Pageable pageable) {
+        return bookingService.getManagerBookings(hotelId, status, when, q, pageable);
     }
 
     @PatchMapping("/{bookingId}/cancel")

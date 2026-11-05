@@ -112,12 +112,12 @@ Pay with the test card `4242 4242 4242 4242`, any future date and any CVC.
 
 | Demo data | Details |
 |---|---|
-| Admin | `admin@vibestay.com` / `Admin123!` |
-| Managers | `manager1` to `manager6@vibestay.com` / `Manager123!` |
-| Customers | `customer1` to `customer16@vibestay.com` / `Customer123!` |
+| Admin | `admin@vibestay.com` / `Admin123!` (Yasmeen Al Khaja) |
+| Managers | `manager1` to `manager6@vibestay.com` / `Manager123!` (e.g. Mohammed Al Sayed, username `mohammed.alsayed`) |
+| Customers | `customer1` to `customer24@vibestay.com` / `Customer123!` (e.g. Sara Ahmed, username `sara.ahmed`) |
 | Hotels | 11 hotels in Bahrain, UAE, Qatar, Saudi Arabia, Oman and Kuwait (8 active, 2 pending, 1 inactive) |
 | Rooms | 11 rooms per hotel, across 6 room types |
-| Bookings | 26 sample bookings (upcoming, completed and cancelled) |
+| Bookings | About 490 bookings from the last 5 months to 2 months ahead: completed (most reviewed), paid and confirmed, cancelled (paid or unpaid) and a few pending payment. Every active hotel has a guest arriving today, one staying now and one leaving today. Generated with a fixed seed, so a fresh database always gets the same data |
 
 These passwords are fake and for development only.
 
@@ -201,6 +201,8 @@ Base URL: `http://localhost:8000`. The full interactive documentation is in Swag
 | POST | `/api/availability/search` | Public | Find hotels and rooms free for the dates and guests |
 | POST | `/api/bookings` | Customer | Create a PENDING booking (one or more rooms, guests with ages), held for 15 minutes |
 | GET | `/api/bookings/my-bookings` | Customer | My bookings |
+| GET | `/api/bookings/managed` | Manager | Bookings across my hotels. Filters: `hotelId`, `status`, `when` (`upcoming`, `current`, `past`), `q` (reference, guest name or email). Returns a page with `content` and `totalElements` |
+| GET | `/api/bookings/all` | Admin | Every booking, with the same filters as `/managed`. Returns a page with `content` and `totalElements` |
 | GET | `/api/bookings/{bookingId}` | Customer, Manager, Admin | Booking details (own booking, own hotel, or any for admin) |
 | PATCH | `/api/bookings/{bookingId}/cancel` | Customer, Manager, Admin | Cancel a booking |
 | PATCH | `/api/bookings/{bookingId}/status` | Manager, Admin | Mark a confirmed booking COMPLETED |

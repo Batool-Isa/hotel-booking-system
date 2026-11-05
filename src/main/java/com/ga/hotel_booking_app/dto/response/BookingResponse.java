@@ -15,6 +15,11 @@ public class BookingResponse {
     private String bookingReference;
     private Long hotelId;
     private String hotelName;
+    // who made the booking (shown to managers and admins)
+    private String guestName;
+    private String guestEmail;
+    private String guestPhone;
+    private LocalDateTime createdAt;
     private LocalDate checkIn;
     private LocalDate checkOut;
     private String status;

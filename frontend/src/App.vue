@@ -57,10 +57,11 @@ const TITLES = {
   "check-email": "Check your email",
   profile: "My profile",
   bookings: "My bookings",
-  manage: "Manager portal",
+  manage: "My hotels",
+  "manage-bookings": "Bookings",
   "manage-new": "Add a hotel",
   "manage-hotel": "Manage hotel",
-  admin: "Admin panel",
+  admin: "Admin",
   "payment-success": "Payment successful",
   "payment-cancel": "Payment cancelled",
 };
@@ -98,6 +99,7 @@ function parseHash() {
       break;
     case "manage":
       if (segs[1] === "new") name = "manage-new";
+      else if (segs[1] === "bookings") name = "manage-bookings";
       else if (segs[1] === "hotel") {
         name = "manage-hotel";
         params.id = segs[2];
@@ -135,6 +137,7 @@ function guard(r) {
       "manage",
       "manage-new",
       "manage-hotel",
+      "manage-bookings",
       "admin",
       "payment-success",
       "payment-cancel",
@@ -166,6 +169,13 @@ function guard(r) {
       type: "warn",
     };
   if (n === "manage" && isAdmin.value) return { to: "/admin?tab=hotels" };
+  if (n === "manage-bookings" && !isManager.value)
+    return isAdmin.value
+      ? { to: "/admin?tab=bookings" }
+      : { to: "/", msg: "You don't have access to the manager portal.", type: "warn" };
+  // staff don't book stays, so their home is their own workspace
+  if (n === "home" && isManager.value) return { to: "/manage" };
+  if (n === "home" && isAdmin.value) return { to: "/admin" };
   if (n === "admin" && !isAdmin.value)
     return {
       to: "/",
@@ -224,6 +234,8 @@ async function loadRoute(r, seq) {
       return loadProfilePage();
     case "manage":
       return loadManagerHotels(0);
+    case "manage-bookings":
+      return loadManagerHotelOptions();
     case "manage-new":
       return initHotelForm(null);
     case "manage-hotel":
@@ -1784,6 +1796,14 @@ const mh = reactive({
   error: "",
   live: {},
 });
+// [badge text, badge class, help text] for a hotel's status on the manager's cards
+const HOTEL_STATUS = {
+  ACTIVE: ["Live", "b-green", ""],
+  PENDING_APPROVAL: ["Awaiting approval", "b-yellow", "An admin is reviewing this hotel. You can add rooms once it’s approved."],
+  REJECTED: ["Rejected", "b-red", "An admin rejected this hotel. Check its details, then contact an admin."],
+  INACTIVE: ["Inactive", "b-gray", "Hidden from guests and can’t take bookings. An admin can reactivate it."],
+};
+const hotelStatus = (st) => HOTEL_STATUS[st] || [st || "", "b-gray", ""];
 async function probeLive(id) {
   try {
     await api("GET", `/api/hotels/${id}/rooms`, {
@@ -1807,10 +1827,6 @@ async function loadManagerHotels(p = 0) {
     mh.items.forEach((h) => {
       hc[h.id] = h;
     });
-    mh.live = {};
-    mh.items.forEach(async (h) => {
-      mh.live[h.id] = await probeLive(h.id);
-    });
   } catch (e) {
     mh.error = e.message;
     mh.items = [];
@@ -1818,6 +1834,20 @@ async function loadManagerHotels(p = 0) {
     mh.loading = false;
   }
 }
+/* ---------------- manager bookings ---------------- */
+const mgrHotels = ref([]); // [{ id, name }] for the hotel filter
+const mgrBookingsRef = ref(null); // the <manager-bookings> list on screen, reloaded on live events
+async function loadManagerHotelOptions() {
+  try {
+    const list = await api("GET", "/api/hotels/my-hotels", {
+      query: { page: 0, size: 100, sort: "name,asc" },
+    });
+    mgrHotels.value = (Array.isArray(list) ? list : []).map((h) => ({ id: h.id, name: h.name }));
+  } catch {
+    mgrHotels.value = [];
+  }
+}
+
 const mp = reactive({
   hotel: null,
   live: null,
@@ -2541,6 +2571,9 @@ const ad = reactive({
   bNext: false,
   bFilter: "ALL",
   counts: { pending: null, hotels: null, types: null, users: null },
+  stats: null,
+  chart: "revenue",
+  hover: -1,
   loading: false,
   error: "",
 });
@@ -2559,21 +2592,16 @@ async function loadAdmin(tab) {
     ? tab
     : "overview";
   ad.error = "";
+  const navItem = ADMIN_NAV.find((n) => n.tabs.includes(ad.tab));
+  document.title = (navItem ? navItem.label : "Admin") + " – VibeStay";
   try {
     if (ad.tab === "overview") {
-      const [p, h, t, u] = await Promise.all([
-        api("GET", "/api/hotels/pending", { query: { size: 50 } }),
-        api("GET", "/api/hotels", { auth: false, query: { size: 50 } }),
-        api("GET", "/api/rooms-types"),
-        api("GET", "/api/admin/users", { query: { size: 1 } }).catch(
-          () => null,
-        ),
-      ]);
-      ad.counts.users =
-        u && u.totalElements != null ? String(u.totalElements) : null;
-      ad.counts.pending = cnt(p.length, 50);
-      ad.counts.hotels = cnt(h.length, 50);
-      ad.counts.types = cnt(t.length, 1000);
+      const [st, t] = await Promise.all([api("GET", "/api/admin/stats"), api("GET", "/api/rooms-types").catch(() => [])]);
+      ad.stats = st;
+      ad.counts.pending = String(st.hotelsByStatus.PENDING_APPROVAL || 0);
+      ad.counts.hotels = String(st.hotelsByStatus.ACTIVE || 0);
+      ad.counts.users = String(st.usersTotal);
+      ad.counts.types = String(t.length);
       roomTypes.value = t;
     }
     if (ad.tab === "pending") await loadPending(0);
@@ -2581,7 +2609,8 @@ async function loadAdmin(tab) {
     if (ad.tab === "users") await loadAdminUsers(0);
     if (ad.tab === "types") await loadRoomTypes();
     if (ad.tab === "amenities") await loadAmenityCatalog();
-    if (ad.tab === "bookings") await loadAdminBookings(0);
+    if (ad.tab === "bookings") await loadAdminHotelOptions();
+    if (ad.tab !== "overview") refreshPendingCount();
   } catch (e) {
     ad.error = e.message;
   }
@@ -2653,6 +2682,47 @@ async function setUserStatus(u, status) {
 function adminTab(t) {
   go("/admin?tab=" + t);
 }
+// admin sections shown in the top nav; `tabs` are the views that light up each item
+const ADMIN_NAV = [
+  { tab: "overview", tabs: ["overview"], label: "Dashboard", icon: "home" },
+  { tab: "pending", tabs: ["pending"], label: "Approvals", icon: "clock" },
+  { tab: "hotels", tabs: ["hotels", "status"], label: "Hotels", icon: "building" },
+  { tab: "bookings", tabs: ["bookings"], label: "Bookings", icon: "calendar" },
+  { tab: "users", tabs: ["users"], label: "Users", icon: "users" },
+  { tab: "types", tabs: ["types", "amenities"], label: "Setup", icon: "settings" },
+];
+const ADMIN_HEAD = {
+  pending: ["Hotels waiting for approval", "Check each new hotel and approve it to make it live, or reject it."],
+  hotels: ["Hotels", "Every hotel on VibeStay. Open one to edit it, assign a manager or change its status."],
+  bookings: ["Bookings", "Every booking across all hotels. Search for a guest, a reference or a hotel."],
+  users: ["Users", "Guests, hotel managers and admins. Users are never deleted – deactivating an account keeps its data."],
+  types: ["Setup", "The room types and amenities that hotels can choose from."],
+  amenities: ["Setup", "The room types and amenities that hotels can choose from."],
+};
+// e.g. "1–4 Oct": the same days of last month that the dashboard compares against
+const prevPeriodLabel = computed(() => {
+  const now = new Date();
+  const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastDay = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+  const month = prev.toLocaleDateString("en-GB", { month: "short" });
+  return `1–${Math.min(now.getDate(), lastDay)} ${month}`;
+});
+const adminNavOn = (item) => route.name === "admin" && item.tabs.includes(ad.tab);
+const adHotelOptions = ref([]); // every hotel, for the bookings hotel filter
+async function loadAdminHotelOptions() {
+  try {
+    const l = await api("GET", "/api/hotels/all", { query: { page: 0, size: 200, sort: "name,asc" } });
+    adHotelOptions.value = (Array.isArray(l) ? l : []).map((h) => ({ id: h.id, name: h.name }));
+  } catch {
+    adHotelOptions.value = [];
+  }
+}
+// keeps the "Approvals" badge in the nav up to date
+function refreshPendingCount() {
+  api("GET", "/api/admin/stats")
+    .then((st) => (ad.counts.pending = String(st.hotelsByStatus.PENDING_APPROVAL || 0)))
+    .catch(() => {});
+}
 async function loadPending(p = 0) {
   ad.loading = true;
   try {
@@ -2668,28 +2738,16 @@ async function loadPending(p = 0) {
     ad.loading = false;
   }
 }
-async function loadAdminBookings(p = 0) {
-  ad.loading = true;
-  try {
-    const l = await api("GET", "/api/bookings/all", {
-      query: { page: p, size: 10, sort: "id,desc" },
-    });
-    ad.bookings = Array.isArray(l) ? l : [];
-    ad.bPage = p;
-    ad.bNext = ad.bookings.length === 10;
-  } catch (e) {
-    ad.bookings = [];
-    ad.error = e.message;
-  } finally {
-    ad.loading = false;
-  }
-}
-const adBookingsShown = computed(() =>
-  ad.bFilter === "ALL"
-    ? ad.bookings
-    : ad.bookings.filter((b) => b.status === ad.bFilter),
-);
-const reloadAdminBookings = () => loadAdminBookings(ad.bPage);
+const pctChange = (now, before) => { const a = Number(now || 0), b = Number(before || 0); if (!b) return a ? null : 0; return Math.round(((a - b) / b) * 100); };
+const adChart = computed(() => {
+  const d = (ad.stats && ad.stats.daily) || [];
+  const key = ad.chart === "revenue" ? "revenue" : "bookings";
+  const vals = d.map((x) => Number(x[key] || 0));
+  const max = Math.max(1, ...vals);
+  return { bars: d.map((x, i) => ({ date: x.date, bookings: x.bookings, revenue: x.revenue, h: (vals[i] / max) * 100 })), max, total: vals.reduce((a, b) => a + b, 0) };
+});
+const shortDate = (d) => new Date(d + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+const breakdown = (m, order) => { const o = m || {}; const keys = order || Object.keys(o); const total = keys.reduce((a, k) => a + (o[k] || 0), 0); return keys.map((k) => ({ key: k, n: o[k] || 0, pct: total ? ((o[k] || 0) / total) * 100 : 0 })); };
 async function loadAdminHotels(p = 0) {
   ad.loading = true;
   try {
@@ -2966,6 +3024,7 @@ function onBookingEvent(n) {
       n.status === "CANCELLED" ? "warn" : "info",
     );
   if (route.name === "bookings") loadBookings(mb.page);
+  if (mgrBookingsRef.value) mgrBookingsRef.value.reload();
 }
 function toggleFeed() {
   feedOpen.value = !feedOpen.value;
@@ -3015,6 +3074,7 @@ const navActive = (n) =>
     explore: ["explore"],
     bookings: ["bookings"],
     manage: ["manage", "manage-new", "manage-hotel"],
+    "manage-bookings": ["manage-bookings"],
     admin: ["admin"],
   })[n].includes(route.name);
 const tomorrowISO = () => toISO(addDays(new Date(), 1));
@@ -3092,11 +3152,14 @@ const printPage = () => window.print();
               <a v-if="isCustomer" href="#/bookings"
                 ><icon name="list"></icon>My bookings</a
               >
-              <a v-if="isManager" href="#/manage"
-                ><icon name="brief"></icon>Manager portal</a
-              >
+              <template v-if="isManager">
+                <a href="#/manage"><icon name="building"></icon>My hotels</a>
+                <a href="#/manage/bookings"
+                  ><icon name="calendar"></icon>Bookings</a
+                >
+              </template>
               <a v-if="isAdmin" href="#/admin"
-                ><icon name="shield"></icon>Admin panel</a
+                ><icon name="home"></icon>Dashboard</a
               >
               <hr />
               <button @click="logout">
@@ -3111,15 +3174,17 @@ const printPage = () => window.print();
         </template>
       </div>
       <nav class="wrap navtabs" aria-label="Main">
-        <a class="nav-pill" :class="{ on: navActive('home') }" href="#/"
-          ><icon name="bed"></icon>Stays</a
-        >
-        <a
-          class="nav-pill"
-          :class="{ on: navActive('explore') }"
-          href="#/explore"
-          ><icon name="building"></icon>Explore hotels</a
-        >
+        <template v-if="!isManager && !isAdmin">
+          <a class="nav-pill" :class="{ on: navActive('home') }" href="#/"
+            ><icon name="bed"></icon>Stays</a
+          >
+          <a
+            class="nav-pill"
+            :class="{ on: navActive('explore') }"
+            href="#/explore"
+            ><icon name="building"></icon>Explore hotels</a
+          >
+        </template>
         <a
           v-if="isCustomer"
           class="nav-pill"
@@ -3132,15 +3197,30 @@ const printPage = () => window.print();
           class="nav-pill"
           :class="{ on: navActive('manage') }"
           href="#/manage"
-          ><icon name="brief"></icon>Manager portal</a
+          ><icon name="building"></icon>My hotels</a
         >
         <a
-          v-if="isAdmin"
+          v-if="isManager"
           class="nav-pill"
-          :class="{ on: navActive('admin') }"
-          href="#/admin"
-          ><icon name="shield"></icon>Admin panel</a
+          :class="{ on: navActive('manage-bookings') }"
+          href="#/manage/bookings"
+          ><icon name="calendar"></icon>Bookings</a
         >
+        <template v-if="isAdmin">
+          <a
+            v-for="item in ADMIN_NAV"
+            :key="item.tab"
+            class="nav-pill"
+            :class="{ on: adminNavOn(item) }"
+            :href="'#/admin?tab=' + item.tab"
+            ><icon :name="item.icon"></icon>{{ item.label
+            }}<span
+              v-if="item.tab === 'pending' && Number(ad.counts.pending) > 0"
+              class="nav-count"
+              >{{ ad.counts.pending }}</span
+            ></a
+          >
+        </template>
       </nav>
     </header>
 
@@ -3448,7 +3528,7 @@ const printPage = () => window.print();
                         v-for="a in hc[h.hotelId].amenities.slice(0, 5)"
                         :key="a.id"
                         class="chip"
-                        >{{ amenityIcon(a.name) }} {{ a.name }}</span
+                        ><icon :name="amenityIcon(a.name)" :size="14"></icon>{{ a.name }}</span
                       >
                     </div>
                     <div
@@ -3662,7 +3742,7 @@ const printPage = () => window.print();
                     v-for="a in (h.amenities || []).slice(0, 4)"
                     :key="a.id"
                     class="chip"
-                    >{{ amenityIcon(a.name) }} {{ a.name }}</span
+                    ><icon :name="amenityIcon(a.name)" :size="14"></icon>{{ a.name }}</span
                   >
                 </div>
               </div>
@@ -3828,9 +3908,7 @@ const printPage = () => window.print();
                       :key="a.id"
                       class="fact"
                     >
-                      <span style="font-size: 1.3rem">{{
-                        amenityIcon(a.name)
-                      }}</span>
+                      <icon :name="amenityIcon(a.name)" :size="20"></icon>
                       <div>
                         <b>{{ a.name }}</b>
                         <div class="xs muted" v-if="a.description">
@@ -5170,15 +5248,20 @@ const printPage = () => window.print();
         <div class="wrap">
           <div class="row between">
             <div>
-              <h2>Manager portal</h2>
+              <h2>My hotels</h2>
               <p class="muted">
                 The hotels you manage. New hotels are reviewed by an admin
                 before they go live.
               </p>
             </div>
-            <a class="btn btn-primary" href="#/manage/new"
-              ><icon name="plus" :size="16"></icon>Add a hotel</a
-            >
+            <div class="row" style="gap: 8px">
+              <a class="btn btn-outline" href="#/manage/bookings"
+                ><icon name="calendar" :size="16"></icon>View bookings</a
+              >
+              <a class="btn btn-primary" href="#/manage/new"
+                ><icon name="plus" :size="16"></icon>Add a hotel</a
+              >
+            </div>
           </div>
           <alert-box v-if="mh.error" type="error" :msg="mh.error"></alert-box>
           <div v-if="mh.loading" class="grid g3">
@@ -5206,32 +5289,39 @@ const printPage = () => window.print();
               <div class="bd">
                 <div class="row between">
                   <h3 style="margin: 0">{{ h.name }}</h3>
-                  <span v-if="mh.live[h.id] === true" class="badge b-green"
-                    >Live</span
-                  ><span
-                    v-else-if="mh.live[h.id] === false"
-                    class="badge b-yellow"
-                    title="Pending approval, rejected or inactive"
-                    >Not live</span
+                  <span
+                    class="badge"
+                    :class="hotelStatus(h.status)[1]"
+                    style="white-space: nowrap"
+                    >{{ hotelStatus(h.status)[0] }}</span
                   >
                 </div>
                 <div class="loc">
                   <icon name="pin" :size="15"></icon>{{ h.city }},
                   {{ h.country }}
                 </div>
+                <div v-if="h.reviewCount" class="small muted">
+                  <icon name="star" :size="14"></icon>
+                  <b>{{ Number(h.averageRating || 0).toFixed(1) }}</b> ·
+                  {{ plural(h.reviewCount, "review") }}
+                </div>
                 <p
-                  v-if="mh.live[h.id] === false"
+                  v-if="hotelStatus(h.status)[2]"
                   class="xs muted"
                   style="margin: 0"
                 >
-                  Waiting for admin approval (or inactive). Rooms can be added
-                  once it’s live.
+                  {{ hotelStatus(h.status)[2] }}
                 </p>
-                <div class="row" style="margin-top: auto">
+                <div class="row" style="margin-top: auto; gap: 6px">
                   <a
                     class="btn btn-primary btn-sm"
                     :href="'#/manage/hotel/' + h.id"
                     >Manage</a
+                  ><a
+                    v-if="h.status === 'ACTIVE'"
+                    class="btn btn-outline btn-sm"
+                    :href="'#/manage/hotel/' + h.id + '?tab=bookings'"
+                    ><icon name="calendar" :size="14"></icon>Bookings</a
                   ><a class="btn btn-ghost btn-sm" :href="'#/hotel/' + h.id"
                     >Preview</a
                   >
@@ -5255,6 +5345,24 @@ const printPage = () => window.print();
               Next<icon name="right" :size="16"></icon>
             </button>
           </div>
+        </div>
+      </section>
+
+      <!-- ================= MANAGER BOOKINGS ================= -->
+      <section v-if="route.name === 'manage-bookings'" class="page">
+        <div class="wrap">
+          <h2>Bookings</h2>
+          <p class="muted">
+            Every booking across your hotels. Search for a guest, see who is
+            arriving, and complete or cancel stays.
+          </p>
+          <manager-bookings
+            ref="mgrBookingsRef"
+            :hotels="mgrHotels"
+            :on-details="openBooking"
+            :on-complete="completeBooking"
+            :on-cancel="cancelBooking"
+          ></manager-bookings>
         </div>
       </section>
 
@@ -5409,7 +5517,7 @@ const printPage = () => window.print();
           <template v-else-if="mp.hotel">
             <div class="crumbs">
               <a :href="isAdmin ? '#/admin?tab=hotels' : '#/manage'"
-                >← {{ isAdmin ? "Admin panel" : "My hotels" }}</a
+                >← {{ isAdmin ? "Hotels" : "My hotels" }}</a
               >
             </div>
             <div class="row between">
@@ -5745,7 +5853,7 @@ const printPage = () => window.print();
                   <tbody>
                     <tr v-for="a in mp.hotel.amenities" :key="a.id">
                       <td>
-                        <b>{{ amenityIcon(a.name) }} {{ a.name }}</b>
+                        <b><icon :name="amenityIcon(a.name)" :size="14"></icon>{{ a.name }}</b>
                       </td>
                       <td class="small">{{ a.description || "–" }}</td>
                       <td>
@@ -5948,7 +6056,15 @@ const printPage = () => window.print();
             </div>
 
             <!-- bookings -->
-            <div v-if="mp.tab === 'bookings'" class="card pad">
+            <manager-bookings
+              v-if="mp.tab === 'bookings' && isManager"
+              ref="mgrBookingsRef"
+              :hotel-id="mp.hotel.id"
+              :on-details="openBooking"
+              :on-complete="completeBooking"
+              :on-cancel="cancelBooking"
+            ></manager-bookings>
+            <div v-else-if="mp.tab === 'bookings'" class="card pad">
               <lookup-panel
                 :lk="lk"
                 @find="lookupBooking"
@@ -5963,118 +6079,112 @@ const printPage = () => window.print();
       <!-- ================= ADMIN ================= -->
       <section v-if="route.name === 'admin'" class="page">
         <div class="wrap">
-          <h2>Admin panel</h2>
-          <div class="tabs">
-            <button
-              class="tab"
-              :class="{ on: ad.tab === 'overview' }"
-              @click="adminTab('overview')"
-            >
-              <icon name="home" :size="16"></icon>Overview
-            </button>
-            <button
-              class="tab"
-              :class="{ on: ad.tab === 'pending' }"
-              @click="adminTab('pending')"
-            >
-              <icon name="clock" :size="16"></icon>Pending approvals
-            </button>
-            <button
-              class="tab"
-              :class="{ on: ad.tab === 'hotels' }"
-              @click="adminTab('hotels')"
-            >
-              <icon name="building" :size="16"></icon>Hotels
-            </button>
-            <button
-              class="tab"
-              :class="{ on: ad.tab === 'users' }"
-              @click="adminTab('users')"
-            >
-              <icon name="users" :size="16"></icon>Users
-            </button>
-            <button
-              class="tab"
-              :class="{ on: ad.tab === 'types' }"
-              @click="adminTab('types')"
-            >
-              <icon name="bed" :size="16"></icon>Room types
-            </button>
-            <button
-              class="tab"
-              :class="{ on: ad.tab === 'amenities' }"
-              @click="adminTab('amenities')"
-            >
-              <icon name="check" :size="16"></icon>Amenities
-            </button>
-            <button
-              class="tab"
-              :class="{ on: ad.tab === 'status' }"
-              @click="adminTab('status')"
-            >
-              <icon name="settings" :size="16"></icon>Hotel status
-            </button>
-            <button
-              class="tab"
-              :class="{ on: ad.tab === 'bookings' }"
-              @click="adminTab('bookings')"
-            >
-              <icon name="calendar" :size="16"></icon>Bookings
-            </button>
+          <div v-if="ADMIN_HEAD[ad.tab]" class="mb2">
+            <h2 style="margin-bottom: 4px">{{ ADMIN_HEAD[ad.tab][0] }}</h2>
+            <p class="muted" style="margin: 0">{{ ADMIN_HEAD[ad.tab][1] }}</p>
           </div>
           <alert-box v-if="ad.error" type="error" :msg="ad.error"></alert-box>
 
           <div v-if="ad.tab === 'overview'">
-            <div class="row mb2 mt2">
-              <a class="btn btn-primary" href="#/manage/new"
-                ><icon name="plus" :size="16"></icon>Create a hotel</a
-              ><a class="btn btn-outline" href="#/admin?tab=bookings"
-                >Find a booking</a
-              >
-            </div>
-
-            <div class="grid g4">
-                <!--- if pending requests is more than 0 card should be in yellow color --->
-              <div class="card stat" :class="{ 'needs-review': ad.counts.pending > 0 }">
-                <b>{{ ad.counts.pending ?? "–" }}</b
-                ><span>Hotels awaiting approval</span>
-                  
-                <div class="mt">
-                  <a class="btn btn-outline btn-sm" href="#/admin?tab=pending"
-                    >Review</a
-                  >
-                </div>
+            <div class="row between mb2 mt2" style="gap: 10px">
+              <div>
+                <h2 style="margin: 0">Dashboard</h2>
+                <div class="small muted">Live figures from all hotels, bookings and users</div>
               </div>
-              <div class="card stat">
-                <b>{{ ad.counts.hotels ?? "–" }}</b
-                ><span>Live hotels</span>
-                <div class="mt">
-                  <a class="btn btn-outline btn-sm" href="#/admin?tab=hotels"
-                    >View hotels</a
-                  >
-                </div>
-              </div>
-              <div class="card stat">
-                <b>{{ ad.counts.users ?? "–" }}</b
-                ><span>Registered users</span>
-                <div class="mt">
-                  <a class="btn btn-outline btn-sm" href="#/admin?tab=users"
-                    >View users</a
-                  >
-                </div>
-              </div>
-              <div class="card stat">
-                <b>{{ ad.counts.types ?? "–" }}</b
-                ><span>Active room types</span>
-                <div class="mt">
-                  <a class="btn btn-outline btn-sm" href="#/admin?tab=types"
-                    >Edit room types</a
-                  >
-                </div>
+              <div class="row" style="gap: 8px">
+                <button class="btn btn-outline btn-sm" @click="loadAdmin('overview')"><icon name="refresh" :size="15"></icon>Refresh</button>
+                <a class="btn btn-primary btn-sm" href="#/manage/new"><icon name="plus" :size="15"></icon>Create hotel</a>
               </div>
             </div>
+            <div v-if="!ad.stats && !ad.error" class="grid g4"><div v-for="i in 4" :key="i" class="skel" style="height: 112px"></div></div>
+            <template v-if="ad.stats">
+              <a v-if="ad.stats.hotelsByStatus.PENDING_APPROVAL > 0" class="dash-alert mb2" href="#/admin?tab=pending"><icon name="clock" :size="18"></icon><span><b>{{ plural(ad.stats.hotelsByStatus.PENDING_APPROVAL, "hotel") }}</b> waiting for your approval</span><span class="dash-alert-go">Review now →</span></a>
+              <div class="grid g4 dash-kpis">
+                <div class="card kpi">
+                  <div class="kpi-top"><span>Revenue this month</span><icon name="dollar" :size="18"></icon></div>
+                  <b>{{ money(ad.stats.revenueThisMonth) }}</b>
+                  <div class="kpi-sub"><span v-if="pctChange(ad.stats.revenueThisMonth, ad.stats.revenueLastMonth) !== null" class="delta" :class="pctChange(ad.stats.revenueThisMonth, ad.stats.revenueLastMonth) >= 0 ? 'up' : 'down'">{{ pctChange(ad.stats.revenueThisMonth, ad.stats.revenueLastMonth) >= 0 ? "▲" : "▼" }} {{ Math.abs(pctChange(ad.stats.revenueThisMonth, ad.stats.revenueLastMonth)) }}%</span><span v-else class="delta">New</span> vs {{ prevPeriodLabel }}</div>
+                </div>
+                <div class="card kpi">
+                  <div class="kpi-top"><span>Bookings this month</span><icon name="calendar" :size="18"></icon></div>
+                  <b>{{ ad.stats.bookingsThisMonth }}</b>
+                  <div class="kpi-sub"><span v-if="pctChange(ad.stats.bookingsThisMonth, ad.stats.bookingsLastMonth) !== null" class="delta" :class="pctChange(ad.stats.bookingsThisMonth, ad.stats.bookingsLastMonth) >= 0 ? 'up' : 'down'">{{ pctChange(ad.stats.bookingsThisMonth, ad.stats.bookingsLastMonth) >= 0 ? "▲" : "▼" }} {{ Math.abs(pctChange(ad.stats.bookingsThisMonth, ad.stats.bookingsLastMonth)) }}%</span><span v-else class="delta">New</span> vs {{ prevPeriodLabel }}</div>
+                </div>
+                <div class="card kpi">
+                  <div class="kpi-top"><span>Average booking value</span><icon name="trend" :size="18"></icon></div>
+                  <b>{{ money(ad.stats.averageBookingValue) }}</b>
+                  <div class="kpi-sub">{{ money(ad.stats.revenueTotal) }} earned in total</div>
+                </div>
+                <div class="card kpi">
+                  <div class="kpi-top"><span>Guest rating</span><icon name="star" :size="18"></icon></div>
+                  <b>{{ ad.stats.reviewsTotal ? ad.stats.averageRating.toFixed(1) : "–" }}<small v-if="ad.stats.reviewsTotal"> / 5</small></b>
+                  <div class="kpi-sub">from {{ plural(ad.stats.reviewsTotal, "review") }}</div>
+                </div>
+              </div>
+              <div class="card pad mt2">
+                <div class="row between" style="gap: 10px; align-items: flex-start">
+                  <div>
+                    <h3 style="margin: 0">{{ ad.chart === "revenue" ? "Revenue" : "Bookings" }} · last 30 days</h3>
+                    <div class="small muted">{{ ad.chart === "revenue" ? money(adChart.total) + " from paid bookings" : plural(adChart.total, "booking") + " made" }}</div>
+                  </div>
+                  <div class="seg">
+                    <button :class="{ on: ad.chart === 'revenue' }" @click="ad.chart = 'revenue'">Revenue</button>
+                    <button :class="{ on: ad.chart === 'bookings' }" @click="ad.chart = 'bookings'">Bookings</button>
+                  </div>
+                </div>
+                <div class="bars" @mouseleave="ad.hover = -1">
+                  <div class="bars-grid"><span>{{ ad.chart === "revenue" ? money(adChart.max) : adChart.max }}</span><span>0</span></div>
+                  <div v-for="(b, i) in adChart.bars" :key="b.date" class="bar-col" @mouseenter="ad.hover = i">
+                    <div class="bar" :class="{ dim: ad.hover > -1 && ad.hover !== i, zero: !b.h }" :style="{ height: Math.max(b.h, 1.5) + '%' }"></div>
+                    <div v-if="ad.hover === i" class="bar-tip" :class="{ left: i > 22, right: i < 7 }"><b>{{ shortDate(b.date) }}</b><div>{{ money(b.revenue) }}</div><div>{{ plural(b.bookings, "booking") }}</div></div>
+                  </div>
+                </div>
+                <div class="bars-x"><span>{{ adChart.bars.length ? shortDate(adChart.bars[0].date) : "" }}</span><span>{{ adChart.bars.length ? shortDate(adChart.bars[14].date) : "" }}</span><span>Today</span></div>
+              </div>
+              <div class="grid g3 mt2">
+                <div class="card pad">
+                  <div class="row between"><h3 style="margin: 0">Bookings</h3><a class="small" href="#/admin?tab=bookings">View all</a></div>
+                  <div class="small muted mb">{{ ad.stats.bookingsTotal }} total · {{ ad.stats.cancellationRate }}% cancelled</div>
+                  <div v-for="r in breakdown(ad.stats.bookingsByStatus, ['CONFIRMED', 'COMPLETED', 'PENDING', 'CANCELLED'])" :key="r.key" class="brk">
+                    <div class="brk-row"><span class="badge" :class="statusClass(r.key)">{{ statusLabel(r.key) }}</span><b>{{ r.n }}</b></div>
+                    <div class="brk-track"><div :style="{ width: r.pct + '%' }"></div></div>
+                  </div>
+                </div>
+                <div class="card pad">
+                  <div class="row between"><h3 style="margin: 0">Hotels</h3><a class="small" href="#/admin?tab=hotels">View all</a></div>
+                  <div class="small muted mb">{{ ad.stats.hotelsTotal }} total</div>
+                  <div v-for="r in breakdown(ad.stats.hotelsByStatus, ['ACTIVE', 'PENDING_APPROVAL', 'INACTIVE', 'REJECTED'])" :key="r.key" class="brk">
+                    <div class="brk-row"><span class="badge" :class="statusClass(r.key)">{{ statusLabel(r.key) }}</span><b>{{ r.n }}</b></div>
+                    <div class="brk-track"><div :style="{ width: r.pct + '%' }"></div></div>
+                  </div>
+                </div>
+                <div class="card pad">
+                  <div class="row between"><h3 style="margin: 0">Users</h3><a class="small" href="#/admin?tab=users">View all</a></div>
+                  <div class="small muted mb">{{ ad.stats.usersTotal }} total · {{ ad.stats.usersNewThisMonth }} new this month</div>
+                  <div v-for="r in breakdown(ad.stats.usersByRole, ['CUSTOMER', 'HOTEL_MANAGER', 'ADMIN', 'STAFF']).filter((x) => x.key !== 'STAFF' || x.n)" :key="r.key" class="brk">
+                    <div class="brk-row"><span>{{ roleLabel(r.key) }}</span><b>{{ r.n }}</b></div>
+                    <div class="brk-track"><div :style="{ width: r.pct + '%' }"></div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="card mt2" style="overflow-x: auto">
+                <div class="pad" style="padding-bottom: 0"><h3 style="margin: 0">Top hotels by revenue</h3><div class="small muted">Paid bookings (confirmed and completed), all time</div></div>
+                <div v-if="!ad.stats.topHotels.length" class="pad muted small">No paid bookings yet.</div>
+                <table v-else class="t plain">
+                  <thead><tr><th style="width: 40px">#</th><th>Hotel</th><th style="text-align: right">Bookings</th><th style="text-align: right">Revenue</th><th style="width: 30%">Share</th></tr></thead>
+                  <tbody>
+                    <tr v-for="(h, i) in ad.stats.topHotels" :key="h.hotelId">
+                      <td class="muted">{{ i + 1 }}</td>
+                      <td><a :href="'#/manage/hotel/' + h.hotelId"><b>{{ h.name }}</b></a></td>
+                      <td style="text-align: right">{{ h.bookings }}</td>
+                      <td style="text-align: right; white-space: nowrap"><b>{{ money(h.revenue) }}</b></td>
+                      <td><div class="brk-track"><div :style="{ width: (Number(ad.stats.revenueTotal) ? (Number(h.revenue) / Number(ad.stats.revenueTotal)) * 100 : 0) + '%' }"></div></div></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </template>
           </div>
-
           <div v-if="ad.tab === 'pending'">
             <div v-if="ad.loading" class="skel" style="height: 120px"></div>
             <div v-else-if="!ad.pending.length" class="card empty">
@@ -6276,6 +6386,19 @@ const printPage = () => window.print();
             </div>
           </div>
 
+          <div
+            v-if="ad.tab === 'types' || ad.tab === 'amenities'"
+            class="seg mb"
+            role="tablist"
+            aria-label="Setup"
+          >
+            <button :class="{ on: ad.tab === 'types' }" @click="adminTab('types')">
+              Room types
+            </button>
+            <button :class="{ on: ad.tab === 'amenities' }" @click="adminTab('amenities')">
+              Amenities
+            </button>
+          </div>
           <div v-if="ad.tab === 'types'">
             <div class="row between mb">
               <div>
@@ -6386,7 +6509,7 @@ const printPage = () => window.print();
                   <tr v-for="a in amenityCatalog" :key="a.id">
                     <td>{{ a.id }}</td>
                     <td>
-                      <b>{{ amenityIcon(a.name) }} {{ a.name }}</b>
+                      <b><icon :name="amenityIcon(a.name)" :size="14"></icon>{{ a.name }}</b>
                     </td>
                     <td class="small">{{ a.description || "–" }}</td>
                     <td>
@@ -6411,15 +6534,6 @@ const printPage = () => window.print();
           </div>
 
           <div v-if="ad.tab === 'users'">
-            <div class="row between mb">
-              <div>
-                <h3 style="margin: 0">Users</h3>
-                <div class="small muted">
-                  Search, filter and activate or deactivate accounts. Users are
-                  never deleted – deactivating keeps their data.
-                </div>
-              </div>
-            </div>
             <form
               class="row mb"
               @submit.prevent="loadAdminUsers(0)"
@@ -6636,130 +6750,15 @@ const printPage = () => window.print();
             </form>
           </div>
 
-          <div v-if="ad.tab === 'bookings'">
-            <div class="row between mb" style="gap: 10px">
-              <div class="row" style="gap: 6px">
-                <button
-                  v-for="f in ['ALL', 'PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED']"
-                  :key="f"
-                  class="btn btn-sm"
-                  :class="ad.bFilter === f ? 'btn-primary' : 'btn-outline'"
-                  @click="ad.bFilter = f"
-                >
-                  {{ f === "ALL" ? "All" : statusLabel(f) }}
-                </button>
-              </div>
-              <button class="btn btn-outline btn-sm" @click="reloadAdminBookings">
-                Refresh
-              </button>
-            </div>
-            <div v-if="ad.loading" class="skel" style="height: 140px"></div>
-            <div v-else-if="!adBookingsShown.length" class="card empty">
-              <p>
-                {{
-                  ad.bookings.length
-                    ? "No bookings with this status on this page."
-                    : "No bookings yet."
-                }}
-              </p>
-            </div>
-            <div v-else class="card" style="overflow-x: auto">
-              <table class="t plain">
-                <thead>
-                  <tr>
-                    <th>Reference</th>
-                    <th>Hotel</th>
-                    <th>Stay</th>
-                    <th>Guests</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th style="text-align: right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="b in adBookingsShown" :key="b.id">
-                    <td style="white-space: nowrap">
-                      <span class="ref">{{ b.bookingReference }}</span>
-                      <div style="font-size: 0.85em; color: #6b7280">
-                        #{{ b.id }}
-                      </div>
-                    </td>
-                    <td>
-                      <a :href="'#/hotel/' + b.hotelId"
-                        ><b>{{ b.hotelName }}</b></a
-                      >
-                    </td>
-                    <td style="white-space: nowrap">
-                      {{ fmtDate(b.checkIn) }} → {{ fmtDate(b.checkOut) }}
-                      <div style="font-size: 0.85em; color: #6b7280">
-                        {{ plural(nightsBetween(b.checkIn, b.checkOut), "night") }}
-                        ·
-                        {{ plural((b.rooms || []).length, "room") }}
-                      </div>
-                    </td>
-                    <td style="white-space: nowrap">
-                      {{ plural(b.adults, "adult") }}<span v-if="b.children"
-                        >, {{ plural(b.children, "child", "children") }}</span
-                      >
-                    </td>
-                    <td style="white-space: nowrap">
-                      <b>{{ money(b.totalAmount) }}</b>
-                    </td>
-                    <td style="white-space: nowrap">
-                      <span class="badge" :class="statusClass(b.status)">{{
-                        statusLabel(b.status)
-                      }}</span>
-                    </td>
-                    <td>
-                      <div
-                        class="row"
-                        style="gap: 6px; flex-wrap: nowrap; justify-content: flex-end"
-                      >
-                        <button
-                          class="btn btn-outline btn-sm"
-                          @click="openBooking(b.id)"
-                        >
-                          Details
-                        </button>
-                        <button
-                          v-if="b.status === 'CONFIRMED'"
-                          class="btn btn-green btn-sm"
-                          style="white-space: nowrap"
-                          @click="completeBooking(b, reloadAdminBookings)"
-                        >
-                          Complete
-                        </button>
-                        <button
-                          v-if="b.status === 'CONFIRMED' || b.status === 'PENDING'"
-                          class="btn btn-danger-o btn-sm"
-                          @click="cancelBooking(b, reloadAdminBookings)"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="pager" v-if="ad.bPage > 0 || ad.bNext">
-              <button
-                class="btn btn-outline btn-sm"
-                :disabled="ad.bPage === 0"
-                @click="loadAdminBookings(ad.bPage - 1)"
-              >
-                Previous
-              </button>
-              <span class="small muted">Page {{ ad.bPage + 1 }}</span>
-              <button
-                class="btn btn-outline btn-sm"
-                :disabled="!ad.bNext"
-                @click="loadAdminBookings(ad.bPage + 1)"
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          <manager-bookings
+            v-if="ad.tab === 'bookings'"
+            ref="mgrBookingsRef"
+            endpoint="/api/bookings/all"
+            :hotels="adHotelOptions"
+            :on-details="openBooking"
+            :on-complete="completeBooking"
+            :on-cancel="cancelBooking"
+          ></manager-bookings>
         </div>
       </section>
 
@@ -6981,7 +6980,7 @@ const printPage = () => window.print();
           <div v-if="groupPhotos(hp.view).length > 1" class="rv-thumbs"><button v-for="(u, i) in groupPhotos(hp.view)" :key="u" :class="{ on: i === hp.viewImg }" @click="hp.viewImg = i" :aria-label="'Photo ' + (i + 1)"><img :src="imgUrl(u)" alt="" loading="lazy" /></button></div>
           <p v-if="hp.view.room.roomTypeDescription" class="mt" style="margin-bottom: 8px">{{ hp.view.room.roomTypeDescription }}</p>
           <div class="room-chips"><span class="chip"><icon name="user" :size="14"></icon>Up to {{ plural(hp.view.room.maxAdults, "adult") }}</span><span class="chip"><icon name="baby" :size="14"></icon>Up to {{ plural(hp.view.room.maxChildren, "child", "children") }}</span><span class="chip"><icon name="users" :size="14"></icon>Sleeps {{ hp.view.room.maxOccupancy }}</span><span class="chip"><icon name="building" :size="14"></icon>{{ plural(hp.view.rooms.length, "room") }} left for your dates</span></div>
-          <div v-if="hp.hotel && hp.hotel.amenities && hp.hotel.amenities.length" class="mt"><b class="small">Hotel facilities</b><div class="room-chips" style="margin-top: 6px"><span v-for="a in hp.hotel.amenities.slice(0, 8)" :key="a.id" class="chip">{{ amenityIcon(a.name) }} {{ a.name }}</span></div></div>
+          <div v-if="hp.hotel && hp.hotel.amenities && hp.hotel.amenities.length" class="mt"><b class="small">Hotel facilities</b><div class="room-chips" style="margin-top: 6px"><span v-for="a in hp.hotel.amenities.slice(0, 8)" :key="a.id" class="chip"><icon :name="amenityIcon(a.name)" :size="14"></icon>{{ a.name }}</span></div></div>
         </div>
         <div class="modal-f">
           <div class="rv-price"><strong>{{ money(hp.view.room.pricePerNight * hpNights) }}</strong><span class="xs muted">{{ money(hp.view.room.pricePerNight) }} per night · {{ plural(hpNights, "night") }}</span></div>

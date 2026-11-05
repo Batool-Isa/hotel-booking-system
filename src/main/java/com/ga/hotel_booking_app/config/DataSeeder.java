@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +18,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Configuration
@@ -37,6 +40,7 @@ public class DataSeeder {
     private final RoomImageRepository roomImageRepository;
     private final PaymentRepository paymentRepository;
     private final ReviewRepository reviewRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Bean
     CommandLineRunner seedData() {
@@ -63,11 +67,12 @@ public class DataSeeder {
     }
 
     private void seedStaffUsers() {
-        createUser("admin", "admin@vibestay.com", "Admin123!", Role.RoleName.ADMIN, "VibeStay", "Admin", "+97330000000");
+        createUser(usernameFor("Yasmeen", "Al Khaja"), "admin@vibestay.com", "Admin123!", Role.RoleName.ADMIN,
+                "Yasmeen", "Al Khaja", "+97330000000");
 
         String[][] managers = {
-                {"Hotel", "Manager One", "+97331111111"},
-                {"Hotel", "Manager Two", "+97332222222"},
+                {"Mohammed", "Al Sayed", "+97331111111"},
+                {"Fatema", "Janahi", "+97332222222"},
                 {"Khalid", "Al Mansoori", "+97331000003"},
                 {"Noura", "Al Hashimi", "+97331000004"},
                 {"Yusuf", "Karimi", "+97331000005"},
@@ -75,7 +80,7 @@ public class DataSeeder {
         };
         for (int i = 0; i < managers.length; i++) {
             int n = i + 1;
-            createUser("manager" + n, "manager" + n + "@vibestay.com", "Manager123!",
+            createUser(usernameFor(managers[i][0], managers[i][1]), "manager" + n + "@vibestay.com", "Manager123!",
                     Role.RoleName.HOTEL_MANAGER, managers[i][0], managers[i][1], managers[i][2]);
         }
     }
@@ -84,15 +89,22 @@ public class DataSeeder {
             {"Sara", "Ahmed"}, {"Omar", "Khalid"}, {"Fatima", "Al Zayani"}, {"Hassan", "Jaffar"},
             {"Maryam", "Salman"}, {"Ali", "Hussain"}, {"Zainab", "Mahmood"}, {"Ahmed", "Fakhro"},
             {"Reem", "Nasser"}, {"Yousef", "Darwish"}, {"Huda", "Abdulla"}, {"Tariq", "Mansoor"},
-            {"Aisha", "Rashid"}, {"Jasim", "Saleh"}, {"Dana", "Mubarak"}, {"Karim", "Haddad"}
+            {"Aisha", "Rashid"}, {"Jasim", "Saleh"}, {"Dana", "Mubarak"}, {"Karim", "Haddad"},
+            {"Hamad", "Al Ansari"}, {"Lulwa", "Al Doseri"}, {"Ebrahim", "Shehab"}, {"Noora", "Al Qassab"},
+            {"Saleh", "Al Amer"}, {"Mariam", "Hasan"}, {"Faisal", "Matar"}, {"Shaikha", "Al Mannai"}
     };
 
     private void seedCustomers() {
         for (int i = 0; i < CUSTOMERS.length; i++) {
             int n = i + 1;
-            createUser("customer" + n, "customer" + n + "@vibestay.com", "Customer123!", Role.RoleName.CUSTOMER,
+            createUser(usernameFor(CUSTOMERS[i][0], CUSTOMERS[i][1]), "customer" + n + "@vibestay.com", "Customer123!", Role.RoleName.CUSTOMER,
                     CUSTOMERS[i][0], CUSTOMERS[i][1], String.format("+9733400%04d", n));
         }
+    }
+
+    // "Fatima", "Al Zayani" -> "fatima.alzayani"
+    private static String usernameFor(String first, String last) {
+        return (first + "." + last).toLowerCase().replaceAll("[^a-z.]", "");
     }
 
     private final Map<String, String> encodedPasswords = new HashMap<>();
@@ -387,175 +399,281 @@ public class DataSeeder {
         }
     }
 
-    private record BookingSeed(String hotel, String room, int customer, int startDay, int nights,
-                               int adults, int children, Booking.Status status, String request) {
-    }
+    // ---------------------------------------------------------------- bookings
+    // Generated with a fixed random seed, so every fresh database gets the same data.
+    // Covers every state: completed (most with a review), paid and confirmed, staying now,
+    // arriving / leaving today, cancelled (paid or unpaid) and a few pending payment holds.
 
-    private static List<BookingSeed> bookingSeeds() {
-        String m = "VibeStay Manama Grand", b = "VibeStay Beach Resort", r = "VibeStay Riffa Heights",
-                d = "VibeStay Dubai Marina", a = "VibeStay Abu Dhabi Corniche", q = "VibeStay Doha Pearl",
-                y = "VibeStay Riyadh Tower", u = "VibeStay Muscat Bay";
-        Booking.Status C = Booking.Status.CONFIRMED, P = Booking.Status.PENDING,
-                X = Booking.Status.CANCELLED, D = Booking.Status.COMPLETED;
-        return List.of(
-                new BookingSeed(m, "201", 1, 14, 2, 2, 1, C, "Sample booking created by the data seeder"),
-                new BookingSeed(m, "301", 2, 7, 3, 3, 2, C, "Extra bed for the children please"),
-                new BookingSeed(m, "101", 3, 3, 2, 2, 0, C, null),
-                new BookingSeed(m, "302", 4, 20, 4, 2, 0, P, "Late check-in around midnight"),
-                new BookingSeed(b, "201", 5, 10, 5, 2, 2, C, "Sea-view room if possible"),
-                new BookingSeed(b, "301", 6, 30, 7, 4, 2, C, "Celebrating a family birthday"),
-                new BookingSeed(b, "102", 7, 5, 2, 2, 0, C, null),
-                new BookingSeed(r, "202", 8, 12, 3, 2, 1, C, null),
-                new BookingSeed(d, "401", 9, 25, 3, 2, 0, C, "Anniversary - flowers in the room"),
-                new BookingSeed(d, "201", 10, 9, 4, 2, 1, C, null),
-                new BookingSeed(d, "103", 11, 2, 2, 1, 0, P, "Quiet room, I work from the hotel"),
-                new BookingSeed(a, "302", 12, 15, 5, 3, 1, C, null),
-                new BookingSeed(q, "203", 13, 18, 3, 2, 0, C, "Airport pick-up needed"),
-                new BookingSeed(y, "202", 14, 6, 2, 2, 0, C, "Invoice for the company"),
-                new BookingSeed(u, "301", 15, 40, 6, 4, 2, C, null),
-                new BookingSeed(m, "201", 1, -30, 3, 2, 0, D, null),
-                new BookingSeed(m, "101", 5, -21, 2, 2, 0, D, null),
-                new BookingSeed(b, "301", 2, -45, 4, 4, 2, D, "Early check-in"),
-                new BookingSeed(d, "203", 3, -18, 5, 2, 0, D, null),
-                new BookingSeed(a, "101", 8, -12, 3, 2, 1, D, null),
-                new BookingSeed(q, "301", 4, -60, 4, 3, 2, D, null),
-                new BookingSeed(u, "201", 16, -9, 2, 2, 0, D, null),
-                new BookingSeed(m, "202", 7, -40, 2, 2, 0, D, null),
-                new BookingSeed(m, "302", 9, -50, 3, 2, 1, D, null),
-                new BookingSeed(m, "103", 10, -14, 2, 1, 0, D, null),
-                new BookingSeed(b, "101", 11, -25, 3, 2, 0, D, null),
-                new BookingSeed(b, "202", 12, -35, 4, 2, 1, D, null),
-                new BookingSeed(b, "401", 13, -70, 3, 2, 0, D, null),
-                new BookingSeed(r, "101", 14, -20, 2, 2, 0, D, null),
-                new BookingSeed(r, "201", 15, -33, 3, 2, 0, D, null),
-                new BookingSeed(r, "302", 16, -48, 2, 2, 0, D, null),
-                new BookingSeed(r, "301", 1, -65, 4, 4, 2, D, null),
-                new BookingSeed(d, "101", 2, -28, 2, 2, 0, D, null),
-                new BookingSeed(d, "302", 4, -40, 3, 2, 1, D, null),
-                new BookingSeed(a, "201", 5, -22, 4, 2, 0, D, null),
-                new BookingSeed(a, "301", 6, -55, 5, 3, 2, D, null),
-                new BookingSeed(q, "101", 7, -15, 2, 2, 0, D, null),
-                new BookingSeed(q, "202", 8, -30, 3, 2, 0, D, null),
-                new BookingSeed(y, "101", 9, -11, 2, 1, 0, D, null),
-                new BookingSeed(y, "201", 10, -24, 3, 2, 0, D, null),
-                new BookingSeed(y, "302", 11, -38, 2, 2, 0, D, null),
-                new BookingSeed(u, "101", 12, -19, 3, 2, 0, D, null),
-                new BookingSeed(u, "302", 13, -42, 4, 2, 1, D, null),
-                new BookingSeed(m, "301", 6, 7, 3, 2, 0, X, "Cancelled - plans changed"),
-                new BookingSeed(b, "201", 9, 10, 2, 2, 0, X, "Cancelled - found a different date"),
-                new BookingSeed(d, "401", 12, 25, 2, 2, 0, X, "Cancelled by guest"),
-                new BookingSeed(r, "301", 11, -5, 3, 4, 1, X, "Cancelled before arrival")
-        );
-    }
+    private static final Set<String> FEMALE = Set.of("Sara", "Fatima", "Maryam", "Zainab", "Reem", "Huda",
+            "Aisha", "Dana", "Lulwa", "Noora", "Mariam", "Shaikha");
+    private static final String[] WIVES = {"Noor", "Latifa", "Hessa", "Mona", "Amal", "Rana", "Sumaya", "Batool"};
+    private static final String[] HUSBANDS = {"Hussain", "Jassim", "Mahmood", "Nabeel", "Adel", "Waleed", "Majed", "Sami"};
+    private static final String[] KIDS = {"Adam", "Jana", "Isa", "Malak", "Hamad", "Talia", "Zayed", "Nada",
+            "Yaqoob", "Lina", "Omar", "Ruqaya"};
+    private static final String[] FRIENDS = {"Ali Al Ansari", "Hessa Al Doseri", "Khalil Ebrahim", "Mona Fardan",
+            "Rashed Al Amer", "Noor Taqi", "Bader Al Sayegh", "Layla Mattar"};
+
+    private static final String[] REQUESTS = {
+            "Late check-in, we land around midnight", "High floor if possible", "Quiet room away from the lift",
+            "Early check-in please", "Celebrating our anniversary", "Airport pick-up needed",
+            "Twin beds instead of a double", "Invoice in the company name please", "Sea-view room if available",
+            "Late check-out until 2pm", "Non-smoking room", "Birthday trip - a small cake would be lovely"};
+
+    private static final Map<Integer, String[]> REVIEW_TEXT = Map.of(
+            5, new String[]{"Amazing stay, the staff were friendly and the room was spotless.",
+                    "Perfect for families, the kids loved the pool. We will come back!",
+                    "Everything was excellent from arrival to check-out.",
+                    "We celebrated our anniversary here and the staff made it really special.",
+                    "Quiet, calm and beautifully designed. Housekeeping was excellent.",
+                    "Best hotel breakfast I have had in a long time. Very helpful reception team."},
+            4, new String[]{"Great location and comfortable beds. Breakfast could have more choice.",
+                    "Lovely view and quiet rooms. Parking was easy to find.",
+                    "Clean, modern and close to everything. Wi-Fi was fast.",
+                    "Spacious room and a great shower. The gym was small but well equipped.",
+                    "Good for a business trip. Fast Wi-Fi and a proper desk in the room.",
+                    "Easy check-in, comfortable bed and good value. Would stay again."},
+            3, new String[]{"Good value for money, but check-in took longer than expected.",
+                    "Nice hotel, but the pool area was crowded on the weekend.",
+                    "Room was clean, but the view was of the parking lot.",
+                    "Decent stay. The room was a bit smaller than in the photos."},
+            2, new String[]{"The room was fine but the air conditioning was noisy at night.",
+                    "Housekeeping missed our room twice. Location is good though."},
+            1, new String[]{"Our room was not ready until 6pm and nobody apologised."});
+    private static final int[] RATINGS = {5, 5, 5, 5, 4, 4, 4, 4, 4, 3, 3, 2, 1};
+
+    private final Map<Long, String[]> customerNames = new HashMap<>();
 
     private void seedBookings() {
-        Map<String, Hotel> hotels = new HashMap<>();
-        for (Hotel h : hotelRepository.findAll()) {
-            hotels.put(h.getName(), h);
+        Random rnd = new Random(20261104L);
+        LocalDate today = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
+        Set<String> references = new HashSet<>();
+
+        List<User> customers = new ArrayList<>();
+        for (int i = 1; i <= CUSTOMERS.length; i++) {
+            User customer = userRepository.findUserByEmail("customer" + i + "@vibestay.com");
+            customers.add(customer);
+            customerNames.put(customer.getId(), CUSTOMERS[i - 1]);
         }
-        List<BookingSeed> seeds = bookingSeeds();
-        for (int i = 0; i < seeds.size(); i++) {
-            createBooking(String.format("SEED-%04d", i + 1), seeds.get(i), hotels, i);
+        backdateUsers(rnd, now);
+
+        List<Hotel> hotels = hotelRepository.findAll().stream()
+                .filter(h -> h.getStatus() == Hotel.Status.ACTIVE)
+                .sorted(Comparator.comparing(Hotel::getId)).toList();
+        int showcase = 0;
+        for (Hotel hotel : hotels) {
+            ChildPolicy policy = childPolicyRepository.findByHotelId(hotel.getId()).orElse(null);
+            List<Room> rooms = roomRepository.findByHotelId(hotel.getId()).stream()
+                    .filter(r -> r.getStatus() == Room.Status.ACTIVE)
+                    .sorted(Comparator.comparing(Room::getRoomNumber)).limit(6).toList();
+            for (int i = 0; i < rooms.size(); i++) {
+                Room room = rooms.get(i);
+                // the first three rooms of every hotel show today's front-desk work:
+                // a guest arriving today, a guest staying now, and a guest leaving today (not completed yet)
+                LocalDate[] fixed = switch (i) {
+                    case 0 -> new LocalDate[]{today, today.plusDays(3)};
+                    case 1 -> new LocalDate[]{today.minusDays(2), today.plusDays(2)};
+                    case 2 -> new LocalDate[]{today.minusDays(3), today};
+                    default -> null;
+                };
+                if (fixed != null) {
+                    User guest = customers.get(showcase++ % customers.size());
+                    createBooking(rnd, references, hotel, room, policy, guest, fixed[0], fixed[1],
+                            Booking.Status.CONFIRMED, now);
+                }
+                LocalDate t = today.minusDays(150 + rnd.nextInt(20));
+                while (true) {
+                    t = t.plusDays(6 + rnd.nextInt(30));
+                    int nights = 1 + rnd.nextInt(rnd.nextInt(4) == 0 ? 7 : 4);
+                    LocalDate in = t, out = t.plusDays(nights);
+                    if (in.isAfter(today.plusDays(75))) {
+                        break;
+                    }
+                    if (fixed != null && in.isBefore(fixed[1]) && out.isAfter(fixed[0])) {
+                        t = fixed[1];
+                        continue;
+                    }
+                    // the first three customers book a lot, so the demo accounts have a full history
+                    User guest = rnd.nextInt(10) < 2 ? customers.get(rnd.nextInt(3))
+                            : customers.get(rnd.nextInt(customers.size()));
+                    createBooking(rnd, references, hotel, room, policy, guest, in, out,
+                            pickStatus(rnd, in, out, today), now);
+                    t = out;
+                }
+            }
         }
     }
 
-    private void createBooking(String reference, BookingSeed seed, Map<String, Hotel> hotels, int index) {
-        if (bookingRepository.existsByBookingReference(reference)) {
-            return;
+    private static Booking.Status pickStatus(Random rnd, LocalDate in, LocalDate out, LocalDate today) {
+        int roll = rnd.nextInt(100);
+        if (!out.isAfter(today)) {
+            return roll < 12 ? Booking.Status.CANCELLED : Booking.Status.COMPLETED;
         }
-        Hotel hotel = hotels.get(seed.hotel());
-        User customer = userRepository.findUserByEmail("customer" + seed.customer() + "@vibestay.com");
-        if (hotel == null || customer == null) {
-            return;
+        if (!in.isAfter(today)) {
+            return Booking.Status.CONFIRMED;
         }
-        Room room = roomRepository.findByHotelId(hotel.getId()).stream()
-                .filter(r -> r.getRoomNumber().equals(seed.room()))
-                .findFirst().orElse(null);
-        if (room == null) {
-            return;
+        if (roll < 6 && in.isAfter(today.plusDays(3))) {
+            return Booking.Status.PENDING;
         }
+        return roll < 18 ? Booking.Status.CANCELLED : Booking.Status.CONFIRMED;
+    }
 
-        LocalDate checkIn = LocalDate.now().plusDays(seed.startDay());
-        LocalDate checkOut = checkIn.plusDays(seed.nights());
+    private void createBooking(Random rnd, Set<String> references, Hotel hotel, Room room, ChildPolicy policy,
+                               User customer, LocalDate in, LocalDate out, Booking.Status status,
+                               LocalDateTime now) {
+        int nights = (int) ChronoUnit.DAYS.between(in, out);
+        String reference;
+        do {
+            reference = "VIBE" + Integer.toHexString(0x10000 + rnd.nextInt(0xEFFFF)).toUpperCase();
+        } while (!references.add(reference));
+
+        // when the guest booked: one day to six weeks ahead, never in the future
+        LocalDateTime created = in.minusDays(1 + rnd.nextInt(42)).atTime(8 + rnd.nextInt(14), rnd.nextInt(60));
+        if (created.isAfter(now)) {
+            // future stays: booked some time in the last two months
+            created = now.minusHours(2 + rnd.nextInt(24 * 60));
+        }
+        if (status == Booking.Status.PENDING) {
+            created = now.minusMinutes(1 + rnd.nextInt(8));
+        }
 
         Booking booking = new Booking();
         booking.setBookingReference(reference);
-        booking.setCheckIn(checkIn);
-        booking.setCheckOut(checkOut);
-        booking.setAdults(seed.adults());
-        booking.setChildren(seed.children());
-        booking.setTotalAmount(room.getPricePerNight().multiply(BigDecimal.valueOf(seed.nights())));
-        booking.setStatus(seed.status());
-        booking.setSpecialRequest(seed.request());
+        booking.setCheckIn(in);
+        booking.setCheckOut(out);
+        booking.setTotalAmount(room.getPricePerNight().multiply(BigDecimal.valueOf(nights)));
+        booking.setStatus(status);
         booking.setHotel(hotel);
         booking.setUser(customer);
+        if (status == Booking.Status.PENDING) {
+            // same 15-minute payment hold the app uses; the expiry job cancels it if nobody pays
+            booking.setHoldExpiresAt(created.plusMinutes(15));
+        }
 
         BookingRoom bookingRoom = new BookingRoom();
         bookingRoom.setBooking(booking);
         bookingRoom.setRoom(room);
         bookingRoom.setPricePerNight(room.getPricePerNight());
-        String[] name = CUSTOMERS[seed.customer() - 1];
-        for (int a = 0; a < seed.adults(); a++) {
-            bookingRoom.getGuests().add(guest(bookingRoom,
-                    (a == 0 ? name[0] : "Guest " + (a + 1)) + " " + name[1],
-                    30 + a * 3, BookingGuest.GuestType.ADULT));
-        }
-        for (int c = 0; c < seed.children(); c++) {
-            bookingRoom.getGuests().add(guest(bookingRoom,
-                    "Child " + (c + 1) + " " + name[1],
-                    5 + c * 3, BookingGuest.GuestType.CHILD));
-        }
+        int[] party = addGuests(rnd, bookingRoom, room, policy, customer);
+        booking.setAdults(party[0]);
+        booking.setChildren(party[1]);
         booking.getBookingRooms().add(bookingRoom);
-        if (seed.status() == Booking.Status.PENDING) {
-            booking.setHoldExpiresAt(LocalDateTime.now().plusMinutes(15));
+        if (rnd.nextInt(10) < 3) {
+            booking.setSpecialRequest(party[2] > 0 && rnd.nextBoolean()
+                    ? "Baby cot in the room please" : REQUESTS[rnd.nextInt(REQUESTS.length)]);
         }
         booking = bookingRepository.save(booking);
-        if (seed.status() == Booking.Status.CONFIRMED || seed.status() == Booking.Status.COMPLETED) {
-            createPayment(booking);
+
+        LocalDateTime updated = created.plusMinutes(3);
+        switch (status) {
+            case CONFIRMED -> createPayment(booking, Payment.STATUS.SUCCEED, created.plusMinutes(2));
+            case COMPLETED -> {
+                createPayment(booking, Payment.STATUS.SUCCEED, created.plusMinutes(2));
+                updated = out.atTime(11, rnd.nextInt(60));
+                // most guests leave a review a few days after they check out
+                LocalDateTime reviewed = out.plusDays(rnd.nextInt(6)).atTime(9 + rnd.nextInt(12), rnd.nextInt(60));
+                if (rnd.nextInt(100) < 75 && reviewed.isBefore(now)) {
+                    createReview(rnd, booking, reviewed);
+                }
+            }
+            case CANCELLED -> {
+                // some guests paid and then cancelled, some never finished paying
+                int roll = rnd.nextInt(10);
+                if (roll < 6) {
+                    createPayment(booking, Payment.STATUS.SUCCEED, created.plusMinutes(2));
+                    LocalDateTime latest = in.atStartOfDay().isBefore(now) ? in.atStartOfDay() : now;
+                    LocalDateTime cancelled = created.plusDays(1 + rnd.nextInt(10));
+                    updated = cancelled.isBefore(latest) ? cancelled : latest.minusHours(1);
+                } else {
+                    if (roll < 8) {
+                        createPayment(booking, Payment.STATUS.FAILED, created.plusMinutes(4));
+                    }
+                    updated = created.plusMinutes(15);
+                }
+            }
+            default -> updated = created;
         }
-        if (seed.status() == Booking.Status.COMPLETED) {
-            createReview(booking, index);
+        if (updated.isBefore(created)) {
+            updated = created;
         }
+        jdbcTemplate.update("UPDATE bookings SET created_at = ?, updated_at = ? WHERE id = ?",
+                Timestamp.valueOf(created), Timestamp.valueOf(updated), booking.getId());
     }
 
-    private void createPayment(Booking booking) {
+    // fills the room with a realistic party that fits it; returns {adults, children, infants}
+    private int[] addGuests(Random rnd, BookingRoom bookingRoom, Room room, ChildPolicy policy, User customer) {
+        String[] fullName = customerNames.get(customer.getId());
+        String first = fullName[0], last = fullName[1];
+        int maxAdults = room.getMaxAdults(), maxOccupancy = room.getMaxOccupancy();
+        int adults = maxAdults >= 2 && rnd.nextInt(10) < 7 ? 2 : 1 + rnd.nextInt(maxAdults);
+        int kids = rnd.nextInt(10) < 4
+                ? rnd.nextInt(Math.max(0, Math.min(room.getMaxChildren(), maxOccupancy - adults)) + 1) : 0;
+        int infantMax = policy == null ? 2 : policy.getInfantMaxAge();
+
+        // each customer has one fixed family (same spouse, children and ages in every booking)
+        Random family = new Random(customer.getId() * 7919L);
+        int age = 28 + family.nextInt(25);
+        String spouse = (FEMALE.contains(first) ? HUSBANDS : WIVES)[family.nextInt(8)];
+        int spouseAge = age - 4 + family.nextInt(9);
+        List<String> kidNames = new ArrayList<>(List.of(KIDS));
+        Collections.shuffle(kidNames, family);
+        int[] kidAges = {3 + family.nextInt(9), family.nextInt(8), family.nextInt(3)}; // all within every hotel's child range
+
+        bookingRoom.getGuests().add(guest(bookingRoom, first + " " + last, age, BookingGuest.GuestType.ADULT));
+        for (int a = 1; a < adults; a++) {
+            String name = a == 1 ? spouse + " " + last : FRIENDS[rnd.nextInt(FRIENDS.length)];
+            bookingRoom.getGuests().add(guest(bookingRoom, name, a == 1 ? spouseAge : 25 + rnd.nextInt(40),
+                    BookingGuest.GuestType.ADULT));
+        }
+        int children = 0, infants = 0;
+        for (int c = 0; c < kids; c++) {
+            int kidAge = kidAges[c];
+            boolean infant = kidAge <= infantMax;
+            bookingRoom.getGuests().add(guest(bookingRoom, kidNames.get(c) + " " + last, kidAge,
+                    infant ? BookingGuest.GuestType.INFANT : BookingGuest.GuestType.CHILD));
+            if (infant) {
+                infants++;
+            } else {
+                children++;
+            }
+        }
+        return new int[]{adults, children, infants};
+    }
+
+    private void createPayment(Booking booking, Payment.STATUS status, LocalDateTime at) {
+        String ref = booking.getBookingReference();
         Payment payment = new Payment();
         payment.setBooking(booking);
         payment.setAmount(booking.getTotalAmount());
         payment.setMethod(Payment.METHOD.CARD);
-        payment.setStatus(Payment.STATUS.SUCCEED);
-        payment.setProviderReference("cs_seed_" + booking.getBookingReference());
-        payment.setIdempotencyKey("seed-" + booking.getBookingReference());
-        payment.setPaymentIntent("pi_seed_" + booking.getBookingReference());
-        paymentRepository.save(payment);
+        payment.setStatus(status);
+        payment.setProviderReference("cs_seed_" + ref);
+        payment.setIdempotencyKey("seed-" + ref);
+        payment.setPaymentIntent(status == Payment.STATUS.SUCCEED ? "pi_seed_" + ref : null);
+        payment = paymentRepository.save(payment);
+        jdbcTemplate.update("UPDATE payments SET created_at = ?, updated_at = ? WHERE id = ?",
+                Timestamp.valueOf(at), Timestamp.valueOf(at.plusMinutes(1)), payment.getId());
     }
 
-    private static final Object[][] REVIEWS = {
-            {5.0, "Amazing stay, the staff were friendly and the room was spotless."},
-            {4.0, "Great location and comfortable beds. Breakfast could have more choice."},
-            {5.0, "Perfect for families, the kids loved the pool. We will come back!"},
-            {3.0, "Good value for money, but check-in took longer than expected."},
-            {4.0, "Lovely view and quiet rooms. Parking was easy to find."},
-            {5.0, "Everything was excellent from arrival to check-out."},
-            {4.0, "Clean, modern and close to everything. Wi-Fi was fast."},
-            {2.0, "The room was fine but the air conditioning was noisy at night."},
-            {5.0, "Best hotel breakfast I have had in a long time. Very helpful reception team."},
-            {4.0, "Spacious room and a great shower. The gym was small but well equipped."},
-            {3.0, "Nice hotel, but the pool area was crowded on the weekend."},
-            {5.0, "We celebrated our anniversary here and the staff made it really special."},
-            {4.0, "Easy check-in, comfortable bed and good value. Would stay again."},
-            {3.0, "Room was clean, but the view was of the parking lot."},
-            {5.0, "Quiet, calm and beautifully designed. Housekeeping was excellent."},
-            {4.0, "Good for a business trip. Fast Wi-Fi and a proper desk in the room."}
-    };
-
-    private void createReview(Booking booking, int index) {
-        Object[] data = REVIEWS[index % REVIEWS.length];
+    private void createReview(Random rnd, Booking booking, LocalDateTime at) {
+        int rating = RATINGS[rnd.nextInt(RATINGS.length)];
+        String[] texts = REVIEW_TEXT.get(rating);
         Review review = new Review();
-        review.setRating((Double) data[0]);
-        review.setComment((String) data[1]);
+        review.setRating(rating);
+        review.setComment(rnd.nextInt(10) == 0 ? null : texts[rnd.nextInt(texts.length)]);
         review.setBooking(booking);
-        reviewRepository.save(review);
+        review = reviewRepository.save(review);
+        jdbcTemplate.update("UPDATE reviews SET created_at = ? WHERE id = ?", Timestamp.valueOf(at), review.getId());
+    }
+
+    // accounts look like they joined over the past year or two rather than all at once
+    private void backdateUsers(Random rnd, LocalDateTime now) {
+        for (User user : userRepository.findAll()) {
+            boolean staff = user.getEmail().startsWith("admin") || user.getEmail().startsWith("manager");
+            LocalDateTime joined = now.minusDays((staff ? 400 : 180) + rnd.nextInt(200)).withHour(9 + rnd.nextInt(10));
+            jdbcTemplate.update("UPDATE users SET created_at = ?, updated_at = ? WHERE id = ?",
+                    Timestamp.valueOf(joined), Timestamp.valueOf(joined), user.getId());
+        }
     }
 
     private BookingGuest guest(BookingRoom bookingRoom, String name, int age, BookingGuest.GuestType type) {

@@ -14,4 +14,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
            )
    List<Review> findHotelReviews(
            @Param("hotelId") Long hotelId);
+   @Query("SELECT AVG(r.rating) FROM Review r")
+   Double averageRating();
 }

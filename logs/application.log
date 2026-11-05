@@ -3723,3 +3723,791 @@ java.lang.IllegalArgumentException: 'expressionString' must not be null or blank
 2026-11-04T19:35:10.112+03:00  INFO 15336 --- [hotel-booking-app] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
 2026-11-04T19:35:10.124+03:00  INFO 15336 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
 2026-11-04T19:35:10.161+03:00  INFO 15336 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-11-04T21:16:34.345+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Starting HotelBookingAppApplication using Java 17.0.20.1 with PID 26572 (C:\Users\DELL\Ijdb\project\hotel-booking-app\target\classes started by DELL in C:\Users\DELL\Ijdb\project\hotel-booking-app)
+2026-11-04T21:16:34.362+03:00 DEBUG 26572 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-04T21:16:34.366+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : The following 1 profile is active: "dev"
+2026-11-04T21:16:34.588+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-11-04T21:16:34.589+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-11-04T21:16:39.840+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-04T21:16:40.268+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 384 ms. Found 18 JPA repository interfaces.
+2026-11-04T21:16:42.812+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8000 (http)
+2026-11-04T21:16:42.864+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-04T21:16:42.866+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-04T21:16:43.118+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 8524 ms
+2026-11-04T21:16:43.938+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-04T21:16:44.168+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-11-04T21:16:45.902+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-04T21:16:46.010+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-11-04T21:16:46.503+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@626700d3
+2026-11-04T21:16:46.507+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-11-04T21:16:46.700+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5434/vibestay-app]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: vibestay-app/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-04T21:16:50.460+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-04T21:16:50.663+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T21:16:50.807+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-04T21:16:52.713+03:00 DEBUG 26572 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'authenticationJwtTokenFilter' configured for use
+2026-11-04T21:16:52.714+03:00 DEBUG 26572 --- [hotel-booking-app] [restartedMain] c.g.h.security.RateLimitFilter           : Filter 'rateLimitFilter' configured for use
+2026-11-04T21:16:52.715+03:00 DEBUG 26572 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'jwtRequestFilter' configured for use
+2026-11-04T21:16:58.557+03:00  WARN 26572 --- [hotel-booking-app] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-04T21:16:58.852+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsService
+2026-11-04T21:17:00.467+03:00  WARN 26572 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:17:00.468+03:00  WARN 26572 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/index.html]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:17:00.468+03:00  WARN 26572 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/static/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:17:00.468+03:00  WARN 26572 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/css/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:17:00.469+03:00  WARN 26572 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/js/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:17:00.471+03:00  WARN 26572 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/images/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:17:00.471+03:00  WARN 26572 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/favicon.ico]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:17:00.471+03:00  WARN 26572 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/uploads/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:17:00.614+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-11-04T21:17:00.616+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@25193b4d]]
+2026-11-04T21:17:00.618+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-11-04T21:17:00.667+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8000 (http) with context path '/'
+2026-11-04T21:17:00.697+03:00  INFO 26572 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Started HotelBookingAppApplication in 28.562 seconds (process running for 30.149)
+2026-11-04T21:17:00.932+03:00  WARN 26572 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-11-04T21:17:00.932+03:00  WARN 26572 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-11-04T21:17:02.464+03:00  INFO 26572 --- [hotel-booking-app] [http-nio-8000-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-04T21:17:02.465+03:00  INFO 26572 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-04T21:17:02.473+03:00  INFO 26572 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 8 ms
+2026-11-04T21:18:00.618+03:00  INFO 26572 --- [hotel-booking-app] [MessageBroker-2] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 3, active threads = 1, queued tasks = 1, completed tasks = 1]
+2026-11-04T21:21:13.789+03:00  INFO 26572 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-04T21:21:13.856+03:00  INFO 26572 --- [hotel-booking-app] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-04T21:21:13.857+03:00  INFO 26572 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-11-04T21:21:13.857+03:00  INFO 26572 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@25193b4d]]
+2026-11-04T21:21:13.857+03:00  INFO 26572 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-11-04T21:21:13.863+03:00  INFO 26572 --- [hotel-booking-app] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T21:21:13.867+03:00  INFO 26572 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-04T21:21:13.870+03:00  INFO 26572 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-11-04T21:42:08.418+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Starting HotelBookingAppApplication using Java 17.0.20.1 with PID 24300 (C:\Users\DELL\Ijdb\project\hotel-booking-app\target\classes started by DELL in C:\Users\DELL\Ijdb\project\hotel-booking-app)
+2026-11-04T21:42:08.430+03:00 DEBUG 24300 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-04T21:42:08.433+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : The following 1 profile is active: "dev"
+2026-11-04T21:42:08.610+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-11-04T21:42:08.611+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-11-04T21:42:11.896+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-04T21:42:12.183+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 262 ms. Found 18 JPA repository interfaces.
+2026-11-04T21:42:14.326+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8000 (http)
+2026-11-04T21:42:14.369+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-04T21:42:14.371+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-04T21:42:14.529+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 5916 ms
+2026-11-04T21:42:14.999+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-04T21:42:15.168+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-11-04T21:42:16.497+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-04T21:42:16.587+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-11-04T21:42:17.042+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6b2ce84
+2026-11-04T21:42:17.045+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-11-04T21:42:17.247+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5434/vibestay-app]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: vibestay-app/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-04T21:42:20.456+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-04T21:42:20.621+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T21:42:20.758+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-04T21:42:23.734+03:00 DEBUG 24300 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'authenticationJwtTokenFilter' configured for use
+2026-11-04T21:42:23.735+03:00 DEBUG 24300 --- [hotel-booking-app] [restartedMain] c.g.h.security.RateLimitFilter           : Filter 'rateLimitFilter' configured for use
+2026-11-04T21:42:23.737+03:00 DEBUG 24300 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'jwtRequestFilter' configured for use
+2026-11-04T21:42:28.053+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-04T21:42:28.402+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsService
+2026-11-04T21:42:30.067+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:42:30.068+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/index.html]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:42:30.069+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/static/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:42:30.070+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/css/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:42:30.070+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/js/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:42:30.071+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/images/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:42:30.072+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/favicon.ico]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:42:30.072+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/uploads/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:42:30.230+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-11-04T21:42:30.231+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@53480b46]]
+2026-11-04T21:42:30.235+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-11-04T21:42:30.292+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8000 (http) with context path '/'
+2026-11-04T21:42:30.328+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Started HotelBookingAppApplication in 24.215 seconds (process running for 25.927)
+2026-11-04T21:42:30.583+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-11-04T21:42:30.584+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-11-04T21:42:31.071+03:00  INFO 24300 --- [hotel-booking-app] [http-nio-8000-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-04T21:42:31.072+03:00  INFO 24300 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-04T21:42:31.078+03:00  INFO 24300 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 5 ms
+2026-11-04T21:42:32.455+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidCredentialsException: Invalid email or password]
+2026-11-04T21:42:34.200+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidCredentialsException: Invalid email or password]
+2026-11-04T21:42:35.103+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidCredentialsException: Invalid email or password]
+2026-11-04T21:43:30.218+03:00  INFO 24300 --- [hotel-booking-app] [MessageBroker-2] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[1 current WS(1)-HttpStream(0)-HttpPoll(0), 1 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(1)-CONNECTED(1)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 9, active threads = 0, queued tasks = 0, completed tasks = 9], outboundChannel[pool size = 1, active threads = 0, queued tasks = 0, completed tasks = 1], sockJsScheduler[pool size = 3, active threads = 1, queued tasks = 1, completed tasks = 1]
+2026-11-04T21:50:08.001+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T21:50:08.045+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T21:50:19.866+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T21:50:19.895+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T21:51:43.230+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T21:51:43.249+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T21:52:02.911+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T21:52:06.130+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T21:52:20.172+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T21:55:22.413+03:00  INFO 24300 --- [hotel-booking-app] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 14 class path changes (0 additions, 0 deletions, 14 modifications)
+2026-11-04T21:55:22.427+03:00  INFO 24300 --- [hotel-booking-app] [Thread-1] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-04T21:55:22.500+03:00  INFO 24300 --- [hotel-booking-app] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-04T21:55:22.503+03:00  INFO 24300 --- [hotel-booking-app] [Thread-1] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-11-04T21:55:22.503+03:00  INFO 24300 --- [hotel-booking-app] [Thread-1] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@53480b46]]
+2026-11-04T21:55:22.503+03:00  INFO 24300 --- [hotel-booking-app] [Thread-1] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-11-04T21:55:22.510+03:00  INFO 24300 --- [hotel-booking-app] [Thread-1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T21:55:22.513+03:00  INFO 24300 --- [hotel-booking-app] [Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-04T21:55:22.515+03:00  INFO 24300 --- [hotel-booking-app] [Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-11-04T21:55:22.641+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Starting HotelBookingAppApplication using Java 17.0.20.1 with PID 24300 (C:\Users\DELL\Ijdb\project\hotel-booking-app\target\classes started by DELL in C:\Users\DELL\Ijdb\project\hotel-booking-app)
+2026-11-04T21:55:22.641+03:00 DEBUG 24300 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-04T21:55:22.641+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : The following 1 profile is active: "dev"
+2026-11-04T21:55:23.341+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-04T21:55:23.402+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 58 ms. Found 18 JPA repository interfaces.
+2026-11-04T21:55:23.612+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8000 (http)
+2026-11-04T21:55:23.613+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-04T21:55:23.613+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-04T21:55:23.640+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 992 ms
+2026-11-04T21:55:23.701+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-04T21:55:23.754+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-04T21:55:23.755+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-11-04T21:55:23.805+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@7cb55861
+2026-11-04T21:55:23.805+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-11-04T21:55:23.825+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5434/vibestay-app]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: vibestay-app/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-04T21:55:24.373+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-04T21:55:24.430+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T21:55:24.596+03:00 DEBUG 24300 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'authenticationJwtTokenFilter' configured for use
+2026-11-04T21:55:24.597+03:00 DEBUG 24300 --- [hotel-booking-app] [restartedMain] c.g.h.security.RateLimitFilter           : Filter 'rateLimitFilter' configured for use
+2026-11-04T21:55:24.599+03:00 DEBUG 24300 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'jwtRequestFilter' configured for use
+2026-11-04T21:55:25.088+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-04T21:55:25.168+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsService
+2026-11-04T21:55:25.457+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:25.458+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/index.html]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:25.458+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/static/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:25.458+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/css/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:25.459+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/js/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:25.459+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/images/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:25.459+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/favicon.ico]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:25.459+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/uploads/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:25.489+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-11-04T21:55:25.489+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@2baaff9a]]
+2026-11-04T21:55:25.490+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-11-04T21:55:25.495+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8000 (http) with context path '/'
+2026-11-04T21:55:25.502+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Started HotelBookingAppApplication in 2.908 seconds (process running for 802.256)
+2026-11-04T21:55:25.519+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-11-04T21:55:25.519+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-11-04T21:55:25.521+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-11-04T21:55:33.175+03:00  INFO 24300 --- [hotel-booking-app] [http-nio-8000-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-04T21:55:33.176+03:00  INFO 24300 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-04T21:55:33.181+03:00  INFO 24300 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 5 ms
+2026-11-04T21:55:34.475+03:00  INFO 24300 --- [hotel-booking-app] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 3 class path changes (0 additions, 0 deletions, 3 modifications)
+2026-11-04T21:55:34.479+03:00  INFO 24300 --- [hotel-booking-app] [Thread-7] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-04T21:55:34.575+03:00  INFO 24300 --- [hotel-booking-app] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-04T21:55:34.576+03:00  INFO 24300 --- [hotel-booking-app] [Thread-7] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-11-04T21:55:34.577+03:00  INFO 24300 --- [hotel-booking-app] [Thread-7] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@2baaff9a]]
+2026-11-04T21:55:34.577+03:00  INFO 24300 --- [hotel-booking-app] [Thread-7] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-11-04T21:55:34.579+03:00  INFO 24300 --- [hotel-booking-app] [Thread-7] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T21:55:34.580+03:00  INFO 24300 --- [hotel-booking-app] [Thread-7] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2026-11-04T21:55:34.581+03:00  INFO 24300 --- [hotel-booking-app] [Thread-7] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
+2026-11-04T21:55:34.699+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Starting HotelBookingAppApplication using Java 17.0.20.1 with PID 24300 (C:\Users\DELL\Ijdb\project\hotel-booking-app\target\classes started by DELL in C:\Users\DELL\Ijdb\project\hotel-booking-app)
+2026-11-04T21:55:34.700+03:00 DEBUG 24300 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-04T21:55:34.700+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : The following 1 profile is active: "dev"
+2026-11-04T21:55:35.206+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-04T21:55:35.293+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 84 ms. Found 18 JPA repository interfaces.
+2026-11-04T21:55:35.566+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8000 (http)
+2026-11-04T21:55:35.567+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-04T21:55:35.568+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-04T21:55:35.617+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 914 ms
+2026-11-04T21:55:35.699+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-04T21:55:35.800+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-04T21:55:35.803+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+2026-11-04T21:55:35.976+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection org.postgresql.jdbc.PgConnection@2ced650a
+2026-11-04T21:55:35.976+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+2026-11-04T21:55:36.008+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5434/vibestay-app]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: vibestay-app/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-04T21:55:37.150+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-04T21:55:37.307+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T21:55:37.692+03:00 DEBUG 24300 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'authenticationJwtTokenFilter' configured for use
+2026-11-04T21:55:37.693+03:00 DEBUG 24300 --- [hotel-booking-app] [restartedMain] c.g.h.security.RateLimitFilter           : Filter 'rateLimitFilter' configured for use
+2026-11-04T21:55:37.696+03:00 DEBUG 24300 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'jwtRequestFilter' configured for use
+2026-11-04T21:55:39.287+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-04T21:55:39.537+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsService
+2026-11-04T21:55:40.413+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:40.414+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/index.html]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:40.414+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/static/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:40.414+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/css/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:40.415+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/js/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:40.416+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/images/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:40.416+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/favicon.ico]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:40.416+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/uploads/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T21:55:40.500+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-11-04T21:55:40.501+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@5d0f32a]]
+2026-11-04T21:55:40.502+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-11-04T21:55:40.512+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8000 (http) with context path '/'
+2026-11-04T21:55:40.522+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Started HotelBookingAppApplication in 5.861 seconds (process running for 817.276)
+2026-11-04T21:55:40.545+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-11-04T21:55:40.545+03:00  WARN 24300 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-11-04T21:55:40.547+03:00  INFO 24300 --- [hotel-booking-app] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-11-04T21:55:45.171+03:00  INFO 24300 --- [hotel-booking-app] [http-nio-8000-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-04T21:55:45.171+03:00  INFO 24300 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-04T21:55:45.173+03:00  INFO 24300 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-11-04T21:56:40.504+03:00  INFO 24300 --- [hotel-booking-app] [MessageBroker-2] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[2 current WS(2)-HttpStream(0)-HttpPoll(0), 2 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(2)-CONNECTED(2)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 16, active threads = 0, queued tasks = 0, completed tasks = 24], outboundChannel[pool size = 2, active threads = 0, queued tasks = 0, completed tasks = 2], sockJsScheduler[pool size = 3, active threads = 1, queued tasks = 1, completed tasks = 1]
+2026-11-04T21:57:15.406+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T21:57:25.122+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T21:57:28.365+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T21:57:32.640+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T21:58:05.470+03:00  WARN 24300 --- [hotel-booking-app] [http-nio-8000-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:02:05.179+03:00  INFO 24300 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-04T22:02:05.244+03:00  INFO 24300 --- [hotel-booking-app] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-04T22:02:05.248+03:00  INFO 24300 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-11-04T22:02:05.248+03:00  INFO 24300 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@5d0f32a]]
+2026-11-04T22:02:05.248+03:00  INFO 24300 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-11-04T22:02:05.250+03:00  INFO 24300 --- [hotel-booking-app] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T22:02:05.251+03:00  INFO 24300 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown initiated...
+2026-11-04T22:02:05.252+03:00  INFO 24300 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown completed.
+2026-11-04T22:02:15.027+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Starting HotelBookingAppApplication using Java 17.0.20.1 with PID 20220 (C:\Users\DELL\Ijdb\project\hotel-booking-app\target\classes started by DELL in C:\Users\DELL\Ijdb\project\hotel-booking-app)
+2026-11-04T22:02:15.033+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-04T22:02:15.035+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : The following 1 profile is active: "dev"
+2026-11-04T22:02:15.125+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-11-04T22:02:15.126+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-11-04T22:02:17.274+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-04T22:02:17.792+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 487 ms. Found 18 JPA repository interfaces.
+2026-11-04T22:02:20.506+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8000 (http)
+2026-11-04T22:02:20.556+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-04T22:02:20.557+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-04T22:02:20.723+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 5596 ms
+2026-11-04T22:02:21.165+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-04T22:02:21.332+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-11-04T22:02:24.178+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-04T22:02:24.265+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-11-04T22:02:24.704+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@30454230
+2026-11-04T22:02:24.708+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-11-04T22:02:24.892+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5434/vibestay-app]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: vibestay-app/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-04T22:02:28.507+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-04T22:02:28.680+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T22:02:28.830+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-04T22:02:31.140+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'authenticationJwtTokenFilter' configured for use
+2026-11-04T22:02:31.141+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.security.RateLimitFilter           : Filter 'rateLimitFilter' configured for use
+2026-11-04T22:02:31.141+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'jwtRequestFilter' configured for use
+2026-11-04T22:02:35.084+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-04T22:02:35.369+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsService
+2026-11-04T22:02:36.854+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:02:36.855+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/index.html]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:02:36.856+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/static/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:02:36.856+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/css/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:02:36.856+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/js/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:02:36.856+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/images/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:02:36.857+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/favicon.ico]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:02:36.857+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/uploads/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:02:36.983+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-11-04T22:02:36.985+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@60c95add]]
+2026-11-04T22:02:36.987+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-11-04T22:02:37.024+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8000 (http) with context path '/'
+2026-11-04T22:02:37.045+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Started HotelBookingAppApplication in 22.694 seconds (process running for 23.432)
+2026-11-04T22:02:37.260+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-11-04T22:02:37.261+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-11-04T22:02:38.289+03:00  INFO 20220 --- [hotel-booking-app] [http-nio-8000-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-04T22:02:38.290+03:00  INFO 20220 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-04T22:02:38.294+03:00  INFO 20220 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2026-11-04T22:02:41.656+03:00  WARN 20220 --- [hotel-booking-app] [http-nio-8000-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:02:42.707+03:00  WARN 20220 --- [hotel-booking-app] [http-nio-8000-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:02:42.770+03:00  WARN 20220 --- [hotel-booking-app] [http-nio-8000-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:02:43.508+03:00  WARN 20220 --- [hotel-booking-app] [http-nio-8000-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:02:53.805+03:00  WARN 20220 --- [hotel-booking-app] [http-nio-8000-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:02:53.840+03:00  WARN 20220 --- [hotel-booking-app] [http-nio-8000-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:02:56.215+03:00  WARN 20220 --- [hotel-booking-app] [http-nio-8000-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:03:37.015+03:00  INFO 20220 --- [hotel-booking-app] [MessageBroker-2] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[4 current WS(4)-HttpStream(0)-HttpPoll(0), 4 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(4)-CONNECTED(4)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 16, active threads = 0, queued tasks = 0, completed tasks = 48], outboundChannel[pool size = 4, active threads = 0, queued tasks = 0, completed tasks = 4], sockJsScheduler[pool size = 3, active threads = 1, queued tasks = 1, completed tasks = 1]
+2026-11-04T22:04:05.312+03:00  WARN 20220 --- [hotel-booking-app] [http-nio-8000-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:04:05.338+03:00  WARN 20220 --- [hotel-booking-app] [http-nio-8000-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:06:59.042+03:00  INFO 20220 --- [hotel-booking-app] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2026-11-04T22:06:59.053+03:00  INFO 20220 --- [hotel-booking-app] [Thread-1] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-04T22:06:59.264+03:00  INFO 20220 --- [hotel-booking-app] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-04T22:06:59.293+03:00  INFO 20220 --- [hotel-booking-app] [Thread-1] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-11-04T22:06:59.293+03:00  INFO 20220 --- [hotel-booking-app] [Thread-1] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@60c95add]]
+2026-11-04T22:06:59.294+03:00  INFO 20220 --- [hotel-booking-app] [Thread-1] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-11-04T22:06:59.316+03:00  INFO 20220 --- [hotel-booking-app] [Thread-1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T22:06:59.323+03:00  INFO 20220 --- [hotel-booking-app] [Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-04T22:06:59.330+03:00  INFO 20220 --- [hotel-booking-app] [Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-11-04T22:06:59.686+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Starting HotelBookingAppApplication using Java 17.0.20.1 with PID 20220 (C:\Users\DELL\Ijdb\project\hotel-booking-app\target\classes started by DELL in C:\Users\DELL\Ijdb\project\hotel-booking-app)
+2026-11-04T22:06:59.687+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-04T22:06:59.688+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : The following 1 profile is active: "dev"
+2026-11-04T22:07:01.891+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-04T22:07:02.374+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 474 ms. Found 18 JPA repository interfaces.
+2026-11-04T22:07:03.942+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8000 (http)
+2026-11-04T22:07:03.945+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-04T22:07:03.947+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-04T22:07:04.163+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 4468 ms
+2026-11-04T22:07:04.524+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-04T22:07:04.732+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-04T22:07:04.737+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-11-04T22:07:04.887+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@7114da34
+2026-11-04T22:07:04.888+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-11-04T22:07:04.952+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5434/vibestay-app]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: vibestay-app/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-04T22:07:06.619+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-04T22:07:06.783+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T22:07:07.547+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'authenticationJwtTokenFilter' configured for use
+2026-11-04T22:07:07.548+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.security.RateLimitFilter           : Filter 'rateLimitFilter' configured for use
+2026-11-04T22:07:07.551+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'jwtRequestFilter' configured for use
+2026-11-04T22:07:11.414+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-04T22:07:11.712+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsService
+2026-11-04T22:07:12.536+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:12.540+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/index.html]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:12.541+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/static/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:12.542+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/css/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:12.543+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/js/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:12.545+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/images/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:12.547+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/favicon.ico]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:12.548+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/uploads/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:12.716+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-11-04T22:07:12.716+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@1e9a57b5]]
+2026-11-04T22:07:12.717+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-11-04T22:07:12.729+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8000 (http) with context path '/'
+2026-11-04T22:07:12.772+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Started HotelBookingAppApplication in 13.254 seconds (process running for 299.158)
+2026-11-04T22:07:12.816+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-11-04T22:07:12.817+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-11-04T22:07:12.820+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-11-04T22:07:18.873+03:00  INFO 20220 --- [hotel-booking-app] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2026-11-04T22:07:18.876+03:00  INFO 20220 --- [hotel-booking-app] [Thread-6] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-04T22:07:19.047+03:00  INFO 20220 --- [hotel-booking-app] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-04T22:07:19.048+03:00  INFO 20220 --- [hotel-booking-app] [Thread-6] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-11-04T22:07:19.049+03:00  INFO 20220 --- [hotel-booking-app] [Thread-6] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@1e9a57b5]]
+2026-11-04T22:07:19.049+03:00  INFO 20220 --- [hotel-booking-app] [Thread-6] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-11-04T22:07:19.055+03:00  INFO 20220 --- [hotel-booking-app] [Thread-6] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T22:07:19.056+03:00  INFO 20220 --- [hotel-booking-app] [Thread-6] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2026-11-04T22:07:19.062+03:00  INFO 20220 --- [hotel-booking-app] [Thread-6] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
+2026-11-04T22:07:19.273+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Starting HotelBookingAppApplication using Java 17.0.20.1 with PID 20220 (C:\Users\DELL\Ijdb\project\hotel-booking-app\target\classes started by DELL in C:\Users\DELL\Ijdb\project\hotel-booking-app)
+2026-11-04T22:07:19.273+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-04T22:07:19.274+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : The following 1 profile is active: "dev"
+2026-11-04T22:07:20.959+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-04T22:07:21.379+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 384 ms. Found 18 JPA repository interfaces.
+2026-11-04T22:07:22.737+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8000 (http)
+2026-11-04T22:07:22.740+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-04T22:07:22.741+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-04T22:07:22.895+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 3614 ms
+2026-11-04T22:07:23.166+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-04T22:07:23.487+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-04T22:07:23.511+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+2026-11-04T22:07:23.679+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection org.postgresql.jdbc.PgConnection@7d4767f7
+2026-11-04T22:07:23.680+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+2026-11-04T22:07:23.741+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5434/vibestay-app]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: vibestay-app/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-04T22:07:25.315+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-04T22:07:25.505+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T22:07:25.854+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'authenticationJwtTokenFilter' configured for use
+2026-11-04T22:07:25.855+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.security.RateLimitFilter           : Filter 'rateLimitFilter' configured for use
+2026-11-04T22:07:25.857+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'jwtRequestFilter' configured for use
+2026-11-04T22:07:27.067+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-04T22:07:27.189+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsService
+2026-11-04T22:07:27.865+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:27.866+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/index.html]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:27.866+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/static/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:27.867+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/css/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:27.867+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/js/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:27.867+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/images/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:27.868+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/favicon.ico]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:27.868+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/uploads/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:27.933+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-11-04T22:07:27.934+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@5fd9bb3b]]
+2026-11-04T22:07:27.940+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-11-04T22:07:27.951+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8000 (http) with context path '/'
+2026-11-04T22:07:27.972+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Started HotelBookingAppApplication in 8.769 seconds (process running for 314.359)
+2026-11-04T22:07:28.001+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-11-04T22:07:28.002+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-11-04T22:07:28.004+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-11-04T22:07:29.457+03:00  INFO 20220 --- [hotel-booking-app] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2026-11-04T22:07:29.459+03:00  INFO 20220 --- [hotel-booking-app] [Thread-10] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-04T22:07:29.562+03:00  INFO 20220 --- [hotel-booking-app] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-04T22:07:29.563+03:00  INFO 20220 --- [hotel-booking-app] [Thread-10] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-11-04T22:07:29.563+03:00  INFO 20220 --- [hotel-booking-app] [Thread-10] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@5fd9bb3b]]
+2026-11-04T22:07:29.564+03:00  INFO 20220 --- [hotel-booking-app] [Thread-10] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-11-04T22:07:29.567+03:00  INFO 20220 --- [hotel-booking-app] [Thread-10] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T22:07:29.568+03:00  INFO 20220 --- [hotel-booking-app] [Thread-10] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown initiated...
+2026-11-04T22:07:29.573+03:00  INFO 20220 --- [hotel-booking-app] [Thread-10] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown completed.
+2026-11-04T22:07:29.704+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Starting HotelBookingAppApplication using Java 17.0.20.1 with PID 20220 (C:\Users\DELL\Ijdb\project\hotel-booking-app\target\classes started by DELL in C:\Users\DELL\Ijdb\project\hotel-booking-app)
+2026-11-04T22:07:29.705+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-04T22:07:29.705+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : The following 1 profile is active: "dev"
+2026-11-04T22:07:30.274+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-04T22:07:30.359+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 81 ms. Found 18 JPA repository interfaces.
+2026-11-04T22:07:30.607+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8000 (http)
+2026-11-04T22:07:30.608+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-04T22:07:30.608+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-04T22:07:30.658+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 950 ms
+2026-11-04T22:07:30.751+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-04T22:07:30.866+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-04T22:07:30.868+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Starting...
+2026-11-04T22:07:31.066+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-4 - Added connection org.postgresql.jdbc.PgConnection@f132ed
+2026-11-04T22:07:31.066+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Start completed.
+2026-11-04T22:07:31.110+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5434/vibestay-app]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: vibestay-app/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-04T22:07:32.382+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-04T22:07:32.544+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T22:07:33.116+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'authenticationJwtTokenFilter' configured for use
+2026-11-04T22:07:33.117+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.security.RateLimitFilter           : Filter 'rateLimitFilter' configured for use
+2026-11-04T22:07:33.118+03:00 DEBUG 20220 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'jwtRequestFilter' configured for use
+2026-11-04T22:07:34.672+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-04T22:07:34.767+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsService
+2026-11-04T22:07:35.143+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:35.144+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/index.html]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:35.144+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/static/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:35.144+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/css/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:35.144+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/js/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:35.144+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/images/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:35.144+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/favicon.ico]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:35.145+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/uploads/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:07:35.180+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-11-04T22:07:35.181+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6f109c7a]]
+2026-11-04T22:07:35.181+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-11-04T22:07:35.187+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8000 (http) with context path '/'
+2026-11-04T22:07:35.194+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Started HotelBookingAppApplication in 5.533 seconds (process running for 321.58)
+2026-11-04T22:07:35.208+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-11-04T22:07:35.208+03:00  WARN 20220 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-11-04T22:07:35.210+03:00  INFO 20220 --- [hotel-booking-app] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-11-04T22:07:43.166+03:00  INFO 20220 --- [hotel-booking-app] [http-nio-8000-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-04T22:07:43.166+03:00  INFO 20220 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-04T22:07:43.169+03:00  INFO 20220 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-11-04T22:08:35.182+03:00  INFO 20220 --- [hotel-booking-app] [MessageBroker-2] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[8 current WS(8)-HttpStream(0)-HttpPoll(0), 8 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(8)-CONNECTED(8)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 16, active threads = 0, queued tasks = 0, completed tasks = 90], outboundChannel[pool size = 8, active threads = 0, queued tasks = 0, completed tasks = 8], sockJsScheduler[pool size = 3, active threads = 1, queued tasks = 1, completed tasks = 1]
+2026-11-04T22:11:19.816+03:00  INFO 20220 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-04T22:11:19.888+03:00  INFO 20220 --- [hotel-booking-app] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-04T22:11:19.894+03:00  INFO 20220 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-11-04T22:11:19.894+03:00  INFO 20220 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6f109c7a]]
+2026-11-04T22:11:19.894+03:00  INFO 20220 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-11-04T22:11:19.912+03:00  INFO 20220 --- [hotel-booking-app] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T22:11:19.912+03:00  INFO 20220 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Shutdown initiated...
+2026-11-04T22:11:19.913+03:00  INFO 20220 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Shutdown completed.
+2026-11-04T22:29:07.008+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Starting HotelBookingAppApplication using Java 17.0.20.1 with PID 15216 (C:\Users\DELL\Ijdb\project\hotel-booking-app\target\classes started by DELL in C:\Users\DELL\Ijdb\project\hotel-booking-app)
+2026-11-04T22:29:07.014+03:00 DEBUG 15216 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-04T22:29:07.016+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : The following 1 profile is active: "dev"
+2026-11-04T22:29:07.136+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-11-04T22:29:07.136+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-11-04T22:29:09.366+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-04T22:29:09.525+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 140 ms. Found 18 JPA repository interfaces.
+2026-11-04T22:29:10.954+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8000 (http)
+2026-11-04T22:29:10.979+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-04T22:29:10.980+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-04T22:29:11.072+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 3935 ms
+2026-11-04T22:29:11.355+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-04T22:29:11.473+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-11-04T22:29:12.273+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-04T22:29:12.331+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-11-04T22:29:12.650+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@76a1ed97
+2026-11-04T22:29:12.652+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-11-04T22:29:12.780+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5434/vibestay-app]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: vibestay-app/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-04T22:29:14.824+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-04T22:29:15.193+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : HHH000247: ErrorCode: 0, SQLState: 00000
+2026-11-04T22:29:15.194+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : constraint "uke92mgyq35mdeo8gc1un2o6uk0" of relation "bookings" does not exist, skipping
+2026-11-04T22:29:15.197+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : HHH000247: ErrorCode: 0, SQLState: 00000
+2026-11-04T22:29:15.197+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : constraint "uk64w5lc24c4glbrtdpq2uo1t96" of relation "child_policies" does not exist, skipping
+2026-11-04T22:29:15.200+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : HHH000247: ErrorCode: 0, SQLState: 00000
+2026-11-04T22:29:15.200+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : constraint "ukewmvysc7e9y6uy7og2c21axa9" of relation "email_verification_tokens" does not exist, skipping
+2026-11-04T22:29:15.203+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : HHH000247: ErrorCode: 0, SQLState: 00000
+2026-11-04T22:29:15.203+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : constraint "ukm7xlqsndengqp2kpd5nux2s3i" of relation "hotels" does not exist, skipping
+2026-11-04T22:29:15.206+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : HHH000247: ErrorCode: 0, SQLState: 00000
+2026-11-04T22:29:15.206+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : constraint "uk71lqwbwtklmljk3qlsugr1mig" of relation "password_reset_tokens" does not exist, skipping
+2026-11-04T22:29:15.209+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : HHH000247: ErrorCode: 0, SQLState: 00000
+2026-11-04T22:29:15.210+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : constraint "ukj4pdqn1207fuhx2gybp1ue799" of relation "payments" does not exist, skipping
+2026-11-04T22:29:15.213+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : HHH000247: ErrorCode: 0, SQLState: 00000
+2026-11-04T22:29:15.213+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : constraint "uk3p9j9vyr1qofbcxju65es206r" of relation "reviews" does not exist, skipping
+2026-11-04T22:29:15.216+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : HHH000247: ErrorCode: 0, SQLState: 00000
+2026-11-04T22:29:15.216+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : constraint "ukcy6r8sa6pcg4gp34ky0knq8it" of relation "room_images" does not exist, skipping
+2026-11-04T22:29:15.218+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : HHH000247: ErrorCode: 0, SQLState: 00000
+2026-11-04T22:29:15.219+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : constraint "ukb70k1tp1aa52elkkxht660u36" of relation "room_types" does not exist, skipping
+2026-11-04T22:29:15.222+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : HHH000247: ErrorCode: 0, SQLState: 00000
+2026-11-04T22:29:15.222+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : constraint "uk6dotkott2kjsp8vw4d0m25fb7" of relation "users" does not exist, skipping
+2026-11-04T22:29:15.224+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : HHH000247: ErrorCode: 0, SQLState: 00000
+2026-11-04T22:29:15.224+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : constraint "ukr43af9ap4edm43mmtq01oddj6" of relation "users" does not exist, skipping
+2026-11-04T22:29:15.227+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : HHH000247: ErrorCode: 0, SQLState: 00000
+2026-11-04T22:29:15.227+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jdbc.warn              : constraint "uk7s5nlreekaxdbfml4ofky7utw" of relation "users" does not exist, skipping
+2026-11-04T22:29:15.289+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T22:29:15.423+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-04T22:29:17.381+03:00 DEBUG 15216 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'authenticationJwtTokenFilter' configured for use
+2026-11-04T22:29:17.381+03:00 DEBUG 15216 --- [hotel-booking-app] [restartedMain] c.g.h.security.RateLimitFilter           : Filter 'rateLimitFilter' configured for use
+2026-11-04T22:29:17.382+03:00 DEBUG 15216 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'jwtRequestFilter' configured for use
+2026-11-04T22:29:20.441+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-04T22:29:20.700+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsService
+2026-11-04T22:29:22.062+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:29:22.063+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/index.html]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:29:22.063+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/static/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:29:22.063+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/css/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:29:22.064+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/js/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:29:22.064+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/images/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:29:22.064+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/favicon.ico]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:29:22.064+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/uploads/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:29:22.145+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-11-04T22:29:22.146+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@7c6f4892]]
+2026-11-04T22:29:22.148+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-11-04T22:29:22.185+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8000 (http) with context path '/'
+2026-11-04T22:29:22.205+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Started HotelBookingAppApplication in 16.023 seconds (process running for 16.912)
+2026-11-04T22:29:22.801+03:00  INFO 15216 --- [hotel-booking-app] [http-nio-8000-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-04T22:29:22.802+03:00  INFO 15216 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-04T22:29:22.806+03:00  INFO 15216 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2026-11-04T22:29:30.061+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-11-04T22:29:30.061+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-11-04T22:30:22.157+03:00  INFO 15216 --- [hotel-booking-app] [MessageBroker-2] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[4 current WS(4)-HttpStream(0)-HttpPoll(0), 4 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(4)-CONNECTED(4)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 16, active threads = 0, queued tasks = 0, completed tasks = 39], outboundChannel[pool size = 4, active threads = 0, queued tasks = 0, completed tasks = 4], sockJsScheduler[pool size = 3, active threads = 1, queued tasks = 1, completed tasks = 1]
+2026-11-04T22:31:29.719+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:31:53.079+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:31:53.113+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:31:53.135+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:31:55.728+03:00  INFO 15216 --- [hotel-booking-app] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 2 class path changes (0 additions, 0 deletions, 2 modifications)
+2026-11-04T22:31:55.733+03:00  INFO 15216 --- [hotel-booking-app] [Thread-1] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-04T22:31:55.815+03:00  INFO 15216 --- [hotel-booking-app] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-04T22:31:55.820+03:00  INFO 15216 --- [hotel-booking-app] [Thread-1] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-11-04T22:31:55.820+03:00  INFO 15216 --- [hotel-booking-app] [Thread-1] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@7c6f4892]]
+2026-11-04T22:31:55.820+03:00  INFO 15216 --- [hotel-booking-app] [Thread-1] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-11-04T22:31:55.828+03:00  INFO 15216 --- [hotel-booking-app] [Thread-1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T22:31:55.831+03:00  INFO 15216 --- [hotel-booking-app] [Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-04T22:31:55.833+03:00  INFO 15216 --- [hotel-booking-app] [Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-11-04T22:31:55.983+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Starting HotelBookingAppApplication using Java 17.0.20.1 with PID 15216 (C:\Users\DELL\Ijdb\project\hotel-booking-app\target\classes started by DELL in C:\Users\DELL\Ijdb\project\hotel-booking-app)
+2026-11-04T22:31:55.983+03:00 DEBUG 15216 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-04T22:31:55.983+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : The following 1 profile is active: "dev"
+2026-11-04T22:31:56.785+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-04T22:31:56.877+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 89 ms. Found 18 JPA repository interfaces.
+2026-11-04T22:31:57.221+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8000 (http)
+2026-11-04T22:31:57.222+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-04T22:31:57.223+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-04T22:31:57.277+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1290 ms
+2026-11-04T22:31:58.612+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-04T22:32:00.068+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-04T22:32:00.070+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-11-04T22:32:00.247+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@16ed6eb7
+2026-11-04T22:32:00.248+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-11-04T22:32:00.273+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5434/vibestay-app]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: vibestay-app/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-04T22:32:01.290+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-04T22:32:01.429+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T22:32:01.780+03:00 DEBUG 15216 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'authenticationJwtTokenFilter' configured for use
+2026-11-04T22:32:01.781+03:00 DEBUG 15216 --- [hotel-booking-app] [restartedMain] c.g.h.security.RateLimitFilter           : Filter 'rateLimitFilter' configured for use
+2026-11-04T22:32:01.781+03:00 DEBUG 15216 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'jwtRequestFilter' configured for use
+2026-11-04T22:32:03.549+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-04T22:32:03.683+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsService
+2026-11-04T22:32:04.543+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:32:04.544+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/index.html]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:32:04.544+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/static/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:32:04.544+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/css/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:32:04.544+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/js/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:32:04.545+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/images/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:32:04.545+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/favicon.ico]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:32:04.545+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/uploads/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:32:04.596+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-11-04T22:32:04.596+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@1c0f425e]]
+2026-11-04T22:32:04.597+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-11-04T22:32:04.606+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8000 (http) with context path '/'
+2026-11-04T22:32:04.616+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Started HotelBookingAppApplication in 8.691 seconds (process running for 179.323)
+2026-11-04T22:32:04.644+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-11-04T22:32:04.644+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-11-04T22:32:04.646+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-11-04T22:32:06.166+03:00  INFO 15216 --- [hotel-booking-app] [http-nio-8000-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-04T22:32:06.166+03:00  INFO 15216 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-04T22:32:06.171+03:00  INFO 15216 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 4 ms
+2026-11-04T22:33:04.601+03:00  INFO 15216 --- [hotel-booking-app] [MessageBroker-2] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[4 current WS(4)-HttpStream(0)-HttpPoll(0), 4 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(4)-CONNECTED(4)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 16, active threads = 0, queued tasks = 0, completed tasks = 45], outboundChannel[pool size = 4, active threads = 0, queued tasks = 0, completed tasks = 4], sockJsScheduler[pool size = 3, active threads = 1, queued tasks = 1, completed tasks = 1]
+2026-11-04T22:33:07.330+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:33:12.386+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:34:25.961+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:34:26.006+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:34:26.060+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:34:26.253+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:34:26.320+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:34:44.609+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:34:44.638+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:34:44.664+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:34:44.707+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:34:44.752+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:34:44.781+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:34:44.839+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:34:44.885+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:34:56.416+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InformationNotFoundException: Hotel with id 11 not found]
+2026-11-04T22:34:56.444+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InformationNotFoundException: Hotel with id 11 not found]
+2026-11-04T22:34:56.474+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InformationNotFoundException: Hotel with id 11 not found]
+2026-11-04T22:34:56.501+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InformationNotFoundException: Hotel with id 11 not found]
+2026-11-04T22:34:56.925+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InformationNotFoundException: Hotel with id 11 not found]
+2026-11-04T22:34:58.661+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InformationNotFoundException: Hotel with id 11 not found]
+2026-11-04T22:35:00.027+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:35:00.065+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:35:00.093+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:35:00.123+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:35:00.150+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:35:00.191+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:35:01.949+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InformationNotFoundException: Hotel with id 11 not found]
+2026-11-04T22:35:01.961+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InformationNotFoundException: Hotel with id 11 not found]
+2026-11-04T22:35:01.976+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InformationNotFoundException: Hotel with id 11 not found]
+2026-11-04T22:35:01.987+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InformationNotFoundException: Hotel with id 11 not found]
+2026-11-04T22:35:01.996+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InformationNotFoundException: Hotel with id 11 not found]
+2026-11-04T22:35:02.005+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InformationNotFoundException: Hotel with id 11 not found]
+2026-11-04T22:35:04.446+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:35:08.654+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:35:08.673+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:35:08.700+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:35:08.723+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:35:08.749+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:35:08.773+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:37:04.623+03:00  INFO 15216 --- [hotel-booking-app] [MessageBroker-1] c.g.h.scheduler.BookingHoldExpiryJob     : Booking 386 is cancelled because customer did not pay
+2026-11-04T22:37:26.396+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:38:04.632+03:00  INFO 15216 --- [hotel-booking-app] [MessageBroker-1] c.g.h.scheduler.BookingHoldExpiryJob     : Booking 47 is cancelled because customer did not pay
+2026-11-04T22:38:19.498+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:38:39.816+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:39:04.617+03:00  INFO 15216 --- [hotel-booking-app] [MessageBroker-1] c.g.h.scheduler.BookingHoldExpiryJob     : Booking 40 is cancelled because customer did not pay
+2026-11-04T22:39:04.617+03:00  INFO 15216 --- [hotel-booking-app] [MessageBroker-1] c.g.h.scheduler.BookingHoldExpiryJob     : Booking 305 is cancelled because customer did not pay
+2026-11-04T22:40:04.622+03:00  INFO 15216 --- [hotel-booking-app] [MessageBroker-1] c.g.h.scheduler.BookingHoldExpiryJob     : Booking 159 is cancelled because customer did not pay
+2026-11-04T22:41:42.212+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:41:42.227+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:41:48.953+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:41:48.967+03:00  WARN 15216 --- [hotel-booking-app] [http-nio-8000-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.ga.hotel_booking_app.exception.custom.InvalidInformationException: You can't view rooms of a hotel that is not active]
+2026-11-04T22:42:04.623+03:00  INFO 15216 --- [hotel-booking-app] [MessageBroker-1] c.g.h.scheduler.BookingHoldExpiryJob     : Booking 20 is cancelled because customer did not pay
+2026-11-04T22:42:04.623+03:00  INFO 15216 --- [hotel-booking-app] [MessageBroker-1] c.g.h.scheduler.BookingHoldExpiryJob     : Booking 492 is cancelled because customer did not pay
+2026-11-04T22:45:08.162+03:00  INFO 15216 --- [hotel-booking-app] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2026-11-04T22:45:08.163+03:00  INFO 15216 --- [hotel-booking-app] [Thread-6] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-04T22:45:08.273+03:00  INFO 15216 --- [hotel-booking-app] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-04T22:45:08.278+03:00  INFO 15216 --- [hotel-booking-app] [Thread-6] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-11-04T22:45:08.279+03:00  INFO 15216 --- [hotel-booking-app] [Thread-6] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@1c0f425e]]
+2026-11-04T22:45:08.279+03:00  INFO 15216 --- [hotel-booking-app] [Thread-6] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-11-04T22:45:08.284+03:00  INFO 15216 --- [hotel-booking-app] [Thread-6] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T22:45:08.285+03:00  INFO 15216 --- [hotel-booking-app] [Thread-6] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2026-11-04T22:45:08.287+03:00  INFO 15216 --- [hotel-booking-app] [Thread-6] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
+2026-11-04T22:45:09.397+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Starting HotelBookingAppApplication using Java 17.0.20.1 with PID 15216 (C:\Users\DELL\Ijdb\project\hotel-booking-app\target\classes started by DELL in C:\Users\DELL\Ijdb\project\hotel-booking-app)
+2026-11-04T22:45:09.403+03:00 DEBUG 15216 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-11-04T22:45:09.406+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : The following 1 profile is active: "dev"
+2026-11-04T22:45:11.611+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-04T22:45:11.687+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 74 ms. Found 18 JPA repository interfaces.
+2026-11-04T22:45:11.913+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8000 (http)
+2026-11-04T22:45:11.914+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-04T22:45:11.915+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-04T22:45:11.967+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2508 ms
+2026-11-04T22:45:12.080+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-04T22:45:12.176+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-04T22:45:12.178+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+2026-11-04T22:45:12.242+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection org.postgresql.jdbc.PgConnection@6f7beac3
+2026-11-04T22:45:12.242+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+2026-11-04T22:45:12.267+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5434/vibestay-app]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: vibestay-app/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-04T22:45:12.966+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-04T22:45:13.051+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T22:45:13.309+03:00 DEBUG 15216 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'authenticationJwtTokenFilter' configured for use
+2026-11-04T22:45:13.310+03:00 DEBUG 15216 --- [hotel-booking-app] [restartedMain] c.g.h.security.RateLimitFilter           : Filter 'rateLimitFilter' configured for use
+2026-11-04T22:45:13.310+03:00 DEBUG 15216 --- [hotel-booking-app] [restartedMain] c.g.h.security.JwtRequestFilter          : Filter 'jwtRequestFilter' configured for use
+2026-11-04T22:45:13.959+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-11-04T22:45:14.024+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsService
+2026-11-04T22:45:14.308+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:45:14.309+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/index.html]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:45:14.309+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/static/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:45:14.309+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/css/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:45:14.309+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/js/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:45:14.309+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/images/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:45:14.309+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/favicon.ico]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:45:14.309+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore PathPattern [/uploads/**]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-11-04T22:45:14.332+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-11-04T22:45:14.332+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@3b213bd2]]
+2026-11-04T22:45:14.332+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-11-04T22:45:14.336+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8000 (http) with context path '/'
+2026-11-04T22:45:14.341+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] c.g.h.HotelBookingAppApplication         : Started HotelBookingAppApplication in 5.808 seconds (process running for 969.048)
+2026-11-04T22:45:14.352+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-11-04T22:45:14.352+03:00  WARN 15216 --- [hotel-booking-app] [restartedMain] o.s.core.events.SpringDocAppInitializer  : SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-11-04T22:45:14.353+03:00  INFO 15216 --- [hotel-booking-app] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-11-04T22:45:19.171+03:00  INFO 15216 --- [hotel-booking-app] [http-nio-8000-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-04T22:45:19.171+03:00  INFO 15216 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-04T22:45:19.173+03:00  INFO 15216 --- [hotel-booking-app] [http-nio-8000-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-11-04T22:46:12.817+03:00  INFO 15216 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-04T22:46:12.880+03:00  INFO 15216 --- [hotel-booking-app] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-04T22:46:12.883+03:00  INFO 15216 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-11-04T22:46:12.884+03:00  INFO 15216 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@3b213bd2]]
+2026-11-04T22:46:12.884+03:00  INFO 15216 --- [hotel-booking-app] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-11-04T22:46:12.887+03:00  INFO 15216 --- [hotel-booking-app] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T22:46:12.889+03:00  INFO 15216 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown initiated...
+2026-11-04T22:46:12.890+03:00  INFO 15216 --- [hotel-booking-app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown completed.

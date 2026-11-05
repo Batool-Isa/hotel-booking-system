@@ -65,4 +65,6 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
             @Param("checkIn") LocalDate checkIn,
             @Param("checkOut") LocalDate checkOut,
             Pageable pageable);
+    @Query("SELECT h.status, COUNT(h) FROM Hotel h GROUP BY h.status")
+    List<Object[]> countGroupByStatus();
 }
