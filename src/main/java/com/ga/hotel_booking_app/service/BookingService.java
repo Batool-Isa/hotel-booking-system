@@ -97,8 +97,10 @@ public class BookingService {
             }
         }
         for (Long roomId : roomIds) {
+            logger.info("[{}] waiting for the lock on room {}", Thread.currentThread().getName(), roomId);
             roomRepository.findByIdForUpdate(roomId)
                     .orElseThrow(() -> new InformationNotFoundException("Room with id " + roomId + " not found"));
+            logger.info("[{}] got the lock on room {}", Thread.currentThread().getName(), roomId);
         }
 
 
@@ -250,7 +252,8 @@ public class BookingService {
                 "Customer " + customer.getUsername() + " reserve booking " + booking.getBookingReference()
         );
         logger.info(
-                "Booking created: reference={}, userId={}, hotelId={}",
+                "[{}] Booking created: reference={}, userId={}, hotelId={} (room lock is released when this transaction commits)",
+                Thread.currentThread().getName(),
                 booking.getBookingReference(),
                 customer.getId(),
                 hotel.getId()

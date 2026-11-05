@@ -100,13 +100,17 @@ The app itself runs on PostgreSQL. The `test` profile (used by `./mvnw test`) us
 
 The app starts on `http://localhost:8000`. Swagger is at `http://localhost:8000/swagger-ui/index.html`.
 
-**Payments locally.** Stripe cannot reach `localhost`, so forward its webhooks with the [Stripe CLI](https://docs.stripe.com/stripe-cli) and put the `whsec_...` it prints in `WEBHOOK_SECRET`:
+**Payments locally.** Stripe cannot reach `localhost`, so forward its webhooks with the [Stripe CLI](https://docs.stripe.com/stripe-cli). Open a second terminal (PowerShell works) and keep it running while you use the app:
 
 ```bash
-stripe listen --forward-to localhost:8000/webhook
+stripe listen --api-key <your sk_test_... key> --events checkout.session.completed --forward-to localhost:8000/webhook
 ```
 
-Pay with the test card `4242 4242 4242 4242`, any future date and any CVC.
+- `--events checkout.session.completed` is required by recent versions of the Stripe CLI, and it is the only event the app handles.
+- `--api-key` makes the CLI listen to the same Stripe account as the backend's `SECRET_KEY`. Without it, the CLI may be logged in to another account and never see your payments.
+- It prints `Your webhook signing secret is whsec_...`. Put that value in `WEBHOOK_SECRET` and restart the backend if it changed.
+
+Pay with the test card `4242 4242 4242 4242`, any future date and any CVC. After paying, the terminal shows `checkout.session.completed [200]` and the booking becomes `CONFIRMED`. A `[400]` means `WEBHOOK_SECRET` doesn't match; nothing at all means the CLI is on a different Stripe account. To test the forwarding without paying, run `stripe trigger checkout.session.completed` in another terminal.
 
 **5. Demo data.** The first time the app starts on an empty database, it adds demo data. If the database already has any users or hotels, it adds nothing. For a fresh start, drop and recreate the database.
 

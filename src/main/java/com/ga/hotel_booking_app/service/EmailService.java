@@ -1,6 +1,9 @@
 package com.ga.hotel_booking_app.service;
 
 import com.ga.hotel_booking_app.dto.EmailDetails;
+import com.ga.hotel_booking_app.repository.BookingRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.ga.hotel_booking_app.model.Booking;
 import com.ga.hotel_booking_app.model.EmailVerificationToken;
 import com.ga.hotel_booking_app.model.PasswordResetToken;
@@ -19,8 +22,16 @@ import java.time.temporal.ChronoUnit;
 
 @Service
 public class EmailService {
+    private static final Logger log = LoggerFactory.getLogger(EmailService.class);
     @Autowired
     MailSenderService mailSenderService;
+    @Autowired
+    BookingRepository bookingRepository;
+
+    private Booking reload(Booking booking) {
+        return booking.getId() == null ? booking
+                : bookingRepository.findById(booking.getId()).orElse(booking);
+    }
    @Autowired
    HotelMapService hotelMapService;
     public String buildActionEmailBody(
@@ -947,7 +958,9 @@ public class EmailService {
 
     @Async("emailThreadExecutor")
     @Transactional(readOnly = true)
-    public void sendBookingConfirmationEmail(Booking booking) {
+    public void sendBookingConfirmationEmail(Booking detached) {
+        log.info("[{}] sending confirmation email for {}", Thread.currentThread().getName(), detached.getBookingReference());
+        Booking booking = reload(detached);
         byte[] map = hotelMapService.loadHotelMap(booking);
         String body = buildBookingEmailBody(booking, "Booking Confirmed", "Your VibeStay booking has been successfully confirmed.", map != null);
         EmailDetails emailDetails = new EmailDetails();
@@ -958,7 +971,10 @@ public class EmailService {
     }
 
     @Async("emailThreadExecutor")
-    public void sendBookingCancellationEmail(Booking booking) {
+    @Transactional(readOnly = true)
+    public void sendBookingCancellationEmail(Booking detached) {
+        log.info("[{}] sending cancellation email for {}", Thread.currentThread().getName(), detached.getBookingReference());
+        Booking booking = reload(detached);
         byte[] map = hotelMapService.loadHotelMap(booking);
         String body = buildBookingEmailBody(
                 booking, "Booking Cancelled", "Your VibeStay booking has been cancelled.", map != null);

@@ -193,11 +193,11 @@ public class PaymentService {
         if (booking.getStatus() == Booking.Status.PENDING
                 && booking.getHoldExpiresAt() != null
                 && booking.getHoldExpiresAt().isAfter(LocalDateTime.now())) {
-            notificationService.sendBookingNotification(booking);
-            emailService.sendBookingConfirmationEmail(booking);
             booking.setStatus(Booking.Status.CONFIRMED);
             bookingRepository.save(booking);
             logger.info("Booking {} is confirmed after payment paid", booking.getId());
+            notificationService.sendBookingNotification(booking);
+            emailService.sendBookingConfirmationEmail(booking);
         } else {
             logger.warn("Payment {} succeeded but booking {} is {}",
                     payment.getId(), booking.getBookingReference(), booking.getStatus());
