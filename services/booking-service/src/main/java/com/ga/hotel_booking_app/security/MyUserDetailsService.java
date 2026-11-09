@@ -1,6 +1,5 @@
 package com.ga.hotel_booking_app.security;
 
-import com.ga.hotel_booking_app.exception.custom.InvalidCredentialsException;
 import com.ga.hotel_booking_app.model.User;
 import com.ga.hotel_booking_app.service.UserService;
 import lombok.AllArgsConstructor;
