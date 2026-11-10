@@ -6,7 +6,6 @@ import com.ga.hotel_booking_app.dto.response.MessageResponse;
 import com.ga.hotel_booking_app.exception.custom.InformationNotFoundException;
 import com.ga.hotel_booking_app.exception.custom.InvalidInformationException;
 import com.ga.hotel_booking_app.exception.custom.UnauthorizedActionException;
-import com.ga.hotel_booking_app.model.*;
 import com.ga.hotel_booking_app.repository.HotelImageRepository;
 import com.ga.hotel_booking_app.repository.HotelRepository;
 import com.ga.hotel_booking_app.repository.UserRepository;

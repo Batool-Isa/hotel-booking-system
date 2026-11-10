@@ -12,6 +12,7 @@ import com.ga.hotelservice.model.Hotel;
 import com.ga.hotelservice.repository.ChildPolicyRepository;
 import com.ga.hotelservice.repository.HotelRepository;
 import com.ga.hotelservice.security.AuthUser;
+import com.ga.hotelservice.security.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +26,8 @@ public class ChildPolicyService {
     private HotelRepository hotelRepository;
     @Autowired
     private ChildPolicyRepository childPolicyRepository;
-
-    // the logged-in user, built from the JWT by JwtRequestFilter (no database lookup)
-    private AuthUser getCurrentLoggedInUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return principal instanceof AuthUser user ? user : null;
-    }
+    @Autowired
+    private CurrentUser currentUser;
 
     public ResponseEntity<?> createChildPolicy(
             Long hotelId,
@@ -39,7 +36,7 @@ public class ChildPolicyService {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new InformationNotFoundException("Hotel with id " + hotelId + " not found"));
 
-        AuthUser user = getCurrentLoggedInUser();
+        AuthUser user = currentUser.get();
 
         // hotel manager can only manage their own hotel
         if (user.isManager()) {
@@ -101,7 +98,7 @@ public class ChildPolicyService {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new InformationNotFoundException("Hotel with id " + hotelId + " not found"));
 
-        AuthUser user = getCurrentLoggedInUser();
+        AuthUser user = currentUser.get();
 
         // hotel manager can only update their own hotel's policy
         if (user.isManager()) {

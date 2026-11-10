@@ -18,11 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-/**
- * Demo accounts for user-service: roles, one admin, six hotel managers and 24 guests.
- * Runs only on an empty users schema. Users are created in the same order as before the split
- * (admin, managers, customers), so their ids stay 1, 2-7 and 8-31, the ids bookings refer to.
- */
 @Configuration
 @RequiredArgsConstructor
 public class DataSeeder {
@@ -109,7 +104,6 @@ public class DataSeeder {
         userRepository.save(user);
     }
 
-    // accounts look like they joined over the past year or two rather than all at once
     private void backdateUsers() {
         Random rnd = new Random(20261104L);
         LocalDateTime now = LocalDateTime.now();

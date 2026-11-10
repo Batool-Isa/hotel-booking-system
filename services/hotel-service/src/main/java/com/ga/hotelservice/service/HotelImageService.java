@@ -11,10 +11,9 @@ import com.ga.hotelservice.model.Hotel;
 import com.ga.hotelservice.model.HotelImage;
 import com.ga.hotelservice.repository.HotelImageRepository;
 import com.ga.hotelservice.repository.HotelRepository;
+import com.ga.hotelservice.security.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,19 +33,13 @@ public class HotelImageService {
 
     @Autowired
     private HotelImageRepository hotelImageRepository;
+    @Autowired
+    private CurrentUser currentUser;
 
     private static final Map<String, String> allowedTypes = Map.of(
             "image/jpeg", ".jpg",
             "image/png", ".png",
-            "image/webp", ".webp"
-    );
-
-    // the logged-in user, built from the JWT by JwtRequestFilter (no database lookup)
-    private AuthUser getCurrentLoggedInUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return principal instanceof AuthUser user ? user : null;
-    }
-
+            "image/webp", ".webp");
 
     public ResponseEntity<?> getImages(Long id) {
         List<HotelImage> images = hotelImageRepository.findByHotelId(id);
@@ -67,43 +60,42 @@ public class HotelImageService {
     public ResponseEntity<?> uploadImages(Long id, List<MultipartFile> images, List<String> altTexts) {
         Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new InformationNotFoundException("Hotel with id " + id + " not found"));
-        AuthUser currentUser = getCurrentLoggedInUser();
-        if (currentUser.isManager()) {
-            boolean isThisHotelManager = hotel.isManagedBy(currentUser.getId());
+        AuthUser user = currentUser.get();
+        if (user.isManager()) {
+            boolean isThisHotelManager = hotel.isManagedBy(user.getId());
             if (!isThisHotelManager) {
                 throw new UnauthorizedActionException("You are not authorized to update this hotel");
             }
         }
         if (images.size() != altTexts.size()) {
             throw new InvalidInformationException(
-                    "Each image must have an alt text"
-            );
+                    "Each image must have an alt text");
         }
         try {
             // check if hotel folder exists
             Path uploadPath = Paths.get(UPLOAD_DIR + "/" + hotel.getId());
-            //if not , create one
+            // if not , create one
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
             for (int i = 0; i < images.size(); i++) {
                 String type = images.get(i).getContentType();
 
-                if(!allowedTypes.containsKey(type)){
+                if (!allowedTypes.containsKey(type)) {
                     throw new InvalidInformationException("Only JPG, PNG or WEBP images are allowed");
                 }
 
                 MultipartFile image = images.get(i);
                 String altText = altTexts.get(i);
                 String fileExtension = allowedTypes.get(type);
-                //create images naming
+                // create images naming
                 String uniqueId = UUID.randomUUID().toString().substring(0, 5);
                 String imageName = uniqueId + fileExtension;
 
-                //upload images
+                // upload images
                 Path imageFilePath = uploadPath.resolve(imageName);
                 image.transferTo(imageFilePath);
-                String imageURL = imageFilePath.toString();
+                String imageURL = UPLOAD_DIR + "/" + hotel.getId() + "/" + imageName;
                 HotelImage hotelImage = new HotelImage();
                 hotelImage.setImageURL(imageURL);
                 hotelImage.setAltText(altText);
@@ -112,7 +104,9 @@ public class HotelImageService {
             }
             return ResponseEntity.ok(new MessageResponse("Images uploaded successfully"));
 
-        } catch (Exception e) {
+        } catch (InvalidInformationException e) {
+            throw e;
+        } catch (IOException e) {
             throw new RuntimeException("Failed to upload images", e);
         }
     }
@@ -120,25 +114,25 @@ public class HotelImageService {
     public ResponseEntity<?> deleteImage(Long hotelId, Long imageId) throws IOException {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new InformationNotFoundException("Hotel with id " + hotelId + " not found"));
-        AuthUser currentUser = getCurrentLoggedInUser();
-        if (currentUser.isManager()) {
-            boolean isThisHotelManager = hotel.isManagedBy(currentUser.getId());
+        AuthUser user = currentUser.get();
+        if (user.isManager()) {
+            boolean isThisHotelManager = hotel.isManagedBy(user.getId());
             if (!isThisHotelManager) {
                 throw new UnauthorizedActionException("You are not authorized to update this hotel");
             }
         }
         HotelImage image = hotelImageRepository.findById(imageId)
                 .orElseThrow(() -> new InformationNotFoundException("Hotel Image with id " + imageId + " not found"));
-        if(!image.getHotel().equals(hotel)){
+        if (!image.getHotel().equals(hotel)) {
             throw new UnauthorizedActionException("This image does not belong to this hotel");
         }
-       try{
-           Path filePaths = Paths.get(image.getImageURL());
-           Files.deleteIfExists(filePaths);
-       }catch (IOException e){
-           throw new IOException("Unable to delete image "+e);
-       }
+        try {
+            Path filePaths = Paths.get(image.getImageURL());
+            Files.deleteIfExists(filePaths);
+        } catch (IOException e) {
+            throw new IOException("Unable to delete image " + e);
+        }
         hotelImageRepository.delete(image);
-       return ResponseEntity.ok(new MessageResponse("Hotel Image deleted successfully"));
+        return ResponseEntity.ok(new MessageResponse("Hotel Image deleted successfully"));
     }
 }

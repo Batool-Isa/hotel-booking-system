@@ -11,10 +11,9 @@ import com.ga.hotelservice.model.Room;
 import com.ga.hotelservice.repository.HotelRepository;
 import com.ga.hotelservice.repository.RoomImageRepository;
 import com.ga.hotelservice.repository.RoomRepository;
+import com.ga.hotelservice.security.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,14 +39,10 @@ public class RoomImageService {
 
     @Autowired
     private AuditLogService auditLogService;
+    @Autowired
+    private CurrentUser currentUser;
 
-    // the logged-in user, built from the JWT by JwtRequestFilter (no database lookup)
-    private AuthUser getCurrentLoggedInUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return principal instanceof AuthUser user ? user : null;
-    }
 
-    /** The room must exist and belong to the hotel in the URL. */
     private Room findRoomOfHotel(Long hotelId, Long roomId) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new InformationNotFoundException("Room with id " + roomId + " not found"));
@@ -79,7 +74,7 @@ public class RoomImageService {
     }
     public ResponseEntity<?> uploadImages(Long hotelId, Long roomId, List<MultipartFile> images) {
         Room room = findRoomOfHotel(hotelId, roomId);
-        AuthUser user = getCurrentLoggedInUser();
+        AuthUser user = currentUser.get();
         checkCanManage(room, user);
 
         if (images == null || images.isEmpty()) {
@@ -105,7 +100,8 @@ public class RoomImageService {
                 image.transferTo(imageFilePath);
 
                 RoomImage roomImage = new RoomImage();
-                roomImage.setImageURL(imageFilePath.toString());
+                // build a web path with "/" (Path.toString() uses "\" on Windows)
+                roomImage.setImageURL(UPLOAD_DIR + "/" + hotelId + "/" + roomId + "/" + imageName);
                 roomImage.setRoom(room);
                 roomImageRepository.save(roomImage);
             }
@@ -121,7 +117,7 @@ public class RoomImageService {
 
     public ResponseEntity<?> deleteImage(Long hotelId, Long roomId, Long imageId) throws IOException {
         Room room = findRoomOfHotel(hotelId, roomId);
-        AuthUser user = getCurrentLoggedInUser();
+        AuthUser user = currentUser.get();
         checkCanManage(room, user);
 
         RoomImage image = roomImageRepository.findById(imageId)

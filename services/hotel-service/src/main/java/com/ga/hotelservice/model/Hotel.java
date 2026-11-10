@@ -55,7 +55,6 @@ public class Hotel {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    // Ids of the users (from user-service) who manage this hotel. Plain ids, no link to the users table.
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "hotel_managers", joinColumns = @JoinColumn(name = "hotel_id"))
     @Column(name = "user_id")

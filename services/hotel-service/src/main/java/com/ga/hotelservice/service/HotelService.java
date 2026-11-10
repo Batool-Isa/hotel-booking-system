@@ -1,5 +1,7 @@
 package com.ga.hotelservice.service;
 
+import com.ga.hotelservice.client.UserServiceClient;
+import com.ga.hotelservice.client.UserSummary;
 import com.ga.hotelservice.model.HotelAmenity;
 import com.ga.hotelservice.security.AuthUser;
 import com.ga.hotelservice.dto.request.CreateHotelRequest;
@@ -24,8 +26,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -37,8 +37,11 @@ public class HotelService {
     @Autowired
     private HotelRepository hotelRepository;
 
-@Autowired
-private CurrentUser currentUser;
+    @Autowired
+    private CurrentUser currentUser;
+
+    @Autowired
+    private UserServiceClient userServiceClient;
 
     public ResponseEntity<?> createHotel(CreateHotelRequest request) {
         if (hotelRepository.existsByName(request.getName())) {
@@ -66,6 +69,7 @@ private CurrentUser currentUser;
             if (request.getManagerId() == null) {
                 throw new InvalidInformationException("Manager ID is required when an admin creates a hotel");
             }
+            requireHotelManager(request.getManagerId());
             hotel.setStatus(Hotel.Status.ACTIVE);
             hotel.getManagerIds().add(request.getManagerId());
             hotelRepository.save(hotel);
@@ -156,9 +160,10 @@ private CurrentUser currentUser;
 
 
     }
+
     public ResponseEntity<?> getAllHotels(String search, String name,
-                                       String country, String city,
-                                       Pageable pageable) {
+                                          String country, String city,
+                                          Pageable pageable) {
         Page<Hotel> hotels = hotelRepository.getAllHotels(
                 search, name, city, country, pageable
         );
@@ -211,6 +216,7 @@ private CurrentUser currentUser;
             }
         } else if (user.isAdmin()) {
             if (request.getManagerId() != null) {
+                requireHotelManager(request.getManagerId());
                 hotel.getManagerIds().add(request.getManagerId());
 
             }
@@ -259,12 +265,21 @@ private CurrentUser currentUser;
         return ResponseEntity.ok(new MessageResponse("Hotel Updated successfully"));
     }
 
+    private void requireHotelManager(Long userId) {
+        UserSummary user = userServiceClient.findUser(userId, currentUser.token())
+                .orElseThrow(() -> new InformationNotFoundException("User " + userId + " not found"));
+        if (!"HOTEL_MANAGER".equals(user.getRole())) {
+            throw new InvalidInformationException("User " + userId + " is not a hotel manager");
+        }
+    }
+
     public ResponseEntity<?> assignManager(Long hotelId, Long managerId) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new InformationNotFoundException("Hotel with id " + hotelId + " not found"));
         if (hotel.isManagedBy(managerId)) {
             throw new InvalidInformationException("This manager is already assigned to this hotel");
         }
+        requireHotelManager(managerId);
         hotel.getManagerIds().add(managerId);
         hotelRepository.save(hotel);
         return ResponseEntity.ok(new MessageResponse("Manager assigned successfully to hotel " + hotel.getName()));

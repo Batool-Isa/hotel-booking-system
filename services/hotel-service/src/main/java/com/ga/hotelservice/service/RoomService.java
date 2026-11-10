@@ -14,19 +14,15 @@ import com.ga.hotelservice.model.Hotel;
 import com.ga.hotelservice.model.Room;
 import com.ga.hotelservice.model.RoomType;
 import com.ga.hotelservice.repository.*;
-import com.ga.hotelservice.service.AuditLogService;
+import com.ga.hotelservice.security.CurrentUser;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -43,11 +39,8 @@ public class RoomService {
     @Autowired
     private AuditLogService auditLogService;
 
-    // the logged-in user, built from the JWT by JwtRequestFilter (no database lookup)
-    private AuthUser getCurrentLoggedInUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return principal instanceof AuthUser user ? user : null;
-    }
+    @Autowired
+    private CurrentUser currentUser;
 
     public ResponseEntity<?> createRoom(Long id, @Valid CreateRoomRequest request) {
 
@@ -56,7 +49,7 @@ public class RoomService {
         if (!hotel.getStatus().equals(Hotel.Status.ACTIVE)) {
             throw new InvalidInformationException("You can't add room to a hotel that is not active");
         }
-        AuthUser user = getCurrentLoggedInUser();
+        AuthUser user = currentUser.get();
         if (user.isManager()) {
             // check if manager is assigned to this hotel
             boolean isThisHotelManager = hotel.isManagedBy(user.getId());
@@ -125,7 +118,7 @@ public class RoomService {
     }
     public ResponseEntity<?> getRoom(Long hotelId, Long roomId) {
         Hotel hotel = findHotel(hotelId);
-        AuthUser user = getCurrentLoggedInUser();
+        AuthUser user = currentUser.get();
         checkCanManage(hotel, user, "You can't view rooms of a hotel you don't manage");
         return ResponseEntity.ok(toResponse(findRoomOfHotel(hotelId, roomId)));
     }
@@ -154,7 +147,7 @@ public class RoomService {
             throw new InvalidInformationException("You can't view rooms of a hotel that is not active");
         }
         Page<Room> roomsList;
-        AuthUser user = getCurrentLoggedInUser();
+        AuthUser user =currentUser.get();
         if (user.isManager()) {
             // check if manager is assigned to this hotel
             boolean isThisHotelManager = hotel.isManagedBy(user.getId());
@@ -177,7 +170,7 @@ public class RoomService {
     }
     public ResponseEntity<?> updateRoom(Long hotelId, Long roomId, CreateRoomRequest request) {
         Hotel hotel = findHotel(hotelId);
-        AuthUser user = getCurrentLoggedInUser();
+        AuthUser user = currentUser.get();
         checkCanManage(hotel, user, "You are not authorized to update rooms of this hotel");
         Room room = findRoomOfHotel(hotelId, roomId);
 
@@ -198,7 +191,7 @@ public class RoomService {
         if (!hotel.getStatus().equals(Hotel.Status.ACTIVE)) {
             throw new InvalidInformationException("You can't add room to a hotel that is not active");
         }
-        AuthUser user = getCurrentLoggedInUser();
+        AuthUser user = currentUser.get();
         checkCanManage(hotel, user, "You are not authorized to add room to this hotel");
 
         Set<String> seenNumbers = new HashSet<>();
@@ -224,7 +217,7 @@ public class RoomService {
     }
     public ResponseEntity<?> updateRoomStatus(Long hotelId, Long roomId, UpdateRoomStatusRequest request) {
         Hotel hotel = findHotel(hotelId);
-        AuthUser user = getCurrentLoggedInUser();
+        AuthUser user = currentUser.get();
         checkCanManage(hotel, user, "You are not authorized to update rooms of this hotel");
         Room room = findRoomOfHotel(hotelId, roomId);
 

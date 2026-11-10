@@ -13,6 +13,7 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -86,7 +87,7 @@ public class UserController {
         return passwordResetService.forgotPassword(request);
     }
 
-    @PostMapping("/reset-link")
+    @PostMapping("/reset-password")
     @Operation(summary = "Reset password", description = "Uses the token from the reset email to set a new password")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Password reset successfully"),
@@ -144,5 +145,11 @@ public class UserController {
             @RequestParam("image") MultipartFile image) {
         System.out.println("User Controller calling ---> update user profile image");
         return userService.updateProfileImage(image);
+    }
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_MANAGER')")
+    @Operation(summary = "Get a user's details", description = "Used by other micro services to check what is user role and what privilege he have")
+    public ResponseEntity<?> getUserSummary(@PathVariable("id") Long id) {
+        return userService.getUserSummary(id);
     }
 }

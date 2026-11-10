@@ -3,6 +3,7 @@ package com.ga.userservice.service;
 import com.ga.userservice.dto.response.UserProfileResponse;
 import com.ga.userservice.dto.request.RegisterRequest;
 import com.ga.userservice.dto.request.UpdateProfileRequest;
+import com.ga.userservice.dto.response.UserSummaryResponse;
 import com.ga.userservice.exception.custom.*;
 import com.ga.userservice.model.EmailVerificationToken;
 import com.ga.userservice.dto.response.MessageResponse;
@@ -107,7 +108,6 @@ public class UserService {
      * @return saved user
      */
     public ResponseEntity<?> register(RegisterRequest request, MultipartFile image) {
-        System.out.println("User service calling ----> register");
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new InformationExistException(
                     "Username " + request.getUsername() + " is already taken!"
@@ -134,7 +134,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setStatus(User.Status.UNVERIFIED);
         if (image != null && !image.isEmpty()) {
-            String profileImage = uploadeImage(image);
+            String profileImage = uploadImage(image);
             profile.setProfileImageUrl(profileImage);
         }
         Role role = roleRepository.findByName(Role.RoleName.CUSTOMER)
@@ -152,7 +152,7 @@ public class UserService {
         ));
     }
 
-    public String uploadeImage(MultipartFile image) {
+    public String uploadImage(MultipartFile image) {
         // validate image efore uploading
         if(image == null || image.isEmpty()){
             throw new InvalidInformationException("Please choose an image file");
@@ -170,19 +170,19 @@ public class UserService {
                 Files.createDirectories(uploadPath);
             }
 
-            String fileExtenstion;
+            String fileExtension;
             if (type.equals("image/png")){
-                fileExtenstion=".png";
+                fileExtension =".png";
             }else if (type.equals("image/webp")) {
-                fileExtenstion=".webp";
+                fileExtension =".webp";
             }else{
-                fileExtenstion=".jpg";
+                fileExtension =".jpg";
             }
 
             //generate uniq id
             String uniqueId = UUID.randomUUID().toString().substring(10);
             // create file name
-            String imageFileName = uniqueId + fileExtenstion;
+            String imageFileName = uniqueId + fileExtension;
             // create file path
             Path filePath = uploadPath.resolve(imageFileName);
 
@@ -201,7 +201,6 @@ public class UserService {
      * @return token created
      */
     public EmailVerificationToken createEmailVerificationToken(User user) {
-        System.out.println("User Service Calling create Verification Token");
         EmailVerificationToken emailVerificationToken = new EmailVerificationToken();
         emailVerificationToken.setUser(user);
         emailVerificationToken.setToken(UUID.randomUUID().toString());
@@ -219,12 +218,10 @@ public class UserService {
      */
     public ResponseEntity<?> loginUser(LoginRequest loginRequest) {
         try {
-            System.out.println("calling user login");
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
            MyUserDetails myUserDetails = (MyUserDetails) authentication.getPrincipal();
             User user = findUserByEmailAddress(loginRequest.getEmail());
-            System.out.println("Status  :" + user.getStatus());
             if (user.getStatus() == (User.Status.UNVERIFIED)) {
                 throw new InvalidCredentialsException("Please verify your email first");
 
@@ -312,7 +309,7 @@ public class UserService {
     public ResponseEntity<?> updateProfileImage(MultipartFile image) {
         User user = getCurrentLoggedInUser();
         UserProfile profile = user.getUserProfile();
-        String profileImage = uploadeImage(image);
+        String profileImage = uploadImage(image);
         profile.setProfileImageUrl(profileImage);
         user.setUserProfile(profile);
         userRepository.save(user);
@@ -334,5 +331,14 @@ public class UserService {
                 "User "+user.getId() +" logged out successfully"
         );
         return ResponseEntity.ok(new MessageResponse("User logged in successfully"));
+    }
+
+    public ResponseEntity<?> getUserSummary(Long id) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new InformationNotFoundException("User with id "+id+"not found")
+        );
+        UserSummaryResponse summaryResponse= new UserSummaryResponse(user.getId(),
+                user.getEmail(),user.getRole().getName().name(), user.getStatus().name());
+        return ResponseEntity.ok(summaryResponse);
     }
 }
