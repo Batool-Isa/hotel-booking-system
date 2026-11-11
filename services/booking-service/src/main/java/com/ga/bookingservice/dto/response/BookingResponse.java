@@ -13,9 +13,9 @@ import java.util.List;
 public class BookingResponse {
     private Long id;
     private String bookingReference;
+    private Long userId;
     private Long hotelId;
     private String hotelName;
-    // who made the booking (shown to managers and admins)
     private String guestName;
     private String guestEmail;
     private String guestPhone;
@@ -29,6 +29,5 @@ public class BookingResponse {
     private BigDecimal totalAmount;
     private String specialRequest;
     private List<BookingRoomResponse> rooms;
-    // true when the guest already posted a review for this booking
     private boolean reviewed;
 }

@@ -1,6 +1,6 @@
 package com.ga.billingservice.repository;
 
-import com.ga.bookingservice.model.Payment;
+import com.ga.billingservice.model.Payment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

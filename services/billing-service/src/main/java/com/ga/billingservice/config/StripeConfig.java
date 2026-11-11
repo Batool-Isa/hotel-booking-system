@@ -1,4 +1,4 @@
-package com.ga.billingservice;
+package com.ga.billingservice.config;
 
 import com.stripe.Stripe;
 import jakarta.annotation.PostConstruct;

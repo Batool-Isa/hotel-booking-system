@@ -1,7 +1,6 @@
-package com.ga.bookingservice.model;
+package com.ga.billingservice.model;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -10,17 +9,14 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payments")
-@ToString(exclude = "booking")
 @Data
 public class Payment {
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(fetch= FetchType.LAZY)
-    @JoinColumn(name = "bookingId")
-    private Booking booking;
+    @Column(name = "booking_id", nullable = false)
+    private Long bookingId;
     @Column(nullable = false)
     private BigDecimal amount;
     @Enumerated(EnumType.STRING)

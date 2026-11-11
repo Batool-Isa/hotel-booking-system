@@ -280,6 +280,7 @@ public class BookingService {
 
     private BookingResponse mapToBookingResponse(Booking booking, HotelSummary hotel) {
         BookingResponse response = new BookingResponse();
+        response.setUserId(currentUser.get().getId());
         response.setId(booking.getId());
         response.setBookingReference(booking.getBookingReference());
         response.setHotelId(booking.getHotelId());
@@ -474,6 +475,45 @@ public class BookingService {
         );
         return ResponseEntity.ok(new MessageResponse("Booking status updated successfully"));
     }
+
+    // called by billing-service (service-to-service, no user token) after Stripe says the booking is paid.
+    // locks the booking row so it can't race with the hold-expiry job or a cancel.
+    // returns the booking's status after the call, so billing knows if it was confirmed.
+    @Transactional
+    public Map<String, Object> confirmPaidBooking(Long bookingId) {
+        Booking booking = bookingRepository.findByIdForUpdate(bookingId)
+                .orElseThrow(() -> new InformationNotFoundException("Booking with id " + bookingId + " not found"));
+
+        if (booking.getStatus() == Booking.Status.PENDING
+                && booking.getHoldExpiresAt() != null
+                && booking.getHoldExpiresAt().isAfter(LocalDateTime.now())) {
+            booking.setStatus(Booking.Status.CONFIRMED);
+            bookingRepository.save(booking);
+            auditLogService.log(
+                    booking.getUserId(),
+                    "BOOKING_PAID",
+                    "BOOKING",
+                    booking.getId(),
+                    "Booking " + booking.getBookingReference() + " confirmed after payment"
+            );
+            logger.info("Booking {} is confirmed after payment paid", booking.getBookingReference());
+        } else if (booking.getStatus() != Booking.Status.CONFIRMED) {
+            // paid too late (hold expired / cancelled): leave it, billing logs a warning
+            logger.warn("Payment arrived for booking {} but it is {}",
+                    booking.getBookingReference(), booking.getStatus());
+        }
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("id", booking.getId());
+        body.put("bookingReference", booking.getBookingReference());
+        body.put("userId", booking.getUserId());
+        body.put("hotelId", booking.getHotelId());
+        body.put("status", booking.getStatus().name());
+        body.put("holdExpiresAt", booking.getHoldExpiresAt());
+        body.put("totalAmount", booking.getTotalAmount());
+        return body;
+    }
+
     public void checkManagerAuthority(Long hotelId){
         List<HotelSummary> hotelSummaries =  hotelServiceClient.getManagersHotel(currentUser.token());
         boolean isHotelManager = hotelSummaries.stream()
