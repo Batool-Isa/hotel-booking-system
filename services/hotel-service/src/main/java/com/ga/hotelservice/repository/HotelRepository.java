@@ -55,13 +55,13 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
             "AND EXISTS (SELECT r FROM Room r WHERE r.hotel = h AND r.status = 'ACTIVE' " +
             "  AND r.maxAdults >= :adults AND r.maxChildren >= :children " +
             "  AND r.maxOccupancy >= :adults + :children )")
-    Page<Hotel> findHotelsWithFreeRooms(
+    List<Hotel> findHotelsWithFreeRooms(
             @Param("city") String city,
             @Param("adults") int adults,
-            @Param("children") int children,
+            @Param("children") int children
 //            @Param("checkIn") LocalDate checkIn,
 //            @Param("checkOut") LocalDate checkOut,
-            Pageable pageable);
+           );
     @Query("SELECT h.status, COUNT(h) FROM Hotel h GROUP BY h.status")
     List<Object[]> countGroupByStatus();
 }

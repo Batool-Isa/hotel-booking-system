@@ -149,4 +149,26 @@ public class HotelController {
 //        return reviewService.getHotelReviews(hotelId);
 //    }
 
+    @GetMapping("/available-rooms")
+    @Operation(summary = "Assign Manager to a hotel", description = "Assign manager to a specific hotel")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Assign a manager to a hotel"),
+            @ApiResponse(responseCode = "404", description = "Hotel or manager are not found"),
+            @ApiResponse(responseCode = "400", description = "User is not a hotel manager or is already assigned"),
+            @ApiResponse(responseCode = "403", description = "Only admin can assign a manager to a hotel"),
+    })
+    public ResponseEntity<?> getAvailableRooms(@RequestParam(required = false) String city,
+                                               @RequestParam int adults,
+                                               @RequestParam int children) {
+        return hotelService.getAvailableRooms(city, adults, children);
+    }
+    @GetMapping("/{id}/summary")
+    @Operation(summary = "Get hotel's summary", description = "Hotel's summary")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Hotel summary with its details"),
+            @ApiResponse(responseCode = "404", description = "Hotel not found"),
+ })
+    public ResponseEntity<?> getHotelSummary(@PathVariable Long id) {
+        return hotelService.getHotelSummary(id);
+    }
 }

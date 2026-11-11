@@ -2,22 +2,17 @@ package com.ga.hotelservice.service;
 
 import com.ga.hotelservice.client.UserServiceClient;
 import com.ga.hotelservice.client.UserSummary;
-import com.ga.hotelservice.model.HotelAmenity;
+import com.ga.hotelservice.dto.response.*;
+import com.ga.hotelservice.model.*;
+import com.ga.hotelservice.repository.RoomRepository;
 import com.ga.hotelservice.security.AuthUser;
 import com.ga.hotelservice.dto.request.CreateHotelRequest;
 import com.ga.hotelservice.dto.request.UpdateHotelRequest;
 import com.ga.hotelservice.dto.request.UpdateHotelStatusRequest;
-import com.ga.hotelservice.dto.response.AmenityResponse;
-import com.ga.hotelservice.dto.response.HotelImageResponse;
-import com.ga.hotelservice.dto.response.HotelResponse;
-import com.ga.hotelservice.dto.response.MessageResponse;
 import com.ga.hotelservice.exception.custom.InformationExistException;
 import com.ga.hotelservice.exception.custom.InformationNotFoundException;
 import com.ga.hotelservice.exception.custom.InvalidInformationException;
 import com.ga.hotelservice.exception.custom.UnauthorizedActionException;
-import com.ga.hotelservice.model.Amenity;
-import com.ga.hotelservice.model.Hotel;
-import com.ga.hotelservice.model.HotelImage;
 import com.ga.hotelservice.repository.HotelRepository;
 import com.ga.hotelservice.security.CurrentUser;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -39,7 +33,10 @@ public class HotelService {
 
     @Autowired
     private CurrentUser currentUser;
-
+    @Autowired
+    private RoomRepository roomRepository;
+    @Autowired
+    private RoomService roomService;
     @Autowired
     private UserServiceClient userServiceClient;
 
@@ -86,7 +83,6 @@ public class HotelService {
             throw new InformationNotFoundException("Hotel with id " + id + " not found");
         }
         return ResponseEntity.ok(buildHotelResponse(hotel));
-
     }
 
     public boolean canViewNonActiveHotels(Hotel hotel) {
@@ -117,6 +113,20 @@ public class HotelService {
         response.setCreatedAt(hotel.getCreatedAt());
         //response.getReviewCount(hotel.getreview);
         // response.getAverageRating(hotel.get)
+        List<AmenityResponse> amenities = createAmenities(hotel);
+        response.setAmenities(amenities);
+        List<HotelImageResponse> images = new ArrayList<>();
+        for (HotelImage image : hotel.getImages()) {
+            HotelImageResponse hotelImageResponse = new HotelImageResponse();
+            hotelImageResponse.setId(image.getId());
+            hotelImageResponse.setImageUrl(image.getImageURL());
+            images.add(hotelImageResponse);
+        }
+        response.setImages(images);
+        return response;
+    }
+
+    private List<AmenityResponse> createAmenities(Hotel hotel) {
         List<AmenityResponse> amenities = new ArrayList<>();
 
         for (HotelAmenity hotelAmenity : hotel.getAmenities()) {
@@ -131,16 +141,7 @@ public class HotelService {
 
             amenities.add(amenityResponse);
         }
-        response.setAmenities(amenities);
-        List<HotelImageResponse> images = new ArrayList<>();
-        for (HotelImage image : hotel.getImages()) {
-            HotelImageResponse hotelImageResponse = new HotelImageResponse();
-            hotelImageResponse.setId(image.getId());
-            hotelImageResponse.setImageUrl(image.getImageURL());
-            images.add(hotelImageResponse);
-        }
-        response.setImages(images);
-        return response;
+        return amenities;
     }
 
     public ResponseEntity<?> getHotels(String search, String name,
@@ -284,5 +285,63 @@ public class HotelService {
         hotelRepository.save(hotel);
         return ResponseEntity.ok(new MessageResponse("Manager assigned successfully to hotel " + hotel.getName()));
 
+    }
+
+    public ResponseEntity<?> getAvailableRooms(String city, int adults, int children) {
+        List<Hotel> hotels = hotelRepository
+                .findHotelsWithFreeRooms(city, adults, children);
+
+        List<Long> hotelIds = hotels.stream().map(Hotel::getId).toList();
+        List<Room> rooms = roomRepository.findFreeRooms(hotelIds, adults, children);
+        List<AvailableHotelResponse> result = new ArrayList<>();
+        for (Hotel hotel : hotels) {
+            AvailableHotelResponse response = new AvailableHotelResponse();
+            response.setHotelId(hotel.getId());
+            response.setHotelName(hotel.getName());
+            response.setAddress(hotel.getAddress());
+            response.setCity(hotel.getCity());
+            response.setCountry(hotel.getCountry());
+            response.setLatitude(hotel.getLatitude());
+            response.setLongitude(hotel.getLongitude());
+            for (Room r : rooms) {
+                if (r.getHotel().getId().equals(hotel.getId())) {
+                    response.getRooms().add(buildRoomResponse(r));
+                }
+            }
+            if (!response.getRooms().isEmpty()) {
+                result.add(response);
+            }
+        }
+        return ResponseEntity.ok(result);
+
+    }
+
+    public RoomResponse buildRoomResponse(Room room) {
+        RoomResponse roomResponse = new RoomResponse();
+        roomResponse.setId(room.getId());
+        roomResponse.setRoomTypeName(room.getRoomType().getName());
+        roomResponse.setPricePerNight(room.getPricePerNight());
+        roomResponse.setMaxAdults(room.getMaxAdults());
+        roomResponse.setMaxChildren(room.getMaxChildren());
+        roomResponse.setMaxOccupancy(room.getMaxOccupancy());
+        roomResponse.setRoomNumber(room.getRoomNumber());
+        roomResponse.setFloorNumber(room.getFloorNumber());
+        List<String> imageUrls = room.getImages().stream().sorted(Comparator.comparing(RoomImage::getId)).map(RoomImage::getImageURL).toList();
+        roomResponse.setImageUrls(imageUrls);
+        roomResponse.setImageUrl(imageUrls.isEmpty() ? null : imageUrls.get(0));
+        roomResponse.setRoomTypeDescription(room.getRoomType().getDescription());
+        return roomResponse;
+    }
+
+    public ResponseEntity<?> getHotelSummary(Long id) {
+        Hotel hotel = hotelRepository.findById(id)
+                .orElseThrow(() -> new InformationNotFoundException("Hotel with id " + id + " not found"));
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("id", hotel.getId());
+        body.put("name", hotel.getName());
+        body.put("city", hotel.getCity());
+        body.put("country", hotel.getCountry());
+        body.put("status", hotel.getStatus().name());
+        return ResponseEntity.ok(body);
     }
 }

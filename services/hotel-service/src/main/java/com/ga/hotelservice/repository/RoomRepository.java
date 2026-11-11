@@ -10,9 +10,6 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,8 +36,9 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     List<Room> findFreeRooms(
             @Param("hotelIds") List<Long> hotelIds,
             @Param("adults") int adults,
-            @Param("children") int children,
+            @Param("children") int children
 //            @Param("checkIn") LocalDate checkIn,
 //            @Param("checkOut") LocalDate checkOut,
-            @Param("now") LocalDateTime now);
+//            @Param("now") LocalDateTime now
+);
 }

@@ -147,7 +147,8 @@ public class UserController {
         return userService.updateProfileImage(image);
     }
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_MANAGER')")
+    // admin/manager: any user. anyone else: only their own id (principal is MyUserDetails -> getUser().getId())
+    @PreAuthorize("hasAnyRole('ADMIN','HOTEL_MANAGER') or #id == authentication.principal.user.id")
     @Operation(summary = "Get a user's details", description = "Used by other micro services to check what is user role and what privilege he have")
     public ResponseEntity<?> getUserSummary(@PathVariable("id") Long id) {
         return userService.getUserSummary(id);

@@ -337,8 +337,19 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new InformationNotFoundException("User with id "+id+"not found")
         );
-        UserSummaryResponse summaryResponse= new UserSummaryResponse(user.getId(),
-                user.getEmail(),user.getRole().getName().name(), user.getStatus().name());
+        UserSummaryResponse summaryResponse = new UserSummaryResponse();
+        summaryResponse.setId(user.getId());
+        summaryResponse.setUsername(user.getUsername());
+        summaryResponse.setEmail(user.getEmail());
+        summaryResponse.setRole(user.getRole().getName().name());
+        summaryResponse.setStatus(user.getStatus().name());
+        UserProfile profile = user.getUserProfile();
+        if (profile != null) {
+            summaryResponse.setFirstName(profile.getFirstName());
+            summaryResponse.setLastName(profile.getLastName());
+            summaryResponse.setPhone(profile.getPhone());
+            summaryResponse.setProfileImageUrl(profile.getProfileImageUrl());
+        }
         return ResponseEntity.ok(summaryResponse);
     }
 }

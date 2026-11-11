@@ -38,7 +38,7 @@ public class RoomController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('HOTEL_MANAGER','ADMIN')")
+//    @PreAuthorize("hasAnyRole('HOTEL_MANAGER','ADMIN')")
     @Operation(summary = "Get hotels room", description = "Fetches all hotel room")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "List hotel's rooms"),
@@ -67,7 +67,8 @@ public class RoomController {
     }
 
     @GetMapping("/{roomId}")
-    @PreAuthorize("hasAnyRole('HOTEL_MANAGER','ADMIN')")
+    // CUSTOMER too: booking-service reads the room (price, capacity, status) with the customer's token
+    @PreAuthorize("hasAnyRole('HOTEL_MANAGER','ADMIN','CUSTOMER')")
     @Operation(summary = "Get one room", description = "Shows the details of one room in this hotel")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Room details"),

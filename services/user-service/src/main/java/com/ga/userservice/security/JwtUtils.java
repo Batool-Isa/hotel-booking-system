@@ -41,6 +41,7 @@ Logger logger = Logger.getLogger(JwtUtils.class.getName());
                 .setSubject(userDetails.getUsername())
                 .claim("userId", user.getId())
                 .claim("role", user.getRole().getName().name())
+                .claim("status", user.getStatus().name())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime()+jwtExpirationMs))
                 .signWith(SignatureAlgorithm.HS256, jwtSecret)

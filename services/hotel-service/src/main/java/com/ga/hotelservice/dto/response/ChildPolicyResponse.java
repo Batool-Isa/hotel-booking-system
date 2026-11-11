@@ -13,5 +13,6 @@ public class ChildPolicyResponse {
     private Integer infantMaxAge;
     private Integer childMaxAge;
     private LocalDateTime updatedAt;
+    private boolean infantsCountTowardOccupancy;
 
 }
