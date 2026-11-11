@@ -1,0 +1,8 @@
+package com.ga.bookingservice.repository;
+
+import com.ga.bookingservice.model.AuditLog;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+
+public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
+}

@@ -540,7 +540,7 @@ async function doReset() {
   if (!resetF.validateAll()) return;
   resetF.busy = true;
   try {
-    const r = await api("POST", "/auth/users/reset-link", {
+    const r = await api("POST", "/auth/users/reset-password", {
       auth: false,
       query: { token: extractToken(resetF.values.token) },
       body: {

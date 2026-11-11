@@ -146,16 +146,16 @@ Base URL: `http://localhost:8000`. The full interactive documentation is in Swag
 
 ### Authentication and profile (`/auth/users`)
 
-| Method | Path | Access | What it does |
-|---|---|---|---|
-| POST | `/auth/users/register` | Public | Register (profile photo is optional, sent as multipart form data) |
+| Method | Path                              | Access | What it does |
+|---|-----------------------------------|---|---|
+| POST | `/auth/users/register`            | Public | Register (profile photo is optional, sent as multipart form data) |
 | GET | `/auth/users/verify-email?token=` | Public | Verify email |
-| POST | `/auth/users/login` | Public | Log in, returns the JWT |
-| POST | `/auth/users/forgot-password` | Public | Send a password reset link |
-| POST | `/auth/users/reset-link` | Public | Set a new password with the link token |
-| POST | `/auth/users/change-password` | Logged in | Change my password |
-| GET, PUT | `/auth/users/profile` | Logged in | View or update my profile |
-| PUT | `/auth/users/profile/image` | Logged in | Change my profile photo |
+| POST | `/auth/users/login`               | Public | Log in, returns the JWT |
+| POST | `/auth/users/forgot-password`     | Public | Send a password reset link |
+| POST | `/auth/users/reset-password`      | Public | Set a new password with the link token |
+| POST | `/auth/users/change-password`     | Logged in | Change my password |
+| GET, PUT | `/auth/users/profile`             | Logged in | View or update my profile |
+| PUT | `/auth/users/profile/image`       | Logged in | Change my profile photo |
 
 ### Hotels (`/api/hotels`)
 
