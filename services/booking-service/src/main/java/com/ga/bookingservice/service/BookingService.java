@@ -16,6 +16,8 @@ import com.ga.bookingservice.exception.custom.InformationNotFoundException;
 import com.ga.bookingservice.exception.custom.InvalidInformationException;
 import com.ga.bookingservice.exception.custom.RoomUnavailableException;
 import com.ga.bookingservice.exception.custom.UnauthorizedActionException;
+import com.ga.bookingservice.event.BookingChanged;
+import org.springframework.context.ApplicationEventPublisher;
 import com.ga.bookingservice.model.*;
 import com.ga.bookingservice.repository.BookingRepository;
 import com.ga.bookingservice.security.AuthUser;
@@ -47,7 +49,10 @@ public class BookingService {
     private UserServiceClient userServiceClient;
     @Autowired
     private EmailService emailService;
-//    @Autowired
+    // in-memory events: BookingEventRelay sends them to Kafka after the transaction commits
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+    //    @Autowired
 //    private NotificationService notificationService;
     @Autowired
     private AuditLogService auditLogService;
@@ -258,6 +263,7 @@ public class BookingService {
                 booking.getId(),
                 "Customer " + customerSummary.getFullName() + " reserve booking " + booking.getBookingReference()
         );
+        applicationEventPublisher.publishEvent(new BookingChanged(booking, "BOOKING_CREATED"));
         logger.info(
                 "[{}] Booking created: reference={}, userId={}, hotelId={} (room lock is released when this transaction commits)",
                 Thread.currentThread().getName(),
@@ -381,6 +387,7 @@ public class BookingService {
         bookingRepository.save(booking);
 //        notificationService.sendBookingNotification(booking);
 //        emailService.sendBookingCancellationEmail(booking);
+        applicationEventPublisher.publishEvent(new BookingChanged(booking, "BOOKING_CANCELLED"));
         String logDescription;
        UserSummary userDetails = getUserDetails(user.getId());
         if ("HOTEL_MANAGER".equals(user.getRole())) {
@@ -448,6 +455,8 @@ public class BookingService {
         booking.setStatus(Booking.Status.COMPLETED);
         bookingRepository.save(booking);
 //        notificationService.sendBookingNotification(booking);
+        applicationEventPublisher.publishEvent(new BookingChanged(booking, "BOOKING_COMPLETED"));
+
         String logDescription;
         UserSummary userDetails = getUserDetails(user.getId());
         if ("HOTEL_MANAGER".equals(user.getRole())) {
@@ -489,6 +498,8 @@ public class BookingService {
                 && booking.getHoldExpiresAt().isAfter(LocalDateTime.now())) {
             booking.setStatus(Booking.Status.CONFIRMED);
             bookingRepository.save(booking);
+            applicationEventPublisher.publishEvent(new BookingChanged(booking, "BOOKING_CONFIRMED"));
+
             auditLogService.log(
                     booking.getUserId(),
                     "BOOKING_PAID",
