@@ -32,7 +32,8 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/vibestay-app
       USER_SERVICE_URL: http://user-service:8081
       USER_HOTEL_URL: http://hotel-service:8082
-    depends_on: [postgres]
+      KAFKA_SERVERS: kafka:29092
+    depends_on: [ postgres, kafka ]
     networks: [vibestay-net]
 
   billing-service:
@@ -41,7 +42,8 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/vibestay-app
       USER_SERVICE_URL: http://user-service:8081
       BOOKING_SERVICE_URL: http://booking-service:8083
-    depends_on: [postgres]
+      KAFKA_SERVERS: kafka:29092
+    depends_on: [postgres, kafka]
     networks: [vibestay-net]
 
   api-gateway:

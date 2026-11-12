@@ -24,7 +24,6 @@ public class BookingEventConsumer {
         logger.info("Received {} for booking {} (guest {}, hotel {}) [partition {}, offset {}]",
                 event.type(), event.bookingReference(), event.guestEmail(), event.hotelName(), partition, offset);
 
-        // next step: replace the logs with email + websocket
         switch (event.type()) {
             case "BOOKING_CREATED" -> logger.info("-> would send: complete your payment");
             case "BOOKING_CONFIRMED" -> logger.info("-> would send: booking confirmed");

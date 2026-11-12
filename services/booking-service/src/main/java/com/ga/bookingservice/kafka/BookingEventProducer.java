@@ -24,8 +24,7 @@ public class BookingEventProducer {
     private final HotelServiceClient hotelServiceClient;
     private final UserServiceClient userServiceClient;
 
-    // called after the booking change is committed (see BookingEventRelay).
-    // nothing in here may throw: a notification problem must never undo or fail the real action
+
     public void publish(Booking booking, String type) {
         try {
             HotelSummary hotel = fetchHotel(booking);
@@ -50,7 +49,6 @@ public class BookingEventProducer {
         }
     }
 
-    // the hotel summary endpoint needs no token
     private HotelSummary fetchHotel(Booking booking) {
         try {
             return hotelServiceClient.getHotelSummary(booking.getHotelId());
@@ -60,8 +58,7 @@ public class BookingEventProducer {
         }
     }
 
-    // internal lookup (X-Internal-Key), so it also works with no logged-in user:
-    // the Stripe webhook (payment confirmed) and the hold-expiry job
+
     private UserSummary fetchUser(Booking booking) {
         try {
             return userServiceClient.findUserInternal(booking.getUserId()).orElse(null);
