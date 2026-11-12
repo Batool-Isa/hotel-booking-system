@@ -2,6 +2,7 @@ package com.ga.billingservice.service;
 import com.ga.billingservice.client.BookingServiceClient;
 import com.ga.billingservice.client.BookingSummary;
 import com.ga.billingservice.dto.response.MessageResponse;
+import com.ga.billingservice.event.BillingChanged;
 import com.ga.billingservice.exception.custom.InformationNotFoundException;
 import com.ga.billingservice.exception.custom.InvalidInformationException;
 import com.ga.billingservice.exception.custom.ServiceUnavailableException;
@@ -22,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,8 @@ public class PaymentService {
     private PaymentRepository paymentRepository;
     @Autowired
     private StripeGateway stripeGateway;
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
     @Value("${stripe.webhook.secret}")
     private String endpointSecret;
     @Value("${frontend.url}")
@@ -136,7 +140,8 @@ public class PaymentService {
         }
         EventDataObjectDeserializer objectDeserializer = event.getDataObjectDeserializer();
 
-        if ("checkout.session.completed".equals(event.getType())) {
+        if ("checkout.session.completed".equals(event.getType())
+                || "checkout.session.expired".equals(event.getType())) {
             Session session = null;
             if (objectDeserializer.getObject().isPresent()) {
                 session = (Session) objectDeserializer.getObject().get();
@@ -148,7 +153,11 @@ public class PaymentService {
                 }
             }
             if (session != null) {
-                confirmPayment(session);
+                if ("checkout.session.completed".equals(event.getType())) {
+                    confirmPayment(session);
+                } else {
+                    failPayment(session);
+                }
             }
         }
 
@@ -179,9 +188,30 @@ public class PaymentService {
 
         if ("CONFIRMED".equals(booking.getStatus())) {
             logger.info("Booking {} is confirmed after payment paid", booking.getId());
+            applicationEventPublisher.publishEvent(
+                    new BillingChanged(payment, booking, "PAYMENT_SUCCEEDED", session.getCustomerEmail()));
         } else {
             logger.warn("Payment {} succeeded but booking {} is {}",
                     payment.getId(), booking.getBookingReference(), booking.getStatus());
+            applicationEventPublisher.publishEvent(
+                    new BillingChanged(payment, booking, "PAYMENT_LATE", session.getCustomerEmail()));
         }
+    }
+
+    private void failPayment(Session session) {
+        Payment payment = paymentRepository.findByProviderReference(session.getId());
+        if (payment == null) {
+            logger.warn("Payment does not exists with session {}", session.getId());
+            return;
+        }
+        if (payment.getStatus() != Payment.STATUS.PENDING) {
+            logger.info("Payment {} is already {}, ignoring expired session", payment.getId(), payment.getStatus());
+            return;
+        }
+        payment.setStatus(Payment.STATUS.FAILED);
+        paymentRepository.save(payment);
+        logger.info("Payment {} for booking {} failed: checkout session expired", payment.getId(), payment.getBookingId());
+        applicationEventPublisher.publishEvent(
+                new BillingChanged(payment, null, "PAYMENT_FAILED", session.getCustomerEmail()));
     }
 }

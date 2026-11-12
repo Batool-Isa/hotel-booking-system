@@ -61,6 +61,8 @@ public class SecurityConfiguration {
                         "/api/availability/**",
                         "/log",
                         "/webhook",
+                        // service-to-service only: not routed by the gateway, checked with X-Internal-Key
+                        "/internal/**",
                         "/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/hotels/**", "/api/amenities", "/api/hotels/*/reviews")
                         .permitAll().anyRequest().authenticated());
