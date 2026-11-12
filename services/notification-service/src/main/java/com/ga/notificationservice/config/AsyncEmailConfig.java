@@ -1,4 +1,4 @@
-package com.ga.bookingservice.config;
+package com.ga.notificationservice.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;

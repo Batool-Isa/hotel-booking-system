@@ -1,6 +1,6 @@
-package com.ga.userservice.service;
+package com.ga.notificationservice.service;
 
-import com.ga.userservice.dto.EmailDetails;
+import com.ga.notificationservice.dto.EmailDetails;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;

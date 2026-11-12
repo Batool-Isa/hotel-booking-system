@@ -4,6 +4,7 @@ import com.ga.userservice.dto.response.MessageResponse;
 import com.ga.userservice.dto.request.ChangePasswordRequest;
 import com.ga.userservice.dto.request.ForgotPasswordRequest;
 import com.ga.userservice.dto.request.ResetPasswordRequest;
+import com.ga.userservice.event.UserEvent;
 import com.ga.userservice.exception.custom.InformationNotFoundException;
 import com.ga.userservice.exception.custom.InvalidCredentialsException;
 import com.ga.userservice.exception.custom.InvalidTokenException;
@@ -15,6 +16,8 @@ import com.ga.userservice.repository.UserRepository;
 import com.ga.userservice.security.MyUserDetails;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,27 +40,28 @@ public class PasswordResetService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
-    private final EmailService emailService;
-
+    private final ApplicationEventPublisher applicationEventPublisher;
+    @Value("${app.links.reset-password}")
+    private String resetPasswordLink;
 
     @Autowired
     public PasswordResetService(UserRepository userRepository,
                                 @Lazy PasswordEncoder passwordEncoder,
-                                EmailService emailService,
-                                PasswordResetTokenRepository passwordResetTokenRepository) {
+                                PasswordResetTokenRepository passwordResetTokenRepository,
+                                ApplicationEventPublisher applicationEventPublisher) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.emailService = emailService;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     public ResponseEntity<?> forgotPassword(ForgotPasswordRequest request) {
         User user = userRepository.findUserByEmail(request.getEmail());
         if (user != null) {
             //create reset link
-            PasswordResetToken resetPasswordLink = createResetPasswordLink(user);
-            // send email with reset link
-            emailService.sendResetLink(resetPasswordLink, user);
+            PasswordResetToken resetToken = createResetPasswordLink(user);
+            applicationEventPublisher.publishEvent(UserEvent.from(user, "PASSWORD_RESET_REQUESTED",
+                    resetPasswordLink + resetToken.getToken(), resetToken.getExpiresAt()));
         }
         return ResponseEntity.ok(new MessageResponse("if an account exists with that email, a reset link has been sent"));
 

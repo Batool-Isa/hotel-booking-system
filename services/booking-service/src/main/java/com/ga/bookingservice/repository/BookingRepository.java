@@ -25,6 +25,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpec
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT b FROM Booking b WHERE b.id = :id")
     Optional<Booking> findByIdForUpdate(@Param("id") Long id);
+    @Query("SELECT DISTINCT b FROM Booking b LEFT JOIN FETCH " +
+            "b.bookingRooms br LEFT JOIN FETCH br.guests WHERE b.id = :id")
+    Optional<Booking> findWithRoomsById(@Param("id") Long id);
     List<Booking> findByUserId(Long userId);
     Page<Booking> findByUserId(Long userId, Pageable pageable);
     List<Booking> findByHotelId(Long hotelId);
@@ -61,16 +64,17 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpec
     @Query("SELECT b.status, COUNT(b) FROM Booking b GROUP BY b.status")
     List<Object[]> countGroupByStatus();
     long countByCreatedAtGreaterThanEqualAndCreatedAtLessThan(LocalDateTime from, LocalDateTime to);
-    @Query("SELECT COALESCE(SUM(b.totalAmount), 0) FROM Booking b WHERE b.status IN :statuses")
+    @Query("SELECT COALESCE(SUM(b.totalAmount), 0) FROM " +
+            "Booking b WHERE b.status IN :statuses")
     BigDecimal sumRevenue(@Param("statuses") List<Booking.Status> statuses);
-    @Query("SELECT COALESCE(SUM(b.totalAmount), 0) FROM Booking b WHERE b.status IN :statuses AND b.createdAt >= :from AND b.createdAt < :to")
+    @Query("SELECT COALESCE(SUM(b.totalAmount), 0) FROM " +
+            "Booking b WHERE b.status IN :statuses AND b.createdAt >= :from AND b.createdAt < :to")
     BigDecimal sumRevenueBetween(@Param("statuses") List<Booking.Status> statuses, @Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
     @Query("SELECT CAST(b.createdAt AS LocalDate), COUNT(b), COALESCE(SUM(CASE WHEN b.status IN :statuses THEN b.totalAmount ELSE 0 END), 0) FROM Booking b WHERE b.createdAt >= :from GROUP BY CAST(b.createdAt AS LocalDate)")
     List<Object[]> dailyTotalsSince(@Param("statuses") List<Booking.Status> statuses, @Param("from") LocalDateTime from);
-    // hotel name lives in hotel-service now: returns [hotelId, count, revenue]
-    @Query("SELECT b.hotelId, COUNT(b), SUM(b.totalAmount) FROM Booking b WHERE b.status IN :statuses GROUP BY b.hotelId ORDER BY SUM(b.totalAmount) DESC")
+    @Query("SELECT b.hotelId, COUNT(b), SUM(b.totalAmount) FROM " +
+            "Booking b WHERE b.status IN :statuses GROUP BY b.hotelId ORDER BY SUM(b.totalAmount) DESC")
     List<Object[]> topHotelsByRevenue(@Param("statuses") List<Booking.Status> statuses, Pageable pageable);
-
     @Query(value = "SELECT 1 FROM pg_advisory_xact_lock(:roomId)", nativeQuery = true)
     Integer lockRoom(@Param("roomId") Long roomId);
 }

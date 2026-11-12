@@ -1,10 +1,16 @@
+x-common-env: &common-env
+  DB_USERNAME: ${DB_USERNAME}
+  DB_PASSWORD: ${DB_PASSWORD}
+  JWT_SECRET: ${JWT_SECRET}
+  INTERNAL_API_KEY: ${INTERNAL_API_KEY}
+
 services:
   postgres:
     image: postgres:16
     environment:
       POSTGRES_DB: vibestay-app
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123456789
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5434:5432"
     volumes:
@@ -14,13 +20,17 @@ services:
   user-service:
     build: { context: ., args: { SERVICE: user-service } }
     environment:
+      <<: *common-env
+      FRONTEND_URL: ${FRONTEND_URL}
       DB_URL: jdbc:postgresql://postgres:5432/vibestay-app
-    depends_on: [postgres]
+      KAFKA_SERVERS: kafka:29092
+    depends_on: [postgres, kafka]
     networks: [vibestay-net]
 
   hotel-service:
     build: { context: ., args: { SERVICE: hotel-service } }
     environment:
+      <<: *common-env
       DB_URL: jdbc:postgresql://postgres:5432/vibestay-app
       USER_SERVICE_URL: http://user-service:8081
     depends_on: [postgres]
@@ -29,6 +39,7 @@ services:
   booking-service:
     build: { context: ., args: { SERVICE: booking-service } }
     environment:
+      <<: *common-env
       DB_URL: jdbc:postgresql://postgres:5432/vibestay-app
       USER_SERVICE_URL: http://user-service:8081
       USER_HOTEL_URL: http://hotel-service:8082
@@ -39,6 +50,10 @@ services:
   billing-service:
     build: { context: ., args: { SERVICE: billing-service } }
     environment:
+      <<: *common-env
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      FRONTEND_URL: ${FRONTEND_URL}
       DB_URL: jdbc:postgresql://postgres:5432/vibestay-app
       USER_SERVICE_URL: http://user-service:8081
       BOOKING_SERVICE_URL: http://booking-service:8083
@@ -49,6 +64,7 @@ services:
   api-gateway:
     build: { context: ., args: { SERVICE: api-gateway } }
     environment:
+      <<: *common-env
       USER_SERVICE_URL: http://user-service:8081
       HOTEL_SERVICE_URL: http://hotel-service:8082
       BOOKING_SERVICE_URL: http://booking-service:8083
@@ -78,6 +94,9 @@ services:
     build: { context: ., args: { SERVICE: notification-service } }
     environment:
       KAFKA_SERVERS: kafka:29092
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      USER_HOTEL_URL: http://hotel-service:8082
     depends_on: [kafka]
     networks: [vibestay-net]
 

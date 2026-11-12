@@ -341,6 +341,9 @@ public class HotelService {
         body.put("name", hotel.getName());
         body.put("city", hotel.getCity());
         body.put("country", hotel.getCountry());
+        body.put("address", hotel.getAddress());
+        body.put("latitude", hotel.getLatitude());
+        body.put("longitude", hotel.getLongitude());
         body.put("status", hotel.getStatus().name());
         return ResponseEntity.ok(body);
     }

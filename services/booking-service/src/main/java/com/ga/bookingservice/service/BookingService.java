@@ -47,8 +47,6 @@ public class BookingService {
     private HotelServiceClient hotelServiceClient;
     @Autowired
     private UserServiceClient userServiceClient;
-    @Autowired
-    private EmailService emailService;
     // in-memory events: BookingEventRelay sends them to Kafka after the transaction commits
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -386,7 +384,6 @@ public class BookingService {
         booking.setStatus(Booking.Status.CANCELLED);
         bookingRepository.save(booking);
 //        notificationService.sendBookingNotification(booking);
-//        emailService.sendBookingCancellationEmail(booking);
         applicationEventPublisher.publishEvent(new BookingChanged(booking, "BOOKING_CANCELLED"));
         String logDescription;
        UserSummary userDetails = getUserDetails(user.getId());

@@ -4,6 +4,7 @@ import com.ga.userservice.dto.response.UserProfileResponse;
 import com.ga.userservice.dto.request.RegisterRequest;
 import com.ga.userservice.dto.request.UpdateProfileRequest;
 import com.ga.userservice.dto.response.UserSummaryResponse;
+import com.ga.userservice.event.UserEvent;
 import com.ga.userservice.exception.custom.*;
 import com.ga.userservice.model.EmailVerificationToken;
 import com.ga.userservice.dto.response.MessageResponse;
@@ -21,6 +22,8 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,10 +55,13 @@ public class UserService {
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
-    private final EmailService emailService;
     private final RoleRepository roleRepository;
     @Autowired
     private AuditLogService auditLogService;
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+    @Value("${app.links.verify-email}")
+    private String verifyEmailLink;
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     /**
      * creates user service and injects all required dependencies
@@ -66,14 +72,12 @@ public class UserService {
                        JwtUtils jwtUtils,
                        @Lazy AuthenticationManager authenticationManager,
                        EmailVerificationTokenRepository emailVerificationTokenRepository,
-                       EmailService emailService,
                        RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.emailVerificationTokenRepository = emailVerificationTokenRepository;
-        this.emailService = emailService;
         this.roleRepository = roleRepository;
     }
 
@@ -143,7 +147,8 @@ public class UserService {
         user.setUserProfile(profile);
         User savedUser = userRepository.save(user);
         EmailVerificationToken token = createEmailVerificationToken(savedUser);
-        emailService.sendVerificationEmail(token);
+        applicationEventPublisher.publishEvent(UserEvent.from(savedUser, "USER_REGISTERED",
+                verifyEmailLink + token.getToken(), token.getExpiresAt()));
         auditLogService.log(savedUser, "REGISTER", "User", savedUser.getId(),
                 "User "+savedUser.getUsername()+" registered successfully"
         );

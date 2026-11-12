@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -16,5 +18,8 @@ public class HotelSummary {
     private String name;
     private String city;
     private String country;
+    private String address;
+    private BigDecimal latitude;
+    private BigDecimal longitude;
     private String status;
 }

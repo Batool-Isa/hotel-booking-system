@@ -1,4 +1,4 @@
-package com.ga.bookingservice.dto;
+package com.ga.notificationservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

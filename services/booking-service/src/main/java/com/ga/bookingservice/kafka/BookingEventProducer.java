@@ -7,6 +7,7 @@ import com.ga.bookingservice.client.UserSummary;
 import com.ga.bookingservice.config.KafkaTopicConfig;
 import com.ga.bookingservice.event.BookingEvent;
 import com.ga.bookingservice.model.Booking;
+import com.ga.bookingservice.repository.BookingRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,16 +24,17 @@ public class BookingEventProducer {
     private final JsonMapper jsonMapper;
     private final HotelServiceClient hotelServiceClient;
     private final UserServiceClient userServiceClient;
+    private final BookingRepository bookingRepository;
 
 
     public void publish(Booking booking, String type) {
         try {
-            HotelSummary hotel = fetchHotel(booking);
-            UserSummary user = fetchUser(booking);
-            BookingEvent event = BookingEvent.from(booking, type, hotel, user);
+            Booking loaded = reloadWithRooms(booking);
+            HotelSummary hotel = fetchHotel(loaded);
+            UserSummary user = fetchUser(loaded);
+            BookingEvent event = BookingEvent.from(loaded, type, hotel, user);
             String json = jsonMapper.writeValueAsString(event);
 
-            // key = bookingId -> all events of one booking go to the same partition, in order
             kafkaTemplate.send(KafkaTopicConfig.BOOKING_TOPIC, String.valueOf(booking.getId()), json)
                     .whenComplete((result, error) -> {
                         if (error != null) {
@@ -46,6 +48,15 @@ public class BookingEventProducer {
                     });
         } catch (Exception e) {
             logger.error("Could not publish {} for booking {}: {}", type, booking.getBookingReference(), e.getMessage());
+        }
+    }
+
+    private Booking reloadWithRooms(Booking booking) {
+        try {
+            return bookingRepository.findWithRoomsById(booking.getId()).orElse(booking);
+        } catch (Exception e) {
+            logger.warn("Could not reload booking {} with rooms: {}", booking.getId(), e.getMessage());
+            return booking;
         }
     }
 
