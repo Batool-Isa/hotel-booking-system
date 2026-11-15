@@ -20,6 +20,8 @@ services:
     environment:
       <<: *common-env
       USER_SERVICE_URL: http://user-service:8081
+      KAFKA_SERVERS: kafka:29092
+    depends_on: [kafka]
     networks: [vibestay-net]
 
   booking-service:

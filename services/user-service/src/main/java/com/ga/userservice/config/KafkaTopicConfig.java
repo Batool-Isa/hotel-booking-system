@@ -8,10 +8,27 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaTopicConfig {
     public static final String USER_TOPIC = "user-events";
+    public static final String AUDIT_TOPIC = "audit-log-events";
 
     @Bean
     public NewTopic userEventsTopic() {
         return TopicBuilder.name(USER_TOPIC)
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic auditLogTopic() {
+        return TopicBuilder.name(AUDIT_TOPIC)
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic auditLogDltTopic() {
+        return TopicBuilder.name(AUDIT_TOPIC + ".DLT")
                 .partitions(3)
                 .replicas(1)
                 .build();

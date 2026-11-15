@@ -32,6 +32,12 @@ public class AuditLog {
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
+    @Column
+    private LocalDateTime occurredAt;
+    @Column
+    private String sourceService;
+    @Column(unique = true)
+    private String eventId;
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "user_id")

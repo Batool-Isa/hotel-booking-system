@@ -1,14 +1,17 @@
 package com.ga.bookingservice.service;
 
-import com.ga.bookingservice.model.AuditLog;
-import com.ga.bookingservice.repository.AuditLogRepository;
+import com.ga.bookingservice.event.AuditLogEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
-@Repository
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Service
 public class AuditLogService {
     @Autowired
-    private AuditLogRepository auditLogRepository;
+    private ApplicationEventPublisher eventPublisher;
 
     /**
      * Store audit log into db
@@ -19,12 +22,16 @@ public class AuditLogService {
      * @param description human readable description of the log
      */
     public void log(Long userId, String action, String entityType, Long entityId, String description){
-        AuditLog log = new AuditLog();
+        AuditLogEvent log = new AuditLogEvent();
         log.setUserId(userId);
-        log.setEntity_type(entityType);
-        log.setEntity_id(entityId);
+        log.setEntityType(entityType);
+        log.setEntityId(entityId);
         log.setDescription(description);
         log.setAction(action);
-        auditLogRepository.save(log);
+        log.setEventId(UUID.randomUUID().toString());
+        String source = "booking-service";
+        log.setSourceService(source);
+        log.setOccurredAt(LocalDateTime.now());
+        eventPublisher.publishEvent(log);
     }
 }
