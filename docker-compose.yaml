@@ -3,48 +3,33 @@ x-common-env: &common-env
   DB_PASSWORD: ${DB_PASSWORD}
   JWT_SECRET: ${JWT_SECRET}
   INTERNAL_API_KEY: ${INTERNAL_API_KEY}
+  DB_URL: jdbc:postgresql://host.docker.internal:5434/vibestay-app
 
 services:
-  postgres:
-    image: postgres:16
-    environment:
-      POSTGRES_DB: vibestay-app
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "5434:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    networks: [vibestay-net]
-
   user-service:
     build: { context: ., args: { SERVICE: user-service } }
     environment:
       <<: *common-env
       FRONTEND_URL: ${FRONTEND_URL}
-      DB_URL: jdbc:postgresql://postgres:5432/vibestay-app
       KAFKA_SERVERS: kafka:29092
-    depends_on: [postgres, kafka]
+    depends_on: [kafka]
     networks: [vibestay-net]
 
   hotel-service:
     build: { context: ., args: { SERVICE: hotel-service } }
     environment:
       <<: *common-env
-      DB_URL: jdbc:postgresql://postgres:5432/vibestay-app
       USER_SERVICE_URL: http://user-service:8081
-    depends_on: [postgres]
     networks: [vibestay-net]
 
   booking-service:
     build: { context: ., args: { SERVICE: booking-service } }
     environment:
       <<: *common-env
-      DB_URL: jdbc:postgresql://postgres:5432/vibestay-app
       USER_SERVICE_URL: http://user-service:8081
       USER_HOTEL_URL: http://hotel-service:8082
       KAFKA_SERVERS: kafka:29092
-    depends_on: [ postgres, kafka ]
+    depends_on: [kafka]
     networks: [vibestay-net]
 
   billing-service:
@@ -54,11 +39,10 @@ services:
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
       FRONTEND_URL: ${FRONTEND_URL}
-      DB_URL: jdbc:postgresql://postgres:5432/vibestay-app
       USER_SERVICE_URL: http://user-service:8081
       BOOKING_SERVICE_URL: http://booking-service:8083
       KAFKA_SERVERS: kafka:29092
-    depends_on: [postgres, kafka]
+    depends_on: [kafka]
     networks: [vibestay-net]
 
   api-gateway:
@@ -102,6 +86,3 @@ services:
 
 networks:
   vibestay-net:
-
-volumes:
-  pgdata:

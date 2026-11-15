@@ -51,6 +51,23 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpec
             @Param("now") LocalDateTime now
     );
     @Query("""
+                SELECT DISTINCT br.roomId
+                FROM Booking b
+                JOIN b.bookingRooms br
+                WHERE br.roomId IN :roomIds
+                AND ( b.status = com.ga.bookingservice.model.Booking.Status.CONFIRMED OR
+                            (b.status = com.ga.bookingservice.model.Booking.Status.PENDING
+                                        AND b.holdExpiresAt > :now))
+                AND b.checkIn < :checkOut
+                AND b.checkOut > :checkIn
+            """)
+    List<Long> findBookedRoomIds(
+            @Param("roomIds") List<Long> roomIds,
+            @Param("checkIn") LocalDate checkIn,
+            @Param("checkOut") LocalDate checkOut,
+            @Param("now") LocalDateTime now
+    );
+    @Query("""
                 SELECT COUNT(b) > 0
                 FROM Booking b
                 JOIN b.bookingRooms br

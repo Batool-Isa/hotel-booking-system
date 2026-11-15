@@ -2596,13 +2596,19 @@ async function loadAdmin(tab) {
   document.title = (navItem ? navItem.label : "Admin") + " – VibeStay";
   try {
     if (ad.tab === "overview") {
-      const [st, t] = await Promise.all([api("GET", "/api/admin/stats"), api("GET", "/api/rooms-types").catch(() => [])]);
+      // stats are optional: the admin stats endpoint is not available in every backend setup
+      const [st, t] = await Promise.all([api("GET", "/api/admin/stats").catch(() => null), api("GET", "/api/rooms-types").catch(() => [])]);
+      ad.counts.types = String(t.length);
+      roomTypes.value = t;
+      if (!st) {
+        ad.error = "Dashboard statistics aren't available right now. The other admin tabs still work.";
+        refreshPendingCount();
+        return;
+      }
       ad.stats = st;
       ad.counts.pending = String(st.hotelsByStatus.PENDING_APPROVAL || 0);
       ad.counts.hotels = String(st.hotelsByStatus.ACTIVE || 0);
       ad.counts.users = String(st.usersTotal);
-      ad.counts.types = String(t.length);
-      roomTypes.value = t;
     }
     if (ad.tab === "pending") await loadPending(0);
     if (ad.tab === "hotels") await loadAdminHotels(0);
@@ -2721,6 +2727,12 @@ async function loadAdminHotelOptions() {
 function refreshPendingCount() {
   api("GET", "/api/admin/stats")
     .then((st) => (ad.counts.pending = String(st.hotelsByStatus.PENDING_APPROVAL || 0)))
+    // no stats endpoint: count the pending list instead (first 100)
+    .catch(() =>
+      api("GET", "/api/hotels/pending", { query: { page: 0, size: 100 } }).then((l) => {
+        ad.counts.pending = String(Array.isArray(l) ? l.length : 0);
+      }),
+    )
     .catch(() => {});
 }
 async function loadPending(p = 0) {

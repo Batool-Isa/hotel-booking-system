@@ -11,13 +11,18 @@ import com.ga.bookingservice.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class AvailabilityService {
     @Autowired
     private HotelServiceClient hotelServiceClient;
+    @Autowired
+    private BookingRepository bookingRepository;
 
     public ResponseEntity<?> searchAvailability(AvailabilityRequest request) {
         // validate user request
@@ -36,9 +41,12 @@ public class AvailabilityService {
         //get available hotels --> activeOne and has available slots in room in selected date and number of occupacy
         List<AvailableHotel> availableHotel = hotelServiceClient.getAvailableRooms(city, request.getAdults(), request.getChildren());
 
-        List<Long> hotelsIds = availableHotel.stream().map(h ->h.getHotelId()).toList();
-//        List<AvailableRoom> availableRoomsByHotel = roomRepository.findFreeRooms(hotelsIds, adults, children, request.getCheckIn(), request.getCheckOut(), LocalDateTime.now());
-//
+      List<Long> roomIds = availableHotel.stream()
+                .flatMap(h -> h.getRooms().stream())
+                .map(AvailableRoom::getId)
+                .toList();
+        Set<Long> bookedRoomIds = roomIds.isEmpty() ? Set.of() : new HashSet<>(
+                bookingRepository.findBookedRoomIds(roomIds, request.getCheckIn(), request.getCheckOut(), LocalDateTime.now()));
 
         List<AvailableHotelResponse> hotelResponseList = new ArrayList<>();
         for (AvailableHotel hotel : availableHotel) {
@@ -53,6 +61,7 @@ public class AvailabilityService {
             response.setLongitude(hotel.getLongitude());
             List<AvailableRoom> availableRoom = hotel.getRooms();
             for (AvailableRoom r : availableRoom) {
+                if (bookedRoomIds.contains(r.getId())) continue;
                 RoomResponse roomResponse = buildRoomResponse(r);
                 roomResponseList.add(roomResponse);
             }
