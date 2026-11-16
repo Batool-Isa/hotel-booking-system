@@ -12,6 +12,8 @@ services:
       <<: *common-env
       FRONTEND_URL: ${FRONTEND_URL}
       KAFKA_SERVERS: kafka:29092
+      BOOKING_SERVICE_URL: http://booking-service:8083
+      HOTEL_SERVICE_URL: http://hotel-service:8082
     depends_on: [kafka]
     networks: [vibestay-net]
 

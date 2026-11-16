@@ -1,7 +1,7 @@
-package com.ga.hotelservice.dto.response;
+package com.ga.bookingservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.ga.hotelservice.dto.response.ReviewResponse;
+import com.ga.bookingservice.dto.response.ReviewResponse;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,18 +1,19 @@
 
-package com.ga.bookingservice.service;
+package com.ga.userservice.service;
 
-import com.ga.bookingservice.dto.request.LoginRequest;
-import com.ga.bookingservice.dto.request.RegisterRequest;
-import com.ga.bookingservice.exception.custom.InformationExistException;
-import com.ga.bookingservice.exception.custom.InvalidCredentialsException;
-import com.ga.bookingservice.exception.custom.PasswordMismatchException;
-import com.ga.bookingservice.model.Role;
-import com.ga.bookingservice.model.User;
-import com.ga.bookingservice.repository.EmailVerificationTokenRepository;
-import com.ga.bookingservice.repository.RoleRepository;
-import com.ga.bookingservice.repository.UserRepository;
-import com.ga.bookingservice.security.JwtUtils;
-import com.ga.bookingservice.security.MyUserDetails;
+import com.ga.userservice.dto.request.LoginRequest;
+import com.ga.userservice.dto.request.RegisterRequest;
+import com.ga.userservice.exception.custom.InformationExistException;
+import com.ga.userservice.exception.custom.InvalidCredentialsException;
+import com.ga.userservice.exception.custom.PasswordMismatchException;
+import com.ga.userservice.kafka.UserEventProducer;
+import com.ga.userservice.model.Role;
+import com.ga.userservice.model.User;
+import com.ga.userservice.repository.EmailVerificationTokenRepository;
+import com.ga.userservice.repository.RoleRepository;
+import com.ga.userservice.repository.UserRepository;
+import com.ga.userservice.security.JwtUtils;
+import com.ga.userservice.security.MyUserDetails;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ class UserServiceTest {
     @MockitoBean
     private PasswordEncoder passwordEncoder;
     @MockitoBean
-    private EmailService emailService;
+    private UserEventProducer userEventProducer;
     @MockitoBean
     private RoleRepository roleRepository;
     @MockitoBean
@@ -86,7 +87,9 @@ class UserServiceTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         verify(userRepository).save(any(User.class));
         verify(passwordEncoder).encode(request.getPassword());
-        verify(emailService).sendVerificationEmail(any());
+        verify(userEventProducer).publish(argThat(e ->"USER_REGISTERED".equals(e.getType())
+                && "test@example.com".equals(e.getEmail())
+                && e.getLink() != null));
         verify(emailVerificationTokenRepository).save(any());
     }
 
@@ -141,7 +144,7 @@ class UserServiceTest {
         );
         verify(userRepository).existsByEmail(request.getEmail());
         verifyNoInteractions(passwordEncoder);
-        verifyNoInteractions(emailService);
+        verifyNoInteractions(userEventProducer);
     }
 
     @Test
@@ -156,7 +159,7 @@ class UserServiceTest {
         assertThrows(PasswordMismatchException.class, () -> userService.register(request, null));
         verify(userRepository).existsByEmail(request.getEmail());
         verifyNoInteractions(passwordEncoder);
-        verifyNoInteractions(emailService);
+        verifyNoInteractions(userEventProducer);
     }
 
     @Test
