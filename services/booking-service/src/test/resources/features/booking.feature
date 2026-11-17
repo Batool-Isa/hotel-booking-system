@@ -12,3 +12,9 @@ Feature: Booking service
     And I am logged in as a CUSTOMER with id 2
     When I request that booking
     Then the response status should be 403
+
+  Scenario: Requesting one of my booking is accepted
+    Given a booking exists that belongs to user 1
+    And I am logged in as a CUSTOMER with id 1
+    When I request that booking
+    Then the response status should be 200
