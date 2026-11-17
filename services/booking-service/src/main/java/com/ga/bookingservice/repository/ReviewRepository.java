@@ -10,8 +10,7 @@ import java.util.List;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
    boolean existsByBookingId(Long id);
-   @Query("SELECT r FROM Review r JOIN FETCH r.booking b JOIN FETCH b.user WHERE b.hotel.id = :hotelId ORDER BY r.createdAt DESC"
-           )
+ @Query("SELECT r FROM Review r JOIN FETCH r.booking b WHERE b.hotelId = :hotelId ORDER BY r.createdAt DESC")
    List<Review> findHotelReviews(
            @Param("hotelId") Long hotelId);
    @Query("SELECT AVG(r.rating) FROM Review r")

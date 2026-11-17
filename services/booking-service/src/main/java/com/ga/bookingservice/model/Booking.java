@@ -8,9 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -19,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "bookings")
-@ToString(exclude = { "bookingRooms ", "guests"})
+@ToString(exclude = {"bookingRooms", "review"})
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,10 +57,8 @@ public class Booking {
             orphanRemoval = true
     )
     private Set<BookingRoom> bookingRooms  = new HashSet<>();
-//    @OneToMany(mappedBy = "payments")
-//    private List<Payment> payments = new ArrayList<>();
-//    @OneToOne(mappedBy = "booking", fetch = FetchType.LAZY)
-//    private Review review;
+    @OneToOne(mappedBy = "booking", fetch = FetchType.LAZY)
+    private Review review;
     public enum Status {
         PENDING,
         CONFIRMED,
