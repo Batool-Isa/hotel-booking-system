@@ -1,0 +1,367 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1760 1580" width="1760" height="1580" xmlns:c2pa="http://c2pa.org/manifest"><style>text{font-family:'Segoe UI','DejaVu Sans',Arial,sans-serif}.th{font-size:15px;font-weight:700;fill:#fff}.tc{font-size:13px;fill:#1E293B}.tr{font-size:11.5px;fill:#64748B;font-style:italic}.tg{font-size:9px;font-weight:700;fill:#fff}.pt{font-size:20px;font-weight:700;fill:#fff}.ps{font-size:13px;fill:#fff;opacity:.9}.ti{font-size:30px;font-weight:800;fill:#0F172A}.su{font-size:16px;fill:#475569}.lb{font-size:12px;font-weight:600}</style><defs><filter id="sh" x="-5%" y="-5%" width="110%" height="115%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity=".15"/></filter><marker id="ard" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#B45309"/></marker><marker id="ars" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#475569"/></marker></defs><rect width="1760" height="1580" fill="#F8FAFC"/><rect x="40" y="110" width="640" height="790" rx="16" fill="#F3E8FF" fill-opacity=".35" stroke="#7C3AED" stroke-width="2.5"/>
+<rect x="40" y="110" width="640" height="44" rx="16" fill="#7C3AED"/><rect x="40" y="138" width="640" height="16" fill="#7C3AED"/>
+<text x="60" y="139" class="pt">user-service</text><text x="660" y="138" class="ps" text-anchor="end">users, profiles, tokens, audit log</text>
+<rect x="780" y="110" width="940" height="790" rx="16" fill="#CCFBF1" fill-opacity=".35" stroke="#0D9488" stroke-width="2.5"/>
+<rect x="780" y="110" width="940" height="44" rx="16" fill="#0D9488"/><rect x="780" y="138" width="940" height="16" fill="#0D9488"/>
+<text x="800" y="139" class="pt">hotel-service</text><text x="1700" y="138" class="ps" text-anchor="end">hotels, rooms, images, amenities</text>
+<rect x="40" y="1000" width="1040" height="440" rx="16" fill="#FFEDD5" fill-opacity=".35" stroke="#EA580C" stroke-width="2.5"/>
+<rect x="40" y="1000" width="1040" height="44" rx="16" fill="#EA580C"/><rect x="40" y="1028" width="1040" height="16" fill="#EA580C"/>
+<text x="60" y="1029" class="pt">booking-service</text><text x="1060" y="1028" class="ps" text-anchor="end">bookings, rooms, guests, reviews</text>
+<rect x="1180" y="1000" width="540" height="440" rx="16" fill="#DBEAFE" fill-opacity=".35" stroke="#2563EB" stroke-width="2.5"/>
+<rect x="1180" y="1000" width="540" height="44" rx="16" fill="#2563EB"/><rect x="1180" y="1028" width="540" height="16" fill="#2563EB"/>
+<text x="1200" y="1029" class="pt">billing-service</text><text x="1700" y="1028" class="ps" text-anchor="end">payments</text>
+<rect x="70" y="170" width="300" height="82" rx="8" fill="#fff" stroke="#7C3AED" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M70 178a8 8 0 0 1 8-8h284a8 8 0 0 1 8 8v24h-300z" fill="#7C3AED"/>
+<text x="84" y="191" class="th">roles</text>
+<rect x="71" y="202" width="298" height="22" fill="#F3E8FF" opacity=".45"/>
+<rect x="78" y="206" width="24" height="14" rx="3" fill="#7C3AED"/><text x="90" y="217" class="tg" text-anchor="middle">PK</text>
+<text x="110" y="218" class="tc">id</text>
+<text x="110" y="240" class="tc">name</text>
+<text x="360" y="240" class="tr" text-anchor="end">ADMIN, CUSTOMER, …</text>
+<rect x="390" y="170" width="270" height="192" rx="8" fill="#fff" stroke="#7C3AED" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M390 178a8 8 0 0 1 8-8h254a8 8 0 0 1 8 8v24h-270z" fill="#7C3AED"/>
+<text x="404" y="191" class="th">profiles</text>
+<rect x="391" y="202" width="268" height="22" fill="#F3E8FF" opacity=".45"/>
+<rect x="398" y="206" width="24" height="14" rx="3" fill="#7C3AED"/><text x="410" y="217" class="tg" text-anchor="middle">PK</text>
+<text x="430" y="218" class="tc">id</text>
+<text x="430" y="240" class="tc">first_name</text>
+<rect x="391" y="246" width="268" height="22" fill="#F3E8FF" opacity=".45"/>
+<text x="430" y="262" class="tc">last_name</text>
+<text x="430" y="284" class="tc">phone</text>
+<rect x="391" y="290" width="268" height="22" fill="#F3E8FF" opacity=".45"/>
+<text x="430" y="306" class="tc">profile_image_url</text>
+<text x="430" y="328" class="tc">created_at</text>
+<rect x="391" y="334" width="268" height="22" fill="#F3E8FF" opacity=".45"/>
+<text x="430" y="350" class="tc">updated_at</text>
+<rect x="70" y="290" width="280" height="258" rx="8" fill="#fff" stroke="#7C3AED" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M70 298a8 8 0 0 1 8-8h264a8 8 0 0 1 8 8v24h-280z" fill="#7C3AED"/>
+<text x="84" y="311" class="th">users</text>
+<rect x="71" y="322" width="278" height="22" fill="#F3E8FF" opacity=".45"/>
+<rect x="78" y="326" width="24" height="14" rx="3" fill="#7C3AED"/><text x="90" y="337" class="tg" text-anchor="middle">PK</text>
+<text x="110" y="338" class="tc">id</text>
+<text x="110" y="360" class="tc">username</text>
+<rect x="71" y="366" width="278" height="22" fill="#F3E8FF" opacity=".45"/>
+<text x="110" y="382" class="tc">email</text>
+<text x="110" y="404" class="tc">password</text>
+<text x="340" y="404" class="tr" text-anchor="end">hashed</text>
+<rect x="71" y="410" width="278" height="22" fill="#F3E8FF" opacity=".45"/>
+<text x="110" y="426" class="tc">email_verified</text>
+<text x="110" y="448" class="tc">status</text>
+<text x="340" y="448" class="tr" text-anchor="end">UNVERIFIED…</text>
+<rect x="71" y="454" width="278" height="22" fill="#F3E8FF" opacity=".45"/>
+<rect x="78" y="458" width="24" height="14" rx="3" fill="#7C3AED"/><text x="90" y="469" class="tg" text-anchor="middle">FK</text>
+<text x="110" y="470" class="tc">role_id</text>
+<text x="340" y="470" class="tr" text-anchor="end">roles</text>
+<rect x="78" y="480" width="24" height="14" rx="3" fill="#7C3AED"/><text x="90" y="491" class="tg" text-anchor="middle">FK</text>
+<text x="110" y="492" class="tc">profile_id</text>
+<text x="340" y="492" class="tr" text-anchor="end">profiles</text>
+<rect x="71" y="498" width="278" height="22" fill="#F3E8FF" opacity=".45"/>
+<text x="110" y="514" class="tc">created_at</text>
+<text x="110" y="536" class="tc">updated_at</text>
+<rect x="390" y="420" width="270" height="170" rx="8" fill="#fff" stroke="#7C3AED" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M390 428a8 8 0 0 1 8-8h254a8 8 0 0 1 8 8v24h-270z" fill="#7C3AED"/>
+<text x="404" y="441" class="th">email_verification_tokens</text>
+<rect x="391" y="452" width="268" height="22" fill="#F3E8FF" opacity=".45"/>
+<rect x="398" y="456" width="24" height="14" rx="3" fill="#7C3AED"/><text x="410" y="467" class="tg" text-anchor="middle">PK</text>
+<text x="430" y="468" class="tc">id</text>
+<text x="430" y="490" class="tc">token</text>
+<rect x="391" y="496" width="268" height="22" fill="#F3E8FF" opacity=".45"/>
+<text x="430" y="512" class="tc">created_at</text>
+<text x="430" y="534" class="tc">used_at</text>
+<rect x="391" y="540" width="268" height="22" fill="#F3E8FF" opacity=".45"/>
+<text x="430" y="556" class="tc">expires_at</text>
+<rect x="398" y="566" width="24" height="14" rx="3" fill="#7C3AED"/><text x="410" y="577" class="tg" text-anchor="middle">FK</text>
+<text x="430" y="578" class="tc">user_id</text>
+<text x="650" y="578" class="tr" text-anchor="end">users</text>
+<rect x="70" y="610" width="280" height="170" rx="8" fill="#fff" stroke="#7C3AED" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M70 618a8 8 0 0 1 8-8h264a8 8 0 0 1 8 8v24h-280z" fill="#7C3AED"/>
+<text x="84" y="631" class="th">password_reset_tokens</text>
+<rect x="71" y="642" width="278" height="22" fill="#F3E8FF" opacity=".45"/>
+<rect x="78" y="646" width="24" height="14" rx="3" fill="#7C3AED"/><text x="90" y="657" class="tg" text-anchor="middle">PK</text>
+<text x="110" y="658" class="tc">id</text>
+<text x="110" y="680" class="tc">token</text>
+<rect x="71" y="686" width="278" height="22" fill="#F3E8FF" opacity=".45"/>
+<text x="110" y="702" class="tc">created_at</text>
+<text x="110" y="724" class="tc">used_at</text>
+<rect x="71" y="730" width="278" height="22" fill="#F3E8FF" opacity=".45"/>
+<text x="110" y="746" class="tc">expires_at</text>
+<rect x="78" y="756" width="24" height="14" rx="3" fill="#7C3AED"/><text x="90" y="767" class="tg" text-anchor="middle">FK</text>
+<text x="110" y="768" class="tc">user_id</text>
+<text x="340" y="768" class="tr" text-anchor="end">users</text>
+<rect x="390" y="610" width="270" height="258" rx="8" fill="#fff" stroke="#7C3AED" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M390 618a8 8 0 0 1 8-8h254a8 8 0 0 1 8 8v24h-270z" fill="#7C3AED"/>
+<text x="404" y="631" class="th">audit_logs</text>
+<rect x="391" y="642" width="268" height="22" fill="#F3E8FF" opacity=".45"/>
+<rect x="398" y="646" width="24" height="14" rx="3" fill="#7C3AED"/><text x="410" y="657" class="tg" text-anchor="middle">PK</text>
+<text x="430" y="658" class="tc">id</text>
+<text x="430" y="680" class="tc">action</text>
+<rect x="391" y="686" width="268" height="22" fill="#F3E8FF" opacity=".45"/>
+<text x="430" y="702" class="tc">entity_type</text>
+<text x="430" y="724" class="tc">entity_id</text>
+<rect x="391" y="730" width="268" height="22" fill="#F3E8FF" opacity=".45"/>
+<text x="430" y="746" class="tc">description</text>
+<text x="430" y="768" class="tc">created_at</text>
+<rect x="391" y="774" width="268" height="22" fill="#F3E8FF" opacity=".45"/>
+<text x="430" y="790" class="tc">occurred_at</text>
+<text x="430" y="812" class="tc">source_service</text>
+<rect x="391" y="818" width="268" height="22" fill="#F3E8FF" opacity=".45"/>
+<text x="430" y="834" class="tc">event_id</text>
+<text x="650" y="834" class="tr" text-anchor="end">dedupe key</text>
+<rect x="398" y="844" width="24" height="14" rx="3" fill="#7C3AED"/><text x="410" y="855" class="tg" text-anchor="middle">FK</text>
+<text x="430" y="856" class="tc">user_id</text>
+<text x="650" y="856" class="tr" text-anchor="end">users</text>
+<rect x="810" y="170" width="280" height="104" rx="8" fill="#fff" stroke="#0D9488" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M810 178a8 8 0 0 1 8-8h264a8 8 0 0 1 8 8v24h-280z" fill="#0D9488"/>
+<text x="824" y="191" class="th">amenities</text>
+<rect x="811" y="202" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<rect x="818" y="206" width="24" height="14" rx="3" fill="#0D9488"/><text x="830" y="217" class="tg" text-anchor="middle">PK</text>
+<text x="850" y="218" class="tc">id</text>
+<text x="850" y="240" class="tc">name</text>
+<rect x="811" y="246" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="850" y="262" class="tc">description</text>
+<rect x="810" y="290" width="280" height="148" rx="8" fill="#fff" stroke="#0D9488" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M810 298a8 8 0 0 1 8-8h264a8 8 0 0 1 8 8v24h-280z" fill="#0D9488"/>
+<text x="824" y="311" class="th">hotels_amenities</text>
+<rect x="811" y="322" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<rect x="818" y="326" width="24" height="14" rx="3" fill="#0D9488"/><text x="830" y="337" class="tg" text-anchor="middle">PK</text>
+<text x="850" y="338" class="tc">id</text>
+<rect x="818" y="348" width="24" height="14" rx="3" fill="#0D9488"/><text x="830" y="359" class="tg" text-anchor="middle">FK</text>
+<text x="850" y="360" class="tc">hotel_id</text>
+<text x="1080" y="360" class="tr" text-anchor="end">hotels</text>
+<rect x="811" y="366" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<rect x="818" y="370" width="24" height="14" rx="3" fill="#0D9488"/><text x="830" y="381" class="tg" text-anchor="middle">FK</text>
+<text x="850" y="382" class="tc">amenity_id</text>
+<text x="1080" y="382" class="tr" text-anchor="end">amenities</text>
+<text x="850" y="404" class="tc">description</text>
+<rect x="811" y="410" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="850" y="426" class="tc">additional_cost</text>
+<rect x="1120" y="170" width="280" height="302" rx="8" fill="#fff" stroke="#0D9488" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M1120 178a8 8 0 0 1 8-8h264a8 8 0 0 1 8 8v24h-280z" fill="#0D9488"/>
+<text x="1134" y="191" class="th">hotels</text>
+<rect x="1121" y="202" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<rect x="1128" y="206" width="24" height="14" rx="3" fill="#0D9488"/><text x="1140" y="217" class="tg" text-anchor="middle">PK</text>
+<text x="1160" y="218" class="tc">id</text>
+<text x="1160" y="240" class="tc">name</text>
+<rect x="1121" y="246" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="1160" y="262" class="tc">description</text>
+<text x="1160" y="284" class="tc">address</text>
+<rect x="1121" y="290" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="1160" y="306" class="tc">city</text>
+<text x="1160" y="328" class="tc">country</text>
+<rect x="1121" y="334" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="1160" y="350" class="tc">latitude</text>
+<text x="1160" y="372" class="tc">longitude</text>
+<rect x="1121" y="378" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="1160" y="394" class="tc">phone</text>
+<text x="1160" y="416" class="tc">status</text>
+<text x="1390" y="416" class="tr" text-anchor="end">PENDING_APPROVAL…</text>
+<rect x="1121" y="422" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="1160" y="438" class="tc">created_at</text>
+<text x="1160" y="460" class="tc">updated_at</text>
+<rect x="1420" y="170" width="270" height="82" rx="8" fill="#fff" stroke="#0D9488" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M1420 178a8 8 0 0 1 8-8h254a8 8 0 0 1 8 8v24h-270z" fill="#0D9488"/>
+<text x="1434" y="191" class="th">hotel_manager_ids</text>
+<rect x="1421" y="202" width="268" height="22" fill="#CCFBF1" opacity=".45"/>
+<rect x="1428" y="206" width="24" height="14" rx="3" fill="#0D9488"/><text x="1440" y="217" class="tg" text-anchor="middle">FK</text>
+<text x="1460" y="218" class="tc">hotel_id</text>
+<text x="1680" y="218" class="tr" text-anchor="end">hotels</text>
+<rect x="1428" y="228" width="24" height="14" rx="3" fill="#B45309"/><text x="1440" y="239" class="tg" text-anchor="middle">ID</text>
+<text x="1460" y="240" class="tc">manager_id</text>
+<text x="1680" y="240" class="tr" text-anchor="end">user id</text>
+<rect x="1420" y="290" width="270" height="192" rx="8" fill="#fff" stroke="#0D9488" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M1420 298a8 8 0 0 1 8-8h254a8 8 0 0 1 8 8v24h-270z" fill="#0D9488"/>
+<text x="1434" y="311" class="th">child_policies</text>
+<rect x="1421" y="322" width="268" height="22" fill="#CCFBF1" opacity=".45"/>
+<rect x="1428" y="326" width="24" height="14" rx="3" fill="#0D9488"/><text x="1440" y="337" class="tg" text-anchor="middle">PK</text>
+<text x="1460" y="338" class="tc">id</text>
+<text x="1460" y="360" class="tc">infant_max_age</text>
+<rect x="1421" y="366" width="268" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="1460" y="382" class="tc">child_max_age</text>
+<text x="1460" y="404" class="tc">infants_count…</text>
+<rect x="1421" y="410" width="268" height="22" fill="#CCFBF1" opacity=".45"/>
+<rect x="1428" y="414" width="24" height="14" rx="3" fill="#0D9488"/><text x="1440" y="425" class="tg" text-anchor="middle">FK</text>
+<text x="1460" y="426" class="tc">hotel_id</text>
+<text x="1680" y="426" class="tr" text-anchor="end">hotels</text>
+<text x="1460" y="448" class="tc">created_at</text>
+<rect x="1421" y="454" width="268" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="1460" y="470" class="tc">updated_at</text>
+<rect x="810" y="500" width="280" height="148" rx="8" fill="#fff" stroke="#0D9488" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M810 508a8 8 0 0 1 8-8h264a8 8 0 0 1 8 8v24h-280z" fill="#0D9488"/>
+<text x="824" y="521" class="th">hotel_images</text>
+<rect x="811" y="532" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<rect x="818" y="536" width="24" height="14" rx="3" fill="#0D9488"/><text x="830" y="547" class="tg" text-anchor="middle">PK</text>
+<text x="850" y="548" class="tc">id</text>
+<text x="850" y="570" class="tc">image_url</text>
+<rect x="811" y="576" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="850" y="592" class="tc">is_primary</text>
+<text x="850" y="614" class="tc">created_at</text>
+<rect x="811" y="620" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<rect x="818" y="624" width="24" height="14" rx="3" fill="#0D9488"/><text x="830" y="635" class="tg" text-anchor="middle">FK</text>
+<text x="850" y="636" class="tc">hotel_id</text>
+<text x="1080" y="636" class="tr" text-anchor="end">hotels</text>
+<rect x="1120" y="530" width="280" height="302" rx="8" fill="#fff" stroke="#0D9488" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M1120 538a8 8 0 0 1 8-8h264a8 8 0 0 1 8 8v24h-280z" fill="#0D9488"/>
+<text x="1134" y="551" class="th">rooms</text>
+<rect x="1121" y="562" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<rect x="1128" y="566" width="24" height="14" rx="3" fill="#0D9488"/><text x="1140" y="577" class="tg" text-anchor="middle">PK</text>
+<text x="1160" y="578" class="tc">id</text>
+<text x="1160" y="600" class="tc">room_number</text>
+<rect x="1121" y="606" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="1160" y="622" class="tc">floor_number</text>
+<text x="1160" y="644" class="tc">status</text>
+<rect x="1121" y="650" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="1160" y="666" class="tc">price_per_night</text>
+<text x="1160" y="688" class="tc">max_adults</text>
+<rect x="1121" y="694" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="1160" y="710" class="tc">max_children</text>
+<text x="1160" y="732" class="tc">max_occupancy</text>
+<rect x="1121" y="738" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<rect x="1128" y="742" width="24" height="14" rx="3" fill="#0D9488"/><text x="1140" y="753" class="tg" text-anchor="middle">FK</text>
+<text x="1160" y="754" class="tc">hotel_id</text>
+<text x="1390" y="754" class="tr" text-anchor="end">hotels</text>
+<rect x="1128" y="764" width="24" height="14" rx="3" fill="#0D9488"/><text x="1140" y="775" class="tg" text-anchor="middle">FK</text>
+<text x="1160" y="776" class="tc">room_type_id</text>
+<text x="1390" y="776" class="tr" text-anchor="end">room_types</text>
+<rect x="1121" y="782" width="278" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="1160" y="798" class="tc">created_at</text>
+<text x="1160" y="820" class="tc">updated_at</text>
+<rect x="1420" y="530" width="270" height="148" rx="8" fill="#fff" stroke="#0D9488" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M1420 538a8 8 0 0 1 8-8h254a8 8 0 0 1 8 8v24h-270z" fill="#0D9488"/>
+<text x="1434" y="551" class="th">room_types</text>
+<rect x="1421" y="562" width="268" height="22" fill="#CCFBF1" opacity=".45"/>
+<rect x="1428" y="566" width="24" height="14" rx="3" fill="#0D9488"/><text x="1440" y="577" class="tg" text-anchor="middle">PK</text>
+<text x="1460" y="578" class="tc">id</text>
+<text x="1460" y="600" class="tc">name</text>
+<rect x="1421" y="606" width="268" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="1460" y="622" class="tc">description</text>
+<text x="1460" y="644" class="tc">status</text>
+<rect x="1421" y="650" width="268" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="1460" y="666" class="tc">created_at</text>
+<rect x="1420" y="700" width="270" height="126" rx="8" fill="#fff" stroke="#0D9488" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M1420 708a8 8 0 0 1 8-8h254a8 8 0 0 1 8 8v24h-270z" fill="#0D9488"/>
+<text x="1434" y="721" class="th">room_images</text>
+<rect x="1421" y="732" width="268" height="22" fill="#CCFBF1" opacity=".45"/>
+<rect x="1428" y="736" width="24" height="14" rx="3" fill="#0D9488"/><text x="1440" y="747" class="tg" text-anchor="middle">PK</text>
+<text x="1460" y="748" class="tc">id</text>
+<text x="1460" y="770" class="tc">image_url</text>
+<rect x="1421" y="776" width="268" height="22" fill="#CCFBF1" opacity=".45"/>
+<text x="1460" y="792" class="tc">created_at</text>
+<rect x="1428" y="802" width="24" height="14" rx="3" fill="#0D9488"/><text x="1440" y="813" class="tg" text-anchor="middle">FK</text>
+<text x="1460" y="814" class="tc">room_id</text>
+<text x="1680" y="814" class="tr" text-anchor="end">rooms</text>
+<rect x="70" y="1060" width="300" height="346" rx="8" fill="#fff" stroke="#EA580C" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M70 1068a8 8 0 0 1 8-8h284a8 8 0 0 1 8 8v24h-300z" fill="#EA580C"/>
+<text x="84" y="1081" class="th">bookings</text>
+<rect x="71" y="1092" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<rect x="78" y="1096" width="24" height="14" rx="3" fill="#EA580C"/><text x="90" y="1107" class="tg" text-anchor="middle">PK</text>
+<text x="110" y="1108" class="tc">id</text>
+<text x="110" y="1130" class="tc">booking_reference</text>
+<rect x="71" y="1136" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<text x="110" y="1152" class="tc">check_in</text>
+<text x="110" y="1174" class="tc">check_out</text>
+<rect x="71" y="1180" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<text x="110" y="1196" class="tc">adults</text>
+<text x="110" y="1218" class="tc">children</text>
+<rect x="71" y="1224" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<text x="110" y="1240" class="tc">total_amount</text>
+<text x="110" y="1262" class="tc">status</text>
+<text x="360" y="1262" class="tr" text-anchor="end">PENDING…</text>
+<rect x="71" y="1268" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<text x="110" y="1284" class="tc">hold_expires_at</text>
+<text x="110" y="1306" class="tc">special_request</text>
+<rect x="71" y="1312" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<text x="110" y="1328" class="tc">created_at</text>
+<text x="110" y="1350" class="tc">updated_at</text>
+<rect x="71" y="1356" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<rect x="78" y="1360" width="24" height="14" rx="3" fill="#B45309"/><text x="90" y="1371" class="tg" text-anchor="middle">ID</text>
+<text x="110" y="1372" class="tc">hotel_id</text>
+<text x="360" y="1372" class="tr" text-anchor="end">hotel id</text>
+<rect x="78" y="1382" width="24" height="14" rx="3" fill="#B45309"/><text x="90" y="1393" class="tg" text-anchor="middle">ID</text>
+<text x="110" y="1394" class="tc">user_id</text>
+<text x="360" y="1394" class="tr" text-anchor="end">user id</text>
+<rect x="410" y="1060" width="300" height="170" rx="8" fill="#fff" stroke="#EA580C" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M410 1068a8 8 0 0 1 8-8h284a8 8 0 0 1 8 8v24h-300z" fill="#EA580C"/>
+<text x="424" y="1081" class="th">booking_rooms</text>
+<rect x="411" y="1092" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<rect x="418" y="1096" width="24" height="14" rx="3" fill="#EA580C"/><text x="430" y="1107" class="tg" text-anchor="middle">PK</text>
+<text x="450" y="1108" class="tc">id</text>
+<rect x="418" y="1118" width="24" height="14" rx="3" fill="#EA580C"/><text x="430" y="1129" class="tg" text-anchor="middle">FK</text>
+<text x="450" y="1130" class="tc">booking_id</text>
+<text x="700" y="1130" class="tr" text-anchor="end">bookings</text>
+<rect x="411" y="1136" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<rect x="418" y="1140" width="24" height="14" rx="3" fill="#B45309"/><text x="430" y="1151" class="tg" text-anchor="middle">ID</text>
+<text x="450" y="1152" class="tc">room_id</text>
+<text x="700" y="1152" class="tr" text-anchor="end">room id</text>
+<text x="450" y="1174" class="tc">price_per_night</text>
+<rect x="411" y="1180" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<text x="450" y="1196" class="tc">room_number</text>
+<text x="450" y="1218" class="tc">room_type_name</text>
+<rect x="750" y="1060" width="300" height="148" rx="8" fill="#fff" stroke="#EA580C" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M750 1068a8 8 0 0 1 8-8h284a8 8 0 0 1 8 8v24h-300z" fill="#EA580C"/>
+<text x="764" y="1081" class="th">booking_guests</text>
+<rect x="751" y="1092" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<rect x="758" y="1096" width="24" height="14" rx="3" fill="#EA580C"/><text x="770" y="1107" class="tg" text-anchor="middle">PK</text>
+<text x="790" y="1108" class="tc">id</text>
+<text x="790" y="1130" class="tc">name</text>
+<rect x="751" y="1136" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<text x="790" y="1152" class="tc">age</text>
+<text x="790" y="1174" class="tc">guest_type</text>
+<text x="1040" y="1174" class="tr" text-anchor="end">INFANT/CHILD/ADULT</text>
+<rect x="751" y="1180" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<rect x="758" y="1184" width="24" height="14" rx="3" fill="#EA580C"/><text x="770" y="1195" class="tg" text-anchor="middle">FK</text>
+<text x="790" y="1196" class="tc">booking_room_id</text>
+<text x="1040" y="1196" class="tr" text-anchor="end">booking_rooms</text>
+<rect x="410" y="1240" width="300" height="148" rx="8" fill="#fff" stroke="#EA580C" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M410 1248a8 8 0 0 1 8-8h284a8 8 0 0 1 8 8v24h-300z" fill="#EA580C"/>
+<text x="424" y="1261" class="th">reviews</text>
+<rect x="411" y="1272" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<rect x="418" y="1276" width="24" height="14" rx="3" fill="#EA580C"/><text x="430" y="1287" class="tg" text-anchor="middle">PK</text>
+<text x="450" y="1288" class="tc">id</text>
+<text x="450" y="1310" class="tc">rating</text>
+<rect x="411" y="1316" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<text x="450" y="1332" class="tc">comment</text>
+<text x="450" y="1354" class="tc">created_at</text>
+<rect x="411" y="1360" width="298" height="22" fill="#FFEDD5" opacity=".45"/>
+<rect x="418" y="1364" width="24" height="14" rx="3" fill="#EA580C"/><text x="430" y="1375" class="tg" text-anchor="middle">FK</text>
+<text x="450" y="1376" class="tc">booking_id</text>
+<text x="700" y="1376" class="tr" text-anchor="end">bookings</text>
+<rect x="1260" y="1060" width="300" height="280" rx="8" fill="#fff" stroke="#2563EB" stroke-width="1.6" filter="url(#sh)"/>
+<path d="M1260 1068a8 8 0 0 1 8-8h284a8 8 0 0 1 8 8v24h-300z" fill="#2563EB"/>
+<text x="1274" y="1081" class="th">payments</text>
+<rect x="1261" y="1092" width="298" height="22" fill="#DBEAFE" opacity=".45"/>
+<rect x="1268" y="1096" width="24" height="14" rx="3" fill="#2563EB"/><text x="1280" y="1107" class="tg" text-anchor="middle">PK</text>
+<text x="1300" y="1108" class="tc">id</text>
+<rect x="1268" y="1118" width="24" height="14" rx="3" fill="#B45309"/><text x="1280" y="1129" class="tg" text-anchor="middle">ID</text>
+<text x="1300" y="1130" class="tc">booking_id</text>
+<text x="1550" y="1130" class="tr" text-anchor="end">booking id</text>
+<rect x="1261" y="1136" width="298" height="22" fill="#DBEAFE" opacity=".45"/>
+<text x="1300" y="1152" class="tc">amount</text>
+<text x="1300" y="1174" class="tc">method</text>
+<rect x="1261" y="1180" width="298" height="22" fill="#DBEAFE" opacity=".45"/>
+<text x="1300" y="1196" class="tc">status</text>
+<text x="1550" y="1196" class="tr" text-anchor="end">PENDING/SUCCEED…</text>
+<text x="1300" y="1218" class="tc">provider_reference</text>
+<rect x="1261" y="1224" width="298" height="22" fill="#DBEAFE" opacity=".45"/>
+<text x="1300" y="1240" class="tc">idempotency_key</text>
+<text x="1550" y="1240" class="tr" text-anchor="end">unique</text>
+<text x="1300" y="1262" class="tc">session_url</text>
+<rect x="1261" y="1268" width="298" height="22" fill="#DBEAFE" opacity=".45"/>
+<text x="1300" y="1284" class="tc">payment_intent</text>
+<text x="1300" y="1306" class="tc">created_at</text>
+<rect x="1261" y="1312" width="298" height="22" fill="#DBEAFE" opacity=".45"/>
+<text x="1300" y="1328" class="tc">updated_at</text>
+<path d="M210 1000 L210 900" fill="none" stroke="#B45309" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#ard)"/>
+<rect x="149.2" y="941" width="121.6" height="20" rx="10" fill="#fff" stroke="#92400E" stroke-width="1.2"/><text x="210.0" y="955" class="lb" fill="#92400E" text-anchor="middle">bookings.user_id</text>
+<path d="M560 1000 L560 935 L900 935 L900 900" fill="none" stroke="#B45309" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#ard)"/>
+<rect x="665.9" y="921" width="128.2" height="20" rx="10" fill="#fff" stroke="#92400E" stroke-width="1.2"/><text x="730.0" y="935" class="lb" fill="#92400E" text-anchor="middle">hotel_id, room_id</text>
+<path d="M1180 1190 L1080 1190" fill="none" stroke="#B45309" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#ard)"/>
+<rect x="1089.0" y="1156" width="82.0" height="20" rx="10" fill="#fff" stroke="#92400E" stroke-width="1.2"/><text x="1130.0" y="1170" class="lb" fill="#92400E" text-anchor="middle">booking_id</text>
+<path d="M780 215 L680 215" fill="none" stroke="#B45309" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#ard)"/>
+<rect x="689.0" y="181" width="82.0" height="20" rx="10" fill="#fff" stroke="#92400E" stroke-width="1.2"/><text x="730.0" y="195" class="lb" fill="#92400E" text-anchor="middle">manager_id</text>
+<text x="40" y="52" class="ti">VibeStay database, one PostgreSQL (RDS), four owners</text>
+<text x="40" y="80" class="su">Each service owns its tables. Across services we store only an id, never a foreign key.</text>
+<rect x="1160" y="1476" width="560" height="62" rx="12" fill="#fff" stroke="#CBD5E1"/>
+<rect x="1180" y="1490" width="24" height="14" rx="3" fill="#475569"/><text x="1192" y="1501" class="tg" text-anchor="middle">PK</text><text x="1212" y="1502" class="tc">primary key</text>
+<rect x="1310" y="1490" width="24" height="14" rx="3" fill="#475569"/><text x="1322" y="1501" class="tg" text-anchor="middle">FK</text><text x="1342" y="1502" class="tc">foreign key (same service)</text>
+<rect x="1540" y="1490" width="24" height="14" rx="3" fill="#B45309"/><text x="1552" y="1501" class="tg" text-anchor="middle">ID</text><text x="1572" y="1502" class="tc">id from another service</text>
+<path d="M1180 1524 h40" stroke="#B45309" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#ard)"/><text x="1232" y="1528" class="tc">stored by id only, checked through a REST call</text><metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTo0OTQ1NGY3NS1lYTJlLTQyOTktYjE1NS0wOTdjY2QxMDFjNzkAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaHkSUQAeIUGOoTTAdAAVzAkAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDphNjgxZGMwYy0yMzYwLTQwYzctODdhYi03MmFkZGIwODE2MjJscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoqNNLn5rnN7/qCsAV0QGBbwAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggstCSS1bD+uspF9IPDqD7BPAxNxHwwp+mNNXwU2i1yqCkZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaBltu74ArO+3UFNF91DZUfwAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRMAAAAAAAAAAAAAAAAZGhhc2hYIAy8dae0NDfRjkrqc/S6YSRwWiLSGmeV3ANUHz+CiAWDZG5hbWVuanVtYmYgbWFuaWZlc3RqZXhjbHVzaW9uc4GiZXN0YXJ0GXVAZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjQ5NDU0Zjc1LWVhMmUtNDI5OS1iMTU1LTA5N2NjZDEwMWM3OS9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOmJiN2MyYjM1LTQwOTEtNGU1OS05OGMxLTk5OThiZTQwMjlkOHJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCCy0JJLVsP66ykX0g8OoPsE8DE3EfDCn6Y01fBTaLXKoKJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggVI2AsGXjf8ehXJRTShbLaIu7MULM/fhFIdSNglU1OzaiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFgg9u29Fg+IDeNl+7KaqFcmTPUyEuACsy9hy4cRO+q1TFB0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQFwZxylCPdLBjI6pQXZ7JAbAHL150ilDbqOUdrfdL287iJxffW2Y3isZ3axsIVOACGaShjboYXCJ991mWxZ1Uos=</c2pa:manifest></metadata></svg>
