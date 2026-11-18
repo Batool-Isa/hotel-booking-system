@@ -2694,7 +2694,6 @@ async function setUserStatus(u, status) {
 function adminTab(t) {
   go("/admin?tab=" + t);
 }
-// admin sections shown in the top nav; `tabs` are the views that light up each item
 const ADMIN_NAV = [
   { tab: "overview", tabs: ["overview"], label: "Dashboard", icon: "home" },
   { tab: "pending", tabs: ["pending"], label: "Approvals", icon: "clock" },
