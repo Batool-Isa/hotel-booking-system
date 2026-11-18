@@ -1,6 +1,5 @@
 package com.ga.userservice.controller;
 
-import com.ga.userservice.dto.response.AdminStatsResponse;
 import com.ga.userservice.service.AdminStatsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

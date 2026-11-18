@@ -186,7 +186,6 @@ textarea {
   transition: width 8s cubic-bezier(0.1, 0.7, 0.2, 1);
 }
 
-/* header */
 .topbar {
   background: var(--navy);
   color: #fff;
@@ -521,7 +520,6 @@ textarea {
   overflow: auto;
 }
 
-/* hero & search */
 .hero {
   background: linear-gradient(135deg, var(--navy-d), var(--navy) 60%, #1a5fc4);
   color: #fff;
@@ -693,7 +691,6 @@ textarea {
   box-shadow: var(--sh);
 }
 
-/* cards & forms */
 .card {
   background: var(--card);
   border: 1px solid var(--line);
@@ -947,7 +944,6 @@ td b > .ic {
   color: var(--navy);
 }
 
-/* sections */
 .section {
   padding-top: 34px;
   padding-bottom: 34px;
@@ -1157,7 +1153,6 @@ td b > .ic {
   accent-color: var(--blue);
 }
 
-/* hotel page */
 .gallery {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
@@ -1258,7 +1253,6 @@ table.t.plain th {
   overflow-x: auto;
 }
 
-/* ---- map ---- */
 .hmap {
   width: 100%;
   border-radius: var(--r);
@@ -1593,7 +1587,6 @@ footer.site a {
   color: #fff;
 }
 
-/* toasts & modal */
 .toasts {
   position: fixed;
   top: 70px;
@@ -1818,7 +1811,6 @@ footer.site a {
   }
 }
 
-/* ---- polish v2 ---- */
 :root {
   --r: 14px;
 }

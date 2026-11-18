@@ -1,6 +1,8 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import './assets/main.css'
+import './assets/wow.css'
+import { initEffects } from './lib/effects'
 
 import AppIcon from './components/AppIcon.vue'
 import HotelMap from './components/HotelMap.vue'
@@ -17,7 +19,6 @@ import { fmtDate, fmtDateTime, money, imgUrl, nightsBetween, statusLabel, status
 
 const app = createApp(App)
 
-// formatting helpers available in every template
 Object.assign(app.config.globalProperties, { fmtDate, fmtDateTime, money, imgUrl, nightsBetween, statusLabel, statusClass, plural, amenityIcon, initials, roleLabel })
 
 app.component('icon', AppIcon)
@@ -33,6 +34,7 @@ app.component('manager-bookings', ManagerBookings)
 app.component('brand-logo', BrandLogo)
 
 app.mount('#app')
+initEffects()
 
 const splash = document.getElementById('splash')
 if (splash) setTimeout(() => { splash.classList.add('hide'); setTimeout(() => splash.remove(), 500) }, Math.max(0, 600 - performance.now()))

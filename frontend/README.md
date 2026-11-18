@@ -1,38 +1,54 @@
-# frontend
+# VibeStay frontend
 
-This template should help get you started developing with Vue 3 in Vite.
+The web app for VibeStay, built with Vue 3 and Vite. Guests, hotel managers and admins all use this one app. What each person sees depends on their role.
 
-## Recommended IDE Setup
+## What is inside
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- **Guests:** search hotels, see availability, book rooms, pay with Stripe, manage bookings, write reviews
+- **Hotel managers:** create hotels and rooms, upload photos, follow bookings live
+- **Admins:** approve hotels, manage users, room types and amenities, see the dashboard
+- **Live notifications** over WebSocket (STOMP) with a bell in the header
+- **Map view** of hotels with Leaflet and OpenStreetMap
+- **Small touches:** animated hero, scroll progress bar, back to top button, image zoom on hover, and confetti when a payment succeeds (all of it respects "reduce motion")
 
-## Recommended Browser Setup
+## Tech
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+Vue 3 (Composition API, `<script setup>`), Vite, Leaflet, `@stomp/stompjs`. No UI framework: the styles are plain CSS in `src/assets`.
 
-## Customize configuration
+## Folder map
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+| Path | What it does |
+|---|---|
+| `src/App.vue` | Routing, pages and state |
+| `src/components/` | Small reusable pieces (search bar, map, form inputs, booking detail, brand logo) |
+| `src/lib/api.js` | Calls the API gateway and handles errors |
+| `src/lib/effects.js` | Scroll progress bar, back to top button, confetti |
+| `src/lib/utils.js` | Formatting helpers (dates, money, image URLs) |
+| `src/assets/main.css`, `wow.css` | Styles and animations |
+| `nginx.conf` | Serves the build and forwards `/api`, `/auth`, `/uploads`, `/webhook` and `/ws` to the gateway |
+| `Dockerfile` | Builds the app and serves it with nginx |
 
-## Project Setup
+## Run it
 
-```sh
+You need Node 22 or newer and the backend running (the API gateway on port 8000).
+
+```bash
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
 ```
 
-### Compile and Minify for Production
+Open `http://localhost:5173`. To point it at another backend, set `VITE_API_BASE` (for example `VITE_API_BASE=http://localhost:8000`).
 
-```sh
-npm run build
+```bash
+npm run build      # production build in dist/
+npm run preview    # serve the build locally
 ```
+
+## In Docker
+
+The root `docker-compose.yaml` builds this folder into the `frontend` image and serves it on port 80. nginx sends API calls to the gateway, so the browser only talks to one address.
+
+## Good to know
+
+- Stripe sends the guest back to `/payment/success`, and the app turns that into its own `#/payment/success` route.
+- The token is kept in the browser session and sent with every request. WebSocket connections send it in the STOMP `CONNECT` frame.

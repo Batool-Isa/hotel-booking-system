@@ -166,7 +166,6 @@ public class BookingConcurrencyTest {
                     result.conflicts.incrementAndGet();
                 } catch (Exception e) {
                     result.errors.incrementAndGet();
-                    e.printStackTrace();
                 } finally {
                     threadUser.remove();
                 }

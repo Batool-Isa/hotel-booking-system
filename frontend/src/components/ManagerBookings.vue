@@ -2,7 +2,6 @@
 import { api } from "@/lib/api";
 import { todayISO, initials, parseISO } from "@/lib/utils";
 
-// sort that makes sense for each time window
 const SORT = {
   upcoming: "checkIn,asc",
   current: "checkOut,asc",
@@ -12,11 +11,11 @@ const SORT = {
 
 export default {
   props: {
-    // hotels the manager runs, for the hotel filter: [{ id, name }]
+
     hotels: { type: Array, default: () => [] },
-    // when set, the list is locked to this hotel (used inside a hotel's page)
+
     hotelId: { type: [Number, String], default: null },
-    // managers use their own list; admins pass "/api/bookings/all"
+
     endpoint: { type: String, default: "/api/bookings/managed" },
     onDetails: Function,
     onComplete: Function,
@@ -122,7 +121,7 @@ export default {
       this.hotel = "";
       this.load(0);
     },
-    // a short hint next to the dates, e.g. "Arrives today"
+
     hint(b) {
       if (b.status === "CANCELLED") return "";
       if (b.checkIn === this.today) return "Arrives today";
@@ -130,7 +129,7 @@ export default {
       if (b.checkIn < this.today && b.checkOut > this.today) return "Staying now";
       return "";
     },
-    // "Thu 14 Jan", plus the year when it isn't this year
+
     shortDate(d) {
       const x = parseISO(d);
       const opts = { weekday: "short", day: "numeric", month: "short" };
@@ -293,7 +292,6 @@ export default {
 }
 .bk-row {
   display: grid;
-  /* fixed-width actions column, so rows with and without buttons line up */
   grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.3fr) minmax(0, 1.4fr) minmax(0, 0.9fr) 220px;
   gap: 16px;
   align-items: center;
@@ -405,7 +403,6 @@ export default {
   flex: none;
 }
 
-/* narrow screens: each booking becomes a small card */
 @media (max-width: 860px) {
   .bk-head {
     display: none;

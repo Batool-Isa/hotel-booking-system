@@ -10,7 +10,6 @@ export const isCustomer = computed(() => role.value==='CUSTOMER');
 export const isManager = computed(() => role.value==='HOTEL_MANAGER');
 export const isAdmin = computed(() => role.value==='ADMIN');
 
-/* App.vue registers what to do when the token turns out to be expired */
 let expireSession = () => {};
 export function setExpireHandler(fn){ expireSession = fn; }
 
@@ -55,7 +54,7 @@ export async function api(method, path, opts={}){
     if(text){ try{ data = JSON.parse(text); }catch{ data = text; } }
     if(res.ok) return data;
     let msg = data && typeof data==='object' ? (data.message||'') : (typeof data==='string' ? data : '');
-    if(res.status===401 && useAuth && auth.token && !(data && data.error)){   // token problem (business 401s such as a wrong password carry an `error` code)
+    if(res.status===401 && useAuth && auth.token && !(data && data.error)){
       expireSession(); throw new ApiError(401,'Your session has expired. Please sign in again.',data); }
     if(res.status===429){ const ra = Number(res.headers.get('Retry-After')||(data&&data.retryAfterSeconds)||0); if(ra>0) throw new ApiError(429, `Too many attempts. Please try again in ${ra>=60?Math.ceil(ra/60)+' minute'+(Math.ceil(ra/60)>1?'s':''):ra+' seconds'}.`, data); }
     if(res.status===403 && !msg){

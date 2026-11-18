@@ -1,7 +1,6 @@
 import { reactive, ref, watch, nextTick } from 'vue';
 import { blank } from './utils';
 
-/* validation for DTO coming from backend and then used in forms */
 export const R = {
   req:  label => v => blank(v) ? `${label} is required` : '',
   email:() => v => !blank(v) && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v).trim()) ? 'Please enter a valid email address' : '',

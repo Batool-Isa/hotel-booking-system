@@ -32,7 +32,6 @@ import {
 } from "@/lib/api";
 import { toasts, toast, dismiss, dlg, ask, answer } from "@/lib/ui";
 
-/* ---------------- routers ---------------- */
 const route = reactive({ name: "home", params: {}, query: {} });
 const page = reactive({ loading: true, error: "" });
 const menuOpen = ref(false),
@@ -173,7 +172,7 @@ function guard(r) {
     return isAdmin.value
       ? { to: "/admin?tab=bookings" }
       : { to: "/", msg: "You don't have access to the manager portal.", type: "warn" };
-  // staff don't book stays, so their home is their own workspace
+
   if (n === "home" && isManager.value) return { to: "/manage" };
   if (n === "home" && isAdmin.value) return { to: "/admin" };
   if (n === "admin" && !isAdmin.value)
@@ -269,7 +268,6 @@ async function loadRoute(r, seq) {
   }
 }
 
-/* ---------------- session ---------------- */
 const profileImage = computed(() =>
   auth.user ? imgUrl(auth.user.profileImageUrl) : "",
 );
@@ -309,7 +307,6 @@ function logout() {
 }
 setExpireHandler(expireSession);
 
-/* ---------------- forms: auth ---------------- */
 const loginF = useForm(
   { email: "", password: "" },
   { email: [R.req("Email"), R.email()], password: [R.req("Password")] },
@@ -446,7 +443,7 @@ async function doRegister() {
         ? v[k].trim()
         : v[k],
     );
-  if (regImage.file) fd.append("image", regImage.file); // the photo is optional
+  if (regImage.file) fd.append("image", regImage.file);
   regF.busy = true;
   try {
     await api("POST", "/auth/users/register", { auth: false, form: fd });
@@ -564,7 +561,6 @@ async function doReset() {
   }
 }
 
-/* ---------------- profile ---------------- */
 const profileF = useForm(
   { username: "", firstName: "", lastName: "", phone: "" },
   {
@@ -665,7 +661,6 @@ async function changePw() {
   }
 }
 
-/* ---------------- home / explore ---------------- */
 const home = reactive({ hotels: [] });
 let homeP = null,
   homeAt = 0;
@@ -770,7 +765,6 @@ function clearExplore() {
   loadExplore(0);
 }
 
-/* ---------------- search ---------------- */
 const minIn = computed(() => toISO(addDays(new Date(), 1)));
 const searchF = useForm(
   {
@@ -973,7 +967,6 @@ function toggleType(t) {
   else sr.types.push(t);
 }
 
-/* ---------------- hotel page ---------------- */
 const hp = reactive({
   hotel: null,
   policy: null,
@@ -989,14 +982,14 @@ const hp = reactive({
   viewImg: 0,
   reviews: [],
   reviewsShown: 3,
-  rating: 0, // average from GET /api/hotels/{id}/reviews (0 = no reviews)
+  rating: 0,
 });
-// 4.3 -> "★★★★☆" and a word for the score badge
+
 const stars = (n) => "★".repeat(Math.round(n)) + "☆".repeat(5 - Math.round(n));
 const ratingLabel = (n) =>
   n >= 4.5 ? "Excellent" : n >= 4 ? "Very good" : n >= 3 ? "Good" : n >= 2 ? "Fair" : "Poor";
 async function loadHotel(id, q) {
-  // reviews load on the side: the page still works if they fail
+
   api("GET", `/api/hotels/${id}/reviews`, { auth: false })
     .then((r) => {
       if (String(route.params.id) !== String(id)) return;
@@ -1178,7 +1171,6 @@ const policyText = (pol) =>
     : null;
 const hotelPhotos = computed(() => hp.images.map((i) => i.imageUrl));
 
-/* ---------------- booking ---------------- */
 const bk = reactive({
   hotel: null,
   policy: null,
@@ -1377,11 +1369,11 @@ function bookingHelp(e) {
     return "We couldn’t complete your booking right now. Please try again in a moment.";
   return m;
 }
-// another guest booked/holds the room, or the manager just deactivated it
+
 const isRoomConflict = (e) =>
   e.code === "ROOM_UNAVAILABLE" ||
   /not available for these dates|not active for booking/i.test(e.message || "");
-/** After a room clash: find out which selected rooms are gone and mark them, keeping the guest details. */
+
 async function markTakenRooms(e) {
   const fromMsg = Number(((e.message || "").match(/Room (?:with id )?(\d+)/) || [])[1]);
   let free = null;
@@ -1397,7 +1389,7 @@ async function markTakenRooms(e) {
     freeRooms = mine ? mine.rooms : [];
     free = new Set(freeRooms.map((r) => r.id));
   } catch {}
-  // the search only hides CONFIRMED bookings, so a room on a 15-min payment hold still looks free: trust the error too
+
   bk.rooms.forEach((r) => {
     r.taken = r.id === fromMsg || (free !== null && !free.has(r.id));
   });
@@ -1453,7 +1445,7 @@ async function submitBooking() {
         })),
       },
     });
-    // the booking is now PENDING and held for 15 minutes: send the guest to Stripe to pay
+
     quiet(created.bookingReference);
     if (!(await startPayment(created.id)))
       go(`/payment/cancel?bookingId=${created.id}`);
@@ -1466,7 +1458,6 @@ async function submitBooking() {
   }
 }
 
-/* ---------------- payment (Stripe) ---------------- */
 const pay = reactive({ booking: null, state: "", busy: false });
 function paymentKey(bookingId) {
   let key = store.get("vs_pay_" + bookingId);
@@ -1509,7 +1500,7 @@ function holdText(b) {
   const ms = holdLeft(b);
   return `${Math.floor(ms / 60000)}:${String(Math.floor((ms % 60000) / 1000)).padStart(2, "0")}`;
 }
-/** "Try payment again": if the hold expired or the booking was cancelled meanwhile, show that instead. */
+
 async function retryPayment() {
   if (!(await startPayment(pay.booking.id)))
     await loadPaymentResult(pay.booking.id, false);
@@ -1522,15 +1513,14 @@ async function loadPaymentResult(id, success) {
   }
   const routeName = success ? "payment-success" : "payment-cancel";
   for (let i = 0; i < (success ? 8 : 1); i++) {
-    if (route.name !== routeName) return; // the guest left the page
+    if (route.name !== routeName) return;
     pay.booking = await api("GET", `/api/bookings/${id}`);
     if (pay.booking.status !== "PENDING") break;
     if (success) await new Promise((r) => setTimeout(r, 2000));
   }
-  pay.state = pay.booking.status.toLowerCase(); // pending / confirmed / cancelled / completed
+  pay.state = pay.booking.status.toLowerCase();
 }
 
-/* ---------------- my bookings ---------------- */
 const known = new Set();
 const quietRefs = new Set();
 function quiet(ref) {
@@ -1599,13 +1589,11 @@ async function cancelBooking(b, after) {
     if (after) await after();
   } catch (e) {
     toast(e.message, "error");
-    // 400/409 here means the booking changed meanwhile (e.g. already cancelled or completed): show its real state
+
     if ((e.status === 400 || e.status === 409) && after) await after();
   }
 }
 
-/* ---------------- write a review (completed stays) ---------------- */
-// reviewed just now, before the list reloads (after a reload `b.reviewed` comes from the API)
 const reviewed = reactive({});
 const RATING_WORDS = ["", "Poor", "Fair", "Good", "Very good", "Excellent"];
 const reviewF = useForm(
@@ -1648,7 +1636,6 @@ async function saveReview() {
   }
 }
 
-/* ---------------- booking lookup (manager/admin) ---------------- */
 const lk = reactive({ id: "", err: "", loading: false, data: null });
 async function lookupBooking() {
   lk.err = "";
@@ -1684,12 +1671,11 @@ async function completeBooking(b, after = lookupBooking) {
     await after();
   } catch (e) {
     toast(e.message, "error");
-    if (e.status === 400 || e.status === 409) await after(); // changed by someone else meanwhile
+    if (e.status === 400 || e.status === 409) await after();
   }
 }
 const cancelFromLookup = (b) => cancelBooking(b, lookupBooking);
 
-/* ---------------- hotel form (create / edit) ---------------- */
 const hotelEditId = ref(null);
 const hotelF = useForm(
   {
@@ -1792,7 +1778,6 @@ function useMyLocation() {
   );
 }
 
-/* ---------------- manager portal ---------------- */
 const mh = reactive({
   items: [],
   page: 0,
@@ -1802,7 +1787,7 @@ const mh = reactive({
   error: "",
   live: {},
 });
-// [badge text, badge class, help text] for a hotel's status on the manager's cards
+
 const HOTEL_STATUS = {
   ACTIVE: ["Live", "b-green", ""],
   PENDING_APPROVAL: ["Awaiting approval", "b-yellow", "An admin is reviewing this hotel. You can add rooms once it’s approved."],
@@ -1840,9 +1825,9 @@ async function loadManagerHotels(p = 0) {
     mh.loading = false;
   }
 }
-/* ---------------- manager bookings ---------------- */
-const mgrHotels = ref([]); // [{ id, name }] for the hotel filter
-const mgrBookingsRef = ref(null); // the <manager-bookings> list on screen, reloaded on live events
+
+const mgrHotels = ref([]);
+const mgrBookingsRef = ref(null);
 async function loadManagerHotelOptions() {
   try {
     const list = await api("GET", "/api/hotels/my-hotels", {
@@ -2059,7 +2044,6 @@ async function setRoomStatus(r, status) {
   await loadMRooms(mp.roomsPage);
 }
 
-/* add many rooms at once: 101, 102, 103 ... */
 const bulkF = useForm(
   {
     roomTypeId: "",
@@ -2133,7 +2117,6 @@ async function saveBulk() {
   }
 }
 
-/* photos of one room */
 const rimg = reactive({
   open: false,
   room: null,
@@ -2250,7 +2233,6 @@ async function deleteRoomImage(img) {
   }
 }
 
-/* ---------------- amenities ---------------- */
 const amenityCatalog = ref([]);
 async function loadAmenityCatalog() {
   try {
@@ -2369,7 +2351,6 @@ async function removeAmenity(a) {
   }
 }
 
-/* admin: the amenity catalog */
 const catF = useForm(
   { id: null, name: "", description: "" },
   {
@@ -2556,7 +2537,6 @@ async function savePolicy() {
   }
 }
 
-/* ---------------- admin ---------------- */
 const ad = reactive({
   tab: "overview",
   users: [],
@@ -2602,7 +2582,7 @@ async function loadAdmin(tab) {
   document.title = (navItem ? navItem.label : "Admin") + " – VibeStay";
   try {
     if (ad.tab === "overview") {
-      // stats are optional: the admin stats endpoint is not available in every backend setup
+
       const [st, t] = await Promise.all([api("GET", "/api/admin/stats").catch(() => null), api("GET", "/api/rooms-types").catch(() => [])]);
       ad.counts.types = String(t.length);
       roomTypes.value = t;
@@ -2627,7 +2607,7 @@ async function loadAdmin(tab) {
     ad.error = e.message;
   }
 }
-/** Loads one page of users using the server-side filters (search, status, role) and sorting. */
+
 async function loadAdminUsers(p = 0) {
   ad.loading = true;
   ad.error = "";
@@ -2666,7 +2646,7 @@ function resetUserFilters() {
   loadAdminUsers(0);
 }
 const isSelf = (u) => !!auth.user && auth.user.email === u.email;
-/** Deactivate (soft delete) or reactivate a user after the admin confirms. */
+
 async function setUserStatus(u, status) {
   const off = status === "INACTIVE";
   const yes = await ask({
@@ -2710,7 +2690,7 @@ const ADMIN_HEAD = {
   types: ["Setup", "The room types and amenities that hotels can choose from."],
   amenities: ["Setup", "The room types and amenities that hotels can choose from."],
 };
-// e.g. "1–4 Oct": the same days of last month that the dashboard compares against
+
 const prevPeriodLabel = computed(() => {
   const now = new Date();
   const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -2719,7 +2699,7 @@ const prevPeriodLabel = computed(() => {
   return `1–${Math.min(now.getDate(), lastDay)} ${month}`;
 });
 const adminNavOn = (item) => route.name === "admin" && item.tabs.includes(ad.tab);
-const adHotelOptions = ref([]); // every hotel, for the bookings hotel filter
+const adHotelOptions = ref([]);
 async function loadAdminHotelOptions() {
   try {
     const l = await api("GET", "/api/hotels/all", { query: { page: 0, size: 200, sort: "name,asc" } });
@@ -2728,11 +2708,11 @@ async function loadAdminHotelOptions() {
     adHotelOptions.value = [];
   }
 }
-// keeps the "Approvals" badge in the nav up to date
+
 function refreshPendingCount() {
   api("GET", "/api/admin/stats")
     .then((st) => (ad.counts.pending = String(st.hotelsByStatus.PENDING_APPROVAL || 0)))
-    // no stats endpoint: count the pending list instead (first 100)
+
     .catch(() =>
       api("GET", "/api/hotels/pending", { query: { page: 0, size: 100 } }).then((l) => {
         ad.counts.pending = String(Array.isArray(l) ? l.length : 0);
@@ -2960,7 +2940,6 @@ async function activateTypeById() {
   }
 }
 
-/* ---------------- live notifications (STOMP over WebSocket) ---------------- */
 const feed = ref([]),
   unread = ref(0),
   wsState = reactive({ on: false });
@@ -2985,7 +2964,7 @@ function connectWs() {
     brokerURL:
       (base.protocol === "https:" ? "wss:" : "ws:") + "//" + base.host + "/ws",
     reconnectDelay: 10000,
-    // the server checks this token when the socket connects (browsers can't send headers on the handshake)
+
     beforeConnect() {
       stomp.connectHeaders = { Authorization: "Bearer " + auth.token };
     },
@@ -2997,12 +2976,12 @@ function connectWs() {
         } catch {}
       };
       if (auth.user && auth.user.email)
-        stomp.subscribe(`/topic/users/${auth.user.email}/bookings`, handle); // my own bookings
+        stomp.subscribe(`/topic/users/${auth.user.email}/bookings`, handle);
       try {
         if (isAdmin.value)
-          stomp.subscribe("/topic/admin/bookings", handle); // admins: everything
+          stomp.subscribe("/topic/admin/bookings", handle);
         else if (isManager.value) {
-          // managers: their hotels only
+
           const list = await api("GET", "/api/hotels/my-hotels", {
             query: { size: 100 },
           });
@@ -3026,7 +3005,7 @@ function connectWs() {
 }
 const recentEvents = new Map();
 function onBookingEvent(n) {
-  // a manager can receive the same event on two channels (own booking + hotel topic): show it once
+
   const key = n.bookingReference + "|" + n.status,
     now = Date.now();
   if (recentEvents.has(key) && now - recentEvents.get(key) < 3000) return;
@@ -3058,13 +3037,12 @@ function scrollToReviews() {
   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-/* ---------------- boot ---------------- */
 document.addEventListener("click", () => {
   menuOpen.value = false;
   feedOpen.value = false;
 });
 window.addEventListener("hashchange", applyRoute);
-// Stripe redirects to /payment/success?bookingId=… (a real path): turn it into our #/ route
+
 if (location.pathname.startsWith("/payment/"))
   history.replaceState(null, "", "/#" + location.pathname + location.search);
 (async () => {
@@ -3105,7 +3083,6 @@ const printPage = () => window.print();
       <option v-for="c in cities" :key="c" :value="c"></option>
     </datalist>
 
-    <!-- ================= HEADER ================= -->
     <header class="topbar no-print">
       <div class="wrap topbar-in">
         <a class="brand" href="#/"><brand-logo :size="36"></brand-logo>VibeStay</a>
@@ -3242,11 +3219,11 @@ const printPage = () => window.print();
     </header>
 
     <main>
-      <!-- ================= HOME ================= -->
+
       <section v-if="route.name === 'home'">
         <div class="hero">
           <div class="wrap">
-            <h1>Find your next stay</h1>
+            <h1>Find your <span class="shine">next stay</span></h1>
             <p>
               Search hotels, see real-time room availability and book in minutes
               – with instant confirmation by email.
@@ -3377,7 +3354,6 @@ const printPage = () => window.print();
         </div>
       </section>
 
-      <!-- ================= SEARCH RESULTS ================= -->
       <section v-if="route.name === 'search'" class="page">
         <div class="wrap">
           <search-bar
@@ -3639,7 +3615,6 @@ const printPage = () => window.print();
         </div>
       </section>
 
-      <!-- ================= EXPLORE ================= -->
       <section v-if="route.name === 'explore'" class="page">
         <div class="wrap">
           <div class="row between" style="flex-wrap: wrap; gap: 10px">
@@ -3792,7 +3767,6 @@ const printPage = () => window.print();
         </div>
       </section>
 
-      <!-- ================= HOTEL DETAILS ================= -->
       <section v-if="route.name === 'hotel'" class="page">
         <div class="wrap">
           <div v-if="page.loading">
@@ -4013,7 +3987,6 @@ const printPage = () => window.print();
                   </div>
                 </div>
 
-                <!-- guest reviews -->
                 <div class="card pad" id="reviews">
                   <div class="row between">
                     <h3 style="margin: 0">Guest reviews</h3>
@@ -4147,7 +4120,6 @@ const printPage = () => window.print();
         </div>
       </section>
 
-      <!-- ================= BOOKING ================= -->
       <section v-if="route.name === 'book'" class="page">
         <div class="wrap">
           <div v-if="page.loading">
@@ -4163,7 +4135,6 @@ const printPage = () => window.print();
             >
           </div>
 
-          <!-- confirmation -->
           <template v-else-if="bk.done">
             <div class="steps">
               <div class="step done"><i>✓</i>Your selection</div>
@@ -4536,7 +4507,6 @@ const printPage = () => window.print();
         </div>
       </section>
 
-      <!-- ================= AUTH: LOGIN ================= -->
       <section v-if="route.name === 'login'" class="page">
         <div class="wrap">
           <div class="card pad authbox">
@@ -4592,7 +4562,6 @@ const printPage = () => window.print();
         </div>
       </section>
 
-      <!-- ================= AUTH: REGISTER ================= -->
       <section v-if="route.name === 'register'" class="page">
         <div class="wrap">
           <div class="card pad authbox wide">
@@ -4948,7 +4917,6 @@ const printPage = () => window.print();
         </div>
       </section>
 
-      <!-- ================= PROFILE ================= -->
       <section v-if="route.name === 'profile' && auth.user" class="page">
         <div class="wrap" style="max-width: 860px">
           <div v-if="page.error" class="alert error">
@@ -5105,7 +5073,6 @@ const printPage = () => window.print();
         </div>
       </section>
 
-      <!-- ================= MY BOOKINGS ================= -->
       <section v-if="route.name === 'bookings'" class="page">
         <div class="wrap" style="max-width: 900px">
           <div class="row between">
@@ -5260,7 +5227,6 @@ const printPage = () => window.print();
         </div>
       </section>
 
-      <!-- ================= MANAGER PORTAL ================= -->
       <section v-if="route.name === 'manage'" class="page">
         <div class="wrap">
           <div class="row between">
@@ -5365,7 +5331,6 @@ const printPage = () => window.print();
         </div>
       </section>
 
-      <!-- ================= MANAGER BOOKINGS ================= -->
       <section v-if="route.name === 'manage-bookings'" class="page">
         <div class="wrap">
           <h2>Bookings</h2>
@@ -5383,7 +5348,6 @@ const printPage = () => window.print();
         </div>
       </section>
 
-      <!-- ================= HOTEL FORM (new) ================= -->
       <section v-if="route.name === 'manage-new'" class="page">
         <div class="wrap" style="max-width: 780px">
           <div class="crumbs">
@@ -5514,7 +5478,6 @@ const printPage = () => window.print();
         </div>
       </section>
 
-      <!-- ================= MANAGE ONE HOTEL ================= -->
       <section v-if="route.name === 'manage-hotel'" class="page">
         <div class="wrap">
           <div v-if="page.loading && !mp.hotel">
@@ -5608,7 +5571,6 @@ const printPage = () => window.print();
               </button>
             </div>
 
-            <!-- details -->
             <div
               v-if="mp.tab === 'overview'"
               class="card pad"
@@ -5709,7 +5671,6 @@ const printPage = () => window.print();
               </form>
             </div>
 
-            <!-- rooms -->
             <div v-if="mp.tab === 'rooms'">
               <div class="row between mb">
                 <div>
@@ -5830,7 +5791,6 @@ const printPage = () => window.print();
               </div>
             </div>
 
-            <!-- amenities -->
             <div v-if="mp.tab === 'amenities'">
               <div class="row between mb">
                 <div>
@@ -5899,7 +5859,6 @@ const printPage = () => window.print();
               </div>
             </div>
 
-            <!-- photos -->
             <div v-if="mp.tab === 'photos'" class="stack">
               <div class="card pad">
                 <h3>Upload photos</h3>
@@ -5995,7 +5954,6 @@ const printPage = () => window.print();
               </div>
             </div>
 
-            <!-- child policy -->
             <div
               v-if="mp.tab === 'policy'"
               class="card pad"
@@ -6072,7 +6030,6 @@ const printPage = () => window.print();
               </form>
             </div>
 
-            <!-- bookings -->
             <manager-bookings
               v-if="mp.tab === 'bookings' && isManager"
               ref="mgrBookingsRef"
@@ -6093,7 +6050,6 @@ const printPage = () => window.print();
         </div>
       </section>
 
-      <!-- ================= ADMIN ================= -->
       <section v-if="route.name === 'admin'" class="page">
         <div class="wrap">
           <div v-if="ADMIN_HEAD[ad.tab]" class="mb2">
@@ -6779,7 +6735,6 @@ const printPage = () => window.print();
         </div>
       </section>
 
-      <!-- ================= PAYMENT RESULT (Stripe redirects back here) ================= -->
       <section
         v-if="route.name === 'payment-success' || route.name === 'payment-cancel'"
         class="page"
@@ -6798,7 +6753,6 @@ const printPage = () => window.print();
               <p class="muted mt">Checking your payment…</p>
             </template>
 
-            <!-- paid and confirmed -->
             <template v-else-if="pay.state === 'confirmed' || pay.state === 'completed'">
               <div class="pay-icon ok"><icon name="check" :size="38"></icon></div>
               <h2>Booking confirmed!</h2>
@@ -6807,7 +6761,6 @@ const printPage = () => window.print();
               </p>
             </template>
 
-            <!-- back from Stripe "success" but the webhook hasn't confirmed it yet -->
             <template v-else-if="pay.state === 'pending' && route.name === 'payment-success'">
               <div class="pay-icon wait"><icon name="clock" :size="38"></icon></div>
               <h2>Payment received – confirming your booking</h2>
@@ -6816,7 +6769,6 @@ const printPage = () => window.print();
               </p>
             </template>
 
-            <!-- cancelled on Stripe: booking is still held and can be paid -->
             <template v-else-if="pay.state === 'pending'">
               <div class="pay-icon warn"><icon name="x" :size="38"></icon></div>
               <h2>Payment cancelled</h2>
@@ -6896,7 +6848,6 @@ const printPage = () => window.print();
       </div>
     </footer>
 
-    <!-- ================= MODALS ================= -->
     <div
       v-if="reviewModal.open"
       class="modal-bg"
