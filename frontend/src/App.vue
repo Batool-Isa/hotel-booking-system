@@ -1471,7 +1471,13 @@ const pay = reactive({ booking: null, state: "", busy: false });
 function paymentKey(bookingId) {
   let key = store.get("vs_pay_" + bookingId);
   if (!key) {
-    key = crypto.randomUUID();
+    key =
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+            const r = (crypto.getRandomValues(new Uint8Array(1))[0] & 15) >> (c === "x" ? 0 : 1);
+            return (c === "x" ? r : (r & 3) | 8).toString(16);
+          });
     store.set("vs_pay_" + bookingId, key);
   }
   return key;
