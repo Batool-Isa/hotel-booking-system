@@ -9,7 +9,9 @@ The web app for VibeStay, built with Vue 3 and Vite. Guests, hotel managers and 
 - **Admins:** approve hotels, manage users, room types and amenities, see the dashboard
 - **Live notifications** over WebSocket (STOMP) with a bell in the header
 - **Map view** of hotels with Leaflet and OpenStreetMap
-- **Small touches:** animated hero, scroll progress bar, back to top button, image zoom on hover, and confetti when a payment succeeds (all of it respects "reduce motion")
+- **360° view:** a WebGL panorama viewer (`PanoViewer.vue`) for equirectangular photos: starts as a "little planet" that unfolds, then drag, pinch or scroll to look around, auto-rotate, full screen. Panoramas live in `public/panoramas/` and are listed in `index.json` (see the README there); the button only shows when a hotel has one. Hotels without their own panorama show the labelled sample
+- **Photo viewer:** lightbox with arrows, counter and keyboard keys
+- **Small touches:** animated hero, search box that types city names, cards that tilt toward the mouse, shimmering loading placeholders, scroll progress bar, back to top button, an animated tick and confetti when a payment succeeds (all of it respects "reduce motion")
 
 ## Tech
 

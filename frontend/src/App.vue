@@ -978,7 +978,6 @@ const hp = reactive({
   sel: [],
   q: null,
   lightbox: -1,
-  tour: false,
   view: null,
   viewImg: 0,
   reviews: [],
@@ -1011,7 +1010,6 @@ async function loadHotel(id, q) {
     sel: [],
     q: null,
     lightbox: -1,
-    tour: false,
     view: null,
     viewImg: 0,
   });
@@ -1027,6 +1025,8 @@ async function loadHotel(id, q) {
   hp.policy = pol && pol !== "missing" ? pol : null;
   hp.policyMissing = pol === "missing";
   hp.images = Array.isArray(imgs) && imgs.length ? imgs : h.images || [];
+  pano.open = false;
+  loadPanos(h.id);
   searchF.reset({
     city: h.city || "",
     ...(q.in ? { checkIn: q.in } : {}),
@@ -1173,50 +1173,40 @@ const policyText = (pol) =>
     : null;
 const hotelPhotos = computed(() => hp.images.map((i) => i.imageUrl));
 
-const tour = reactive({ rot: 0, drag: false, x: 0 });
-const tourPhotos = computed(() => hotelPhotos.value.slice(0, 12));
-const tourRadius = computed(() =>
-  Math.round(150 / Math.tan(Math.PI / Math.max(tourPhotos.value.length, 3))),
-);
-const tourCaption = (i) =>
-  (hp.images[i] && hp.images[i].altText) || (hp.hotel && hp.hotel.name) || "";
-
 function lbStep(d) {
   const n = hotelPhotos.value.length;
   if (n && hp.lightbox >= 0) hp.lightbox = (hp.lightbox + d + n) % n;
 }
-function openTour() {
-  tour.rot = 0;
-  hp.tour = true;
+const pano = reactive({ open: false, items: [] });
+let panoIndex = null;
+async function loadPanos(hotelId) {
+  pano.items = [];
+  try {
+    if (!panoIndex) {
+      const base = import.meta.env.BASE_URL;
+      const r = await fetch(`${base}panoramas/index.json`, { cache: "no-cache" });
+      const j = await r.json();
+      panoIndex = Array.isArray(j.panoramas) ? j.panoramas : [];
+    }
+  } catch (e) {
+    panoIndex = [];
+  }
+  const own = panoIndex.filter((p) => Number(p.hotelId) === Number(hotelId));
+  const list = own.length ? own : panoIndex.filter((p) => p.hotelId == null);
+  if (hp.hotel && Number(hp.hotel.id) === Number(hotelId)) {
+    pano.items = list.map((p) => ({
+      src: `${import.meta.env.BASE_URL}panoramas/${p.file}`,
+      title: p.title,
+      sample: !!p.sample,
+    }));
+  }
 }
-function tourDown(e) {
-  tour.drag = true;
-  tour.x = e.clientX;
-  if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
+function openPano() {
+  pano.open = true;
 }
-function tourMove(e) {
-  if (!tour.drag) return;
-  tour.rot += (e.clientX - tour.x) * 0.4;
-  tour.x = e.clientX;
-}
-function tourUp() {
-  tour.drag = false;
-}
-let tourTimer = null;
-watch(
-  () => hp.tour,
-  (on) => {
-    clearInterval(tourTimer);
-    if (on) tourTimer = setInterval(() => { if (!tour.drag) tour.rot += 0.18; }, 30);
-  },
-);
 window.addEventListener("keydown", (e) => {
-  const step = 360 / Math.max(tourPhotos.value.length, 1);
-  if (hp.tour) {
-    if (e.key === "Escape") hp.tour = false;
-    else if (e.key === "ArrowLeft") tour.rot += step;
-    else if (e.key === "ArrowRight") tour.rot -= step;
-  } else if (hp.lightbox >= 0) {
+  if (pano.open) return;
+  if (hp.lightbox >= 0) {
     if (e.key === "Escape") hp.lightbox = -1;
     else if (e.key === "ArrowLeft") lbStep(-1);
     else if (e.key === "ArrowRight") lbStep(1);
@@ -3871,11 +3861,11 @@ const printPage = () => window.print();
                 </div>
                 <span v-else class="chip" style="margin: 0"><icon name="star" :size="14"></icon>New – no reviews yet</span>
                 <button
-                  v-if="hotelPhotos.length >= 3"
+                  v-if="pano.items.length"
                   class="btn btn-outline"
-                  @click="openTour"
+                  @click="openPano"
                 >
-                  <icon name="building" :size="16"></icon>3D tour
+                  <icon name="globe" :size="16"></icon>360° view
                 </button>
                 <button class="btn btn-primary" @click="scrollToRooms">
                   See availability
@@ -3890,13 +3880,14 @@ const printPage = () => window.print();
                 one: hotelPhotos.length === 1,
                 two: hotelPhotos.length === 2,
                 three: hotelPhotos.length === 3,
+                four: hotelPhotos.length === 4,
               }"
             >
               <template v-if="hotelPhotos.length">
                 <div
                   v-for="(u, i) in hotelPhotos.slice(
                     0,
-                    hotelPhotos.length < 2 ? 1 : 3,
+                    hotelPhotos.length < 2 ? 1 : 5,
                   )"
                   :key="i"
                   @click="hp.lightbox = i"
@@ -3909,10 +3900,10 @@ const printPage = () => window.print();
                     "
                   ></hotel-img>
                   <div
-                    v-if="i === 2 && hotelPhotos.length > 3"
+                    v-if="i === 4 && hotelPhotos.length > 5"
                     class="more-pics"
                   >
-                    +{{ hotelPhotos.length - 3 }} photos
+                    +{{ hotelPhotos.length - 5 }} photos
                   </div>
                 </div>
               </template>
@@ -3922,6 +3913,14 @@ const printPage = () => window.print();
               >
                 <hotel-img :src="''" :name="hp.hotel.name"></hotel-img>
               </div>
+              <button
+                v-if="pano.items.length"
+                type="button"
+                class="pano-fab"
+                @click.stop="openPano"
+              >
+                <icon name="globe" :size="16"></icon>360° view
+              </button>
             </div>
             <div
               v-if="hp.lightbox >= 0"
@@ -3960,40 +3959,11 @@ const printPage = () => window.print();
               </div>
             </div>
 
-            <div v-if="hp.tour" class="tour" @click.self="hp.tour = false">
-              <button class="btn btn-light btn-sm tour-x" @click="hp.tour = false">
-                <icon name="x" :size="16"></icon>Close
-              </button>
-              <div
-                class="tour-stage"
-                @pointerdown="tourDown"
-                @pointermove="tourMove"
-                @pointerup="tourUp"
-                @pointercancel="tourUp"
-              >
-                <div
-                  class="tour-ring"
-                  :style="{
-                    transform:
-                      'translateZ(-' + tourRadius + 'px) rotateY(' + tour.rot + 'deg)',
-                  }"
-                >
-                  <figure
-                    v-for="(u, i) in tourPhotos"
-                    :key="i"
-                    class="tour-item"
-                    :style="{
-                      transform:
-                        'rotateY(' + (i * 360) / tourPhotos.length + 'deg) translateZ(' + tourRadius + 'px)',
-                    }"
-                  >
-                    <img :src="imgUrl(u)" :alt="tourCaption(i)" draggable="false" />
-                    <figcaption>{{ tourCaption(i) }}</figcaption>
-                  </figure>
-                </div>
-              </div>
-              <p class="tour-hint">Drag to look around · arrow keys · Esc to close</p>
-            </div>
+            <pano-viewer
+              v-if="pano.open"
+              :items="pano.items"
+              @close="pano.open = false"
+            ></pano-viewer>
 
             <div class="layout-b mt2">
               <div class="stack">

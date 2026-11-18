@@ -49,7 +49,7 @@ The browser (guest, customer, hotel manager or admin) opens the Vue front end, w
 
 ### AWS
 
-Everything runs on AWS in `us-east-1`. Jenkins builds the Docker images, pushes them to ECR and deploys them to the app server with Docker Compose. The database is on RDS and only the app server can reach it.
+Everything runs on AWS in `us-east-1`. Jenkins builds the Docker images, pushes them to ECR and deploys them to the app server with Docker Compose. The database is on RDS and only the app server can reach it. Hotel photos live on a Docker volume on the app server and are backed up to an S3 bucket, so they survive a rebuilt server.
 
 ![AWS architecture](docs/aws-architecture.png)
 
@@ -134,6 +134,7 @@ The test stages are behind the `RUN_TESTS` option (Build with Parameters) so a q
 | EC2 `vibestay-app` | Runs all containers with Docker Compose, with an Elastic IP so the address does not change |
 | EC2 `vibestay-jenkins` | Runs Jenkins |
 | ECR | Stores the Docker images, one repository per service |
+| S3 (`vibestay-app-uploads`) | Private bucket with a backup of the hotel photo volume. The app server restores from it after a rebuild, using an inline IAM policy on its role and no access keys |
 | RDS (PostgreSQL) | The database, not publicly accessible |
 | VPC and security groups | Default VPC. The site is open on port 80, RDS accepts port 5432 only from the app server's security group, SSH and Jenkins (8080) are limited to my IP |
 | IAM | Permissions so Jenkins can push to ECR and the app server can pull from it, with no AWS keys in the repository |
@@ -147,6 +148,27 @@ docker compose pull
 docker compose up -d
 docker compose ps
 ```
+
+### Deployment evidence
+
+Screenshots from the AWS console. The account ID, ARNs, endpoints, public IP addresses and the database username are hidden.
+
+| What it shows | Screenshot |
+|---|---|
+| Two EC2 instances running: the app server and Jenkins | ![EC2 instances](docs/evidence/01-ec2-instances.png) |
+| Elastic IP attached to the app server | ![Elastic IP](docs/evidence/02-elastic-ip.png) |
+| IAM role on the app server, so no AWS keys are stored on it | ![App server role](docs/evidence/03-app-server-iam-role.png) |
+| Security groups | ![Security groups](docs/evidence/04-security-groups.png) |
+| RDS accepts port 5432 only from the app security group | ![RDS inbound rule](docs/evidence/05-rds-security-group-inbound.png) |
+| RDS is not publicly accessible | ![RDS not public](docs/evidence/06-rds-not-public.png) |
+| One immutable ECR repository per service | ![ECR repositories](docs/evidence/07-ecr-repositories.png) |
+| Versioned image tags (`1.0.<build>`) | ![ECR image tags](docs/evidence/08-ecr-image-tags.png) |
+| IAM roles | ![IAM roles](docs/evidence/09-iam-roles.png) |
+| Permissions of the app role (read ECR, write the uploads backup) | ![App role permissions](docs/evidence/10-app-role-permissions.png) |
+| S3 bucket for the uploads backup | ![S3 bucket](docs/evidence/11-s3-bucket.png) |
+| Jenkins dashboard with the pipeline and its last builds | ![Jenkins dashboard](docs/evidence/14-jenkins-dashboard.png) |
+| Pipeline status and permalinks (last failed build was #1, every build since is green) | ![Pipeline status](docs/evidence/12-jenkins-pipeline-status.png) |
+| Stage view: checkout, tests, build, push to ECR, deploy, smoke test. Build #1 failed at Deploy and was fixed | ![Stage view](docs/evidence/13-jenkins-stage-view.png) |
 
 ## Getting started
 
@@ -436,7 +458,7 @@ The app sends verification, password reset and booking emails. They share one de
 - Refunds through Stripe when a paid booking is cancelled
 - Caching hotel data (for example Spring Cache with Caffeine, or Redis later) and monitoring with CloudWatch or Prometheus and Grafana
 - Retry and dead letter topics for all Kafka consumers
-- Photos stored in S3
+- Serve hotel photos straight from S3 (today they sit on a Docker volume and are backed up to S3)
 - Kubernetes or ECS instead of Docker Compose, and a multi broker Kafka
 - Replies from managers on reviews, AI hotel recommendations, a mobile app
 

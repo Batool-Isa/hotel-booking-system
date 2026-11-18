@@ -7,6 +7,7 @@ import { initEffects } from './lib/effects'
 import AppIcon from './components/AppIcon.vue'
 import HotelMap from './components/HotelMap.vue'
 import HotelImg from './components/HotelImg.vue'
+import PanoViewer from './components/PanoViewer.vue'
 import FInput from './components/FInput.vue'
 import FSelect from './components/FSelect.vue'
 import AlertBox from './components/AlertBox.vue'
@@ -24,6 +25,7 @@ Object.assign(app.config.globalProperties, { fmtDate, fmtDateTime, money, imgUrl
 app.component('icon', AppIcon)
 app.component('hotel-map', HotelMap)
 app.component('hotel-img', HotelImg)
+app.component('pano-viewer', PanoViewer)
 app.component('f-input', FInput)
 app.component('f-select', FSelect)
 app.component('alert-box', AlertBox)

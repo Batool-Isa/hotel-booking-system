@@ -233,85 +233,6 @@
 .lightbox img {
   animation: fade 0.3s ease both;
 }
-.tour {
-  position: fixed;
-  inset: 0;
-  z-index: 130;
-  background: radial-gradient(circle at 50% 40%, #12306b, #050d22 75%);
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  animation: fade 0.3s ease both;
-}
-.tour .tour-x {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 2;
-}
-.tour-stage {
-  width: 300px;
-  height: 200px;
-  perspective: 1100px;
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-}
-.tour-stage:active {
-  cursor: grabbing;
-}
-.tour-ring {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-}
-.tour-item {
-  position: absolute;
-  inset: 0;
-  margin: 0;
-  width: 300px;
-  height: 200px;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
-  backface-visibility: hidden;
-}
-.tour-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  pointer-events: none;
-}
-.tour-item figcaption {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 18px 12px 8px;
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 600;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-}
-.tour-hint {
-  position: absolute;
-  bottom: 28px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 0.95rem;
-  margin: 0;
-}
-@media (max-width: 700px) {
-  .tour-stage,
-  .tour-item {
-    width: 220px;
-    height: 150px;
-  }
-}
 @keyframes pop {
   0% {
     transform: scale(0.3);
@@ -343,5 +264,254 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+.gallery {
+  position: relative;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 190px 190px;
+}
+.gallery.four > div:nth-child(4) {
+  grid-column: 2 / 4;
+}
+.gallery.three {
+  grid-template-rows: 190px 190px;
+}
+.pano-fab {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--navy-d);
+  background: var(--yellow);
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+.pano-fab:hover {
+  background: #ffd45e;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 0 0 rgba(254, 187, 2, 0.6);
+  }
+  50% {
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 0 12px rgba(254, 187, 2, 0);
+  }
+}
+@media (max-width: 700px) {
+  .gallery {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 200px 120px 120px;
+  }
+  .gallery > div:first-child {
+    grid-column: 1 / 3;
+    grid-row: 1;
+  }
+  .gallery.four > div:nth-child(4) {
+    grid-column: auto;
+  }
+}
+
+.pano {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  background: #050d22;
+  animation: fade 0.3s ease both;
+}
+.pano-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  touch-action: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.pano-canvas.ready {
+  opacity: 1;
+}
+.pano-canvas:active {
+  cursor: grabbing;
+}
+.pano-load {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+  pointer-events: none;
+}
+.pano-spin {
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  border-top-color: var(--yellow);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+.pano-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(rgba(5, 13, 34, 0.6), transparent);
+  pointer-events: none;
+}
+.pano-top > * {
+  pointer-events: auto;
+}
+.pano-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.pano-badge {
+  background: var(--yellow);
+  color: var(--navy-d);
+  border-radius: 999px;
+  padding: 3px 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.pano-sample {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+.pano-tools {
+  display: flex;
+  gap: 8px;
+}
+.pano-btn {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.pano-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.06);
+}
+.pano-btn.on {
+  background: var(--yellow);
+  color: var(--navy-d);
+}
+.pano-btn.on .ic {
+  animation: spin 3s linear infinite;
+}
+.pano-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  font-size: 1.8rem;
+  line-height: 1;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+}
+.pano-nav:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.pano-nav.prev {
+  left: 16px;
+}
+.pano-nav.next {
+  right: 16px;
+}
+.pano-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 16px 24px;
+  background: linear-gradient(transparent, rgba(5, 13, 34, 0.65));
+  pointer-events: none;
+}
+.pano-bottom > * {
+  pointer-events: auto;
+}
+.pano-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.pano-tab {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.pano-tab:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+.pano-tab.on {
+  background: #fff;
+  color: var(--navy-d);
+  border-color: #fff;
+}
+.pano-hint {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  transition: opacity 0.6s ease;
+}
+.pano-hint.gone {
+  opacity: 0;
+}
+@media (max-width: 700px) {
+  .pano-nav {
+    display: none;
   }
 }

@@ -1,0 +1,10 @@
+{
+  "panoramas": [
+    {
+      "hotelId": null,
+      "file": "sample-terrace.jpg",
+      "title": "Terrace and waterfront",
+      "sample": true
+    }
+  ]
+}
