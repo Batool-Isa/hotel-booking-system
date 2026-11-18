@@ -16,6 +16,7 @@ pipeline {
         REGISTRY     = "${ECR_HOST}/vibestay"
         TAG          = "${BUILD_NUMBER}"
         APP_HOST     = '172.31.19.178'
+        MODULES      = 'services/booking-service,services/billing-service'
         SERVICES     = 'api-gateway user-service hotel-service booking-service billing-service notification-service'
     }
 
@@ -27,12 +28,32 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Unit tests (JUnit)') {
             when { expression { params.RUN_TESTS } }
             steps {
                 sh '''
-                    docker run --rm -v "$PWD":/workspace -w /workspace \
-                        maven:3.9-eclipse-temurin-17 mvn -B test
+                    docker run --rm -e MODULES="$MODULES" -v "$PWD":/workspace -v maven-repo:/root/.m2 -w /workspace \
+                        maven:3.9-eclipse-temurin-17 sh -c '
+                            mvn -B test -pl $MODULES -Dtest=!RunCucumberTest -Dsurefire.failIfNoSpecifiedTests=false
+                            status=$?
+                            chown -R '"$(id -u):$(id -g)"' /workspace
+                            exit $status
+                        '
+                '''
+            }
+        }
+
+        stage('BDD tests (Cucumber)') {
+            when { expression { params.RUN_TESTS } }
+            steps {
+                sh '''
+                    docker run --rm -e MODULES="$MODULES" -v "$PWD":/workspace -v maven-repo:/root/.m2 -w /workspace \
+                        maven:3.9-eclipse-temurin-17 sh -c '
+                            mvn -B test -pl $MODULES -Dtest=RunCucumberTest -Dsurefire.failIfNoSpecifiedTests=false
+                            status=$?
+                            chown -R '"$(id -u):$(id -g)"' /workspace
+                            exit $status
+                        '
                 '''
             }
         }
@@ -101,6 +122,7 @@ pipeline {
 
     post {
         always {
+            junit allowEmptyResults: true, testResults: 'services/*/target/surefire-reports/*.xml'
             sh 'docker image prune -f || true'
         }
         success {
