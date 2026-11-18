@@ -109,7 +109,7 @@ docker compose logs -f booking-service
 docker compose down
 ```
 
-Images are tagged by `REGISTRY` and `TAG` in `.env` (`${REGISTRY}/booking-service:${TAG}`). On the server the tag is the Jenkins build number, so going back to an older version means setting `TAG` to an older build and running `docker compose up -d`.
+Images are tagged by `REGISTRY` and `TAG` in `.env` (`${REGISTRY}/booking-service:${TAG}`). On the server the tag is a version made from the Jenkins build number (`1.0.<build>`, for example `1.0.7`), and the containers run with `SPRING_PROFILES_ACTIVE=prod`, so going back to an older version means setting `TAG` to an older build and running `docker compose up -d`.
 
 ## CI/CD with Jenkins
 
@@ -198,6 +198,11 @@ Names only, copy `.env.example` and fill in your own values.
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Stripe test keys (`sk_test_...`, `whsec_...`) |
 | `MAIL_USERNAME`, `MAIL_PASSWORD` | SMTP account (a Gmail app password) |
 | `REGISTRY`, `TAG` | Which Docker images to run (set by the pipeline on the server) |
+| `SPRING_PROFILES_ACTIVE` | `dev` on your machine, `prod` in Docker (Compose sets it). Prod turns off SQL logging and debug logs |
+
+## Monitoring and health
+
+Every service has Spring Boot Actuator with a health endpoint (`/actuator/health`, no details exposed). Logs are written to the containers and to `logs/application.log`, and you read them with `docker compose logs -f <service>`. In production the SQL logging and debug logs are off (`application-prod.properties`).
 
 ## Testing
 
@@ -420,7 +425,7 @@ The app sends verification, password reset and booking emails. They share one de
 - Refunds are not handled when a paid booking is cancelled.
 - The notification consumers have no retry or dead letter topic yet.
 - Kafka and the services run on one server, so there is no high availability.
-- There is no caching, so hotel lookups hit the database each time.
+- There is no caching yet, so hotel lookups hit the database each time (planned, see below).
 - Logs are only in Docker and files, with no central monitoring.
 - The site uses HTTP, not HTTPS.
 - Hotel photos live in a Docker volume on the server and are lost if the volume is removed.
@@ -429,7 +434,7 @@ The app sends verification, password reset and booking emails. They share one de
 
 - HTTPS with a domain name and a load balancer
 - Refunds through Stripe when a paid booking is cancelled
-- Caching hotel data and monitoring with CloudWatch or Prometheus and Grafana
+- Caching hotel data (for example Spring Cache with Caffeine, or Redis later) and monitoring with CloudWatch or Prometheus and Grafana
 - Retry and dead letter topics for all Kafka consumers
 - Photos stored in S3
 - Kubernetes or ECS instead of Docker Compose, and a multi broker Kafka

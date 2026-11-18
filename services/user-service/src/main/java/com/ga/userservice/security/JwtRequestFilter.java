@@ -47,10 +47,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String email = jwtUtils.getUserEmailFromJwtToken(jwt);
-                System.out.println("email: ==> " + email);
                 UserDetails userDetails = this.myUserDetailsService.loadUserByUsername(email);
-                System.out.println("userDetails: ==> " + userDetails.getUsername());
-                System.out.println("authorities: ==> " + userDetails.getAuthorities());
                 boolean accountActive = !(userDetails instanceof MyUserDetails details)
                         || details.getUser().getStatus() == User.Status.ACTIVE;
                 if (accountActive) {

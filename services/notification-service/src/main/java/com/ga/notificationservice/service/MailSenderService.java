@@ -27,7 +27,7 @@ public class MailSenderService {
 
 
     public void sendSimpleMail(EmailDetails details) {
-        System.out.println("Email sent by thread "+ Thread.currentThread().getName());
+        log.debug("Email sent by thread {}", Thread.currentThread().getName());
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 

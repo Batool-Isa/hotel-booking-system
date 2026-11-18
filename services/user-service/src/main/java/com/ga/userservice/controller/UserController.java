@@ -1,5 +1,7 @@
 package com.ga.userservice.controller;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.ga.userservice.dto.request.*;
 import com.ga.userservice.service.PasswordResetService;
 import com.ga.userservice.service.UserService;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/auth/users")
 @Tag(name = "User Management", description = "APIs for managing user accounts")
+@Slf4j
 public class UserController {
     @Autowired
     private UserService userService;
@@ -38,7 +41,7 @@ public class UserController {
     })
     public ResponseEntity<?> register(@Valid @ModelAttribute RegisterRequest request,
                                       @RequestParam(value = "image", required = false) MultipartFile image) {
-        System.out.println("User Controller calling ---> register");
+        log.debug("User Controller calling ---> register");
         return userService.register(request, image);
     }
 
@@ -50,7 +53,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Wrong email or password, email not verified, or account inactive")
     })
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
-        System.out.println("User Controller calling ---> login");
+        log.debug("User Controller calling ---> login");
         return userService.loginUser(loginRequest);
     }
 
@@ -61,7 +64,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Not logged in")
     })
     public ResponseEntity<?> logoutUser(HttpServletRequest request) {
-        System.out.println("User Controller calling ---> logout");
+        log.debug("User Controller calling ---> logout");
         return userService.logoutUser(request);
     }
     @GetMapping("/verify-email")
@@ -72,7 +75,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Token not found")
     })
     public String verifyEmail(@RequestParam(name = "token") String token) {
-        System.out.println("User Controller calling ---> verfiy email");
+        log.debug("User Controller calling ---> verfiy email");
         return userService.verifyEmail(token);
     }
 
@@ -83,7 +86,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Invalid email")
     })
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
-        System.out.println("User Controller calling ---> forget password");
+        log.debug("User Controller calling ---> forget password");
         return passwordResetService.forgotPassword(request);
     }
 
@@ -96,7 +99,7 @@ public class UserController {
     })
     public ResponseEntity<?> resetPassword(@RequestParam String token,
                                           @Valid @RequestBody ResetPasswordRequest request) throws BadRequestException {
-        System.out.println("User Controller calling ---> reset password");
+        log.debug("User Controller calling ---> reset password");
         return passwordResetService.resetPassword(token, request);
     }
     @PostMapping("/change-password")
@@ -107,7 +110,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Not logged in or current password is wrong")
     })
     public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest request)  {
-        System.out.println("User Controller calling ---> change password");
+        log.debug("User Controller calling ---> change password");
         return passwordResetService.changePassword(request);
     }
     @GetMapping("/profile")
@@ -117,7 +120,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Not logged in")
     })
     public ResponseEntity<?> getUserProfile()  {
-        System.out.println("User Controller calling ---> get user profile");
+        log.debug("User Controller calling ---> get user profile");
         return userService.getUserProfile();
     }
     @PutMapping("/profile")
@@ -128,7 +131,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Not logged in")
     })
     public ResponseEntity<?> updateUserProfile(@Valid @RequestBody UpdateProfileRequest request)  {
-        System.out.println("User Controller calling ---> update user profile");
+        log.debug("User Controller calling ---> update user profile");
         return userService.updateUserProfile(request);
     }
     @PutMapping(
@@ -143,7 +146,7 @@ public class UserController {
     })
     public ResponseEntity<?> updateProfileImage(
             @RequestParam("image") MultipartFile image) {
-        System.out.println("User Controller calling ---> update user profile image");
+        log.debug("User Controller calling ---> update user profile image");
         return userService.updateProfileImage(image);
     }
     @GetMapping("/{id}")

@@ -34,7 +34,8 @@ public class JwtGatewayFilter implements GlobalFilter, Ordered {
             "/api/availability/search",
             "/swagger-ui",
             "/v3/api-docs",
-            "/uploads"
+            "/uploads",
+            "/actuator/health"
     };
 
     @Override

@@ -1,5 +1,7 @@
 package com.ga.hotelservice.controller;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.ga.hotelservice.dto.request.BulkCreateRoomsRequest;
 import com.ga.hotelservice.dto.request.CreateRoomRequest;
 import com.ga.hotelservice.dto.request.UpdateRoomStatusRequest;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/hotels/{hotelId}/rooms")
+@Slf4j
 public class RoomController {
 
     @Autowired
@@ -33,7 +36,7 @@ public class RoomController {
     })
     public ResponseEntity<?> createRoom(@PathVariable("hotelId") Long id,
             @Valid @RequestBody CreateRoomRequest request) {
-        System.out.println("Room controller calling ---> create room");
+        log.debug("Room controller calling ---> create room");
         return roomService.createRoom(id, request);
     }
 
@@ -47,7 +50,7 @@ public class RoomController {
             @ApiResponse(responseCode = "403", description = "Only admin or assigned manager can view all hotel's rooms includeing under maintance and inactive .. etc"),
     })
     public ResponseEntity<?> getHotelRooms(@PathVariable("hotelId") Long id, Pageable pageable) {
-        System.out.println("Room controller calling ---> get hotel rooms");
+        log.debug("Room controller calling ---> get hotel rooms");
         return roomService.getHotelRooms(id, pageable);
     }
 

@@ -1,5 +1,7 @@
 package com.ga.hotelservice.controller;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.ga.hotelservice.service.HotelImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/hotels/{hotelId}/images")
+@Slf4j
 public class HotelImageController {
     @Autowired
     private HotelImageService hotelImageService;
@@ -32,7 +35,7 @@ public class HotelImageController {
     public ResponseEntity<?> uploadImages(@PathVariable("hotelId") Long id,
             @RequestParam("images") List<MultipartFile> images,
             @RequestParam("altTexts") List<String> altTexts) {
-        System.out.println("Hotel Image Controller calling ---> upload hotel images");
+        log.debug("Hotel Image Controller calling ---> upload hotel images");
         return hotelImageService.uploadImages(id, images, altTexts);
     }
 
@@ -42,7 +45,7 @@ public class HotelImageController {
             @ApiResponse(responseCode = "200", description = "List all hotel's images"),
     })
     public ResponseEntity<?> getImages(@PathVariable("hotelId") Long id) {
-        System.out.println("Hotel Image Controller calling ---> get hotel images");
+        log.debug("Hotel Image Controller calling ---> get hotel images");
         return hotelImageService.getImages(id);
     }
 
@@ -56,7 +59,7 @@ public class HotelImageController {
     })
     public ResponseEntity<?> deleteImage(@PathVariable("hotelId") Long hotelId,
             @PathVariable("imageId") Long imageId) throws IOException {
-        System.out.println("Hotel Image Controller calling ---> delete hotel image");
+        log.debug("Hotel Image Controller calling ---> delete hotel image");
         return hotelImageService.deleteImage(hotelId, imageId);
     }
 }

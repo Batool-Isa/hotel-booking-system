@@ -14,7 +14,7 @@ pipeline {
         AWS_REGION   = 'us-east-1'
         ECR_HOST     = '682579208969.dkr.ecr.us-east-1.amazonaws.com'
         REGISTRY     = "${ECR_HOST}/vibestay"
-        TAG          = "${BUILD_NUMBER}"
+        TAG          = "1.0.${BUILD_NUMBER}"
         APP_HOST     = '172.31.19.178'
         MODULES      = 'services/booking-service,services/billing-service'
         SERVICES     = 'api-gateway user-service hotel-service booking-service billing-service notification-service'

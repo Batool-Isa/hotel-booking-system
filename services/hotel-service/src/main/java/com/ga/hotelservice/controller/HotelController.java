@@ -1,5 +1,7 @@
 package com.ga.hotelservice.controller;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.ga.hotelservice.dto.request.CreateHotelRequest;
 import com.ga.hotelservice.dto.request.UpdateHotelRequest;
 import com.ga.hotelservice.dto.request.UpdateHotelStatusRequest;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/hotels")
+@Slf4j
 public class HotelController {
     @Autowired
     private HotelService hotelService;
@@ -31,7 +34,7 @@ public class HotelController {
             @ApiResponse(responseCode = "400", description = "Manager id is required"),
     })
     public ResponseEntity<?> createHotel(@Valid @RequestBody CreateHotelRequest request) {
-        System.out.println("Hotel Controller calling ---> create");
+        log.debug("Hotel Controller calling ---> create");
         return hotelService.createHotel(request);
     }
 
@@ -42,7 +45,7 @@ public class HotelController {
             @ApiResponse(responseCode = "404", description = "Hotel not found")
     })
     public ResponseEntity<?> getHotel(@PathVariable("id") Long id) {
-        System.out.println("Hotel Controller calling ---> get hotel");
+        log.debug("Hotel Controller calling ---> get hotel");
         return hotelService.getHotel(id);
     }
     @GetMapping
@@ -56,7 +59,7 @@ public class HotelController {
                                        @RequestParam(required = false) String city,
                                        Pageable pageable) {
 
-        System.out.println("Hotel Controller calling ---> get hotels");
+        log.debug("Hotel Controller calling ---> get hotels");
         return hotelService.getHotels(search, name, country, city, pageable);
     }
 
@@ -81,7 +84,7 @@ public class HotelController {
             @ApiResponse(responseCode = "403", description = "Only admin can view pending hotels")
     })
     public ResponseEntity<?> getPendingHotels(Pageable pageable) {
-        System.out.println("Hotel Controller calling ---> get pending hotels");
+        log.debug("Hotel Controller calling ---> get pending hotels");
         return hotelService.getPendingHotels(pageable);
     }
     @GetMapping("/my-hotels")
@@ -92,7 +95,7 @@ public class HotelController {
             @ApiResponse(responseCode = "403", description = "Only manager can view their own hotels")
     })
     public ResponseEntity<?> getMangerHotels(Pageable pageable) {
-        System.out.println("Hotel Controller calling ---> get manager hotels");
+        log.debug("Hotel Controller calling ---> get manager hotels");
         return hotelService.getMangerHotels(pageable);
     }
     @PutMapping("/{id}")
@@ -106,7 +109,7 @@ public class HotelController {
     })
     public ResponseEntity<?> updateHotel(@PathVariable("id") Long id,
                                          @Valid @RequestBody UpdateHotelRequest request) {
-        System.out.println("Hotel Controller calling ---> update hotel information");
+        log.debug("Hotel Controller calling ---> update hotel information");
         return hotelService.updateHotel(id, request);
     }
     @PatchMapping("/{id}/status")
@@ -121,7 +124,7 @@ public class HotelController {
     })
     public ResponseEntity<?> updateHotelStatus(@PathVariable("id") Long id,
                                          @Valid @RequestBody UpdateHotelStatusRequest request) {
-        System.out.println("Hotel Controller calling ---> update hotel status");
+        log.debug("Hotel Controller calling ---> update hotel status");
         return hotelService.updateHotelStatus(id, request);
     }
     @PostMapping("/{hotelId}/managers/{managerId}")

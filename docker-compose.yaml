@@ -4,6 +4,7 @@ x-common-env: &common-env
   DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
   JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
   INTERNAL_API_KEY: ${INTERNAL_API_KEY:?set INTERNAL_API_KEY in .env}
+  SPRING_PROFILES_ACTIVE: prod
   SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "3"
   SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "1"
 
@@ -36,7 +37,7 @@ services:
     networks: [vibestay-net]
 
   user-service:
-    image: ${REGISTRY:-vibestay}/user-service:${TAG:-dev}
+    image: ${REGISTRY:-vibestay}/user-service:${TAG:-latest}
     build: { context: ., dockerfile: services/user-service/Dockerfile }
     restart: unless-stopped
     environment:
@@ -57,7 +58,7 @@ services:
     networks: [vibestay-net]
 
   hotel-service:
-    image: ${REGISTRY:-vibestay}/hotel-service:${TAG:-dev}
+    image: ${REGISTRY:-vibestay}/hotel-service:${TAG:-latest}
     build: { context: ., dockerfile: services/hotel-service/Dockerfile }
     restart: unless-stopped
     environment:
@@ -78,7 +79,7 @@ services:
     networks: [vibestay-net]
 
   booking-service:
-    image: ${REGISTRY:-vibestay}/booking-service:${TAG:-dev}
+    image: ${REGISTRY:-vibestay}/booking-service:${TAG:-latest}
     build: { context: ., dockerfile: services/booking-service/Dockerfile }
     restart: unless-stopped
     environment:
@@ -99,7 +100,7 @@ services:
     networks: [vibestay-net]
 
   billing-service:
-    image: ${REGISTRY:-vibestay}/billing-service:${TAG:-dev}
+    image: ${REGISTRY:-vibestay}/billing-service:${TAG:-latest}
     build: { context: ., dockerfile: services/billing-service/Dockerfile }
     restart: unless-stopped
     environment:
@@ -123,7 +124,7 @@ services:
     networks: [vibestay-net]
 
   notification-service:
-    image: ${REGISTRY:-vibestay}/notification-service:${TAG:-dev}
+    image: ${REGISTRY:-vibestay}/notification-service:${TAG:-latest}
     build: { context: ., dockerfile: services/notification-service/Dockerfile }
     restart: unless-stopped
     environment:
@@ -143,7 +144,7 @@ services:
     networks: [vibestay-net]
 
   api-gateway:
-    image: ${REGISTRY:-vibestay}/api-gateway:${TAG:-dev}
+    image: ${REGISTRY:-vibestay}/api-gateway:${TAG:-latest}
     build: { context: ., dockerfile: services/api-gateway/Dockerfile }
     restart: unless-stopped
     environment:
@@ -169,7 +170,7 @@ services:
 
 
   frontend:
-    image: ${REGISTRY:-vibestay}/frontend:${TAG:-dev}
+    image: ${REGISTRY:-vibestay}/frontend:${TAG:-latest}
     build: { context: ./frontend }
     restart: unless-stopped
     ports:

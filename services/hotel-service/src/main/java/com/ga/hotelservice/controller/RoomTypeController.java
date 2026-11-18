@@ -1,5 +1,7 @@
 package com.ga.hotelservice.controller;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.ga.hotelservice.dto.request.RoomTypeRequest;
 import com.ga.hotelservice.dto.request.UpdateRoomTypeStatusRequest;
 import com.ga.hotelservice.service.RoomTypeService;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @ApiResponses({
         @ApiResponse(responseCode = "401", description = "Not logged in")
 })
+@Slf4j
 public class RoomTypeController {
 
 @Autowired
@@ -30,7 +33,7 @@ private RoomTypeService roomTypeService;
             @ApiResponse(responseCode = "403", description = "Only admin or hotel manager can view room types")
     })
     public ResponseEntity<?> getRoomTypes(){
-        System.out.println("Room Types controller calling ---> get room types");
+        log.debug("Room Types controller calling ---> get room types");
         return roomTypeService.getRoomTypes();
     }
     @GetMapping("{id}")
@@ -42,7 +45,7 @@ private RoomTypeService roomTypeService;
             @ApiResponse(responseCode = "404", description = "Room type not found")
     })
     public ResponseEntity<?> getRoomType(@PathVariable("id") Long id){
-        System.out.println("Room Types controller calling ---> get room type type");
+        log.debug("Room Types controller calling ---> get room type type");
         return roomTypeService.getRoomType(id);
     }
     @PostMapping
@@ -55,7 +58,7 @@ private RoomTypeService roomTypeService;
             @ApiResponse(responseCode = "409", description = "Room type with the same name already exists")
     })
     public ResponseEntity<?> createRoomType(@Valid @RequestBody RoomTypeRequest request){
-        System.out.println("Room Types controller calling ---> create room type");
+        log.debug("Room Types controller calling ---> create room type");
         return roomTypeService.createRoomType(request);
     }
     @PutMapping("{id}")
@@ -69,7 +72,7 @@ private RoomTypeService roomTypeService;
             @ApiResponse(responseCode = "409", description = "Another room type already has this name")
     })
     public ResponseEntity<?> updateRoomType(@PathVariable("id") Long id,@Valid @RequestBody RoomTypeRequest request){
-        System.out.println("Room Types controller calling ---> update room type");
+        log.debug("Room Types controller calling ---> update room type");
         return roomTypeService.updateRoomType(id, request);
     }
     @PatchMapping("{id}/status")
@@ -82,7 +85,7 @@ private RoomTypeService roomTypeService;
             @ApiResponse(responseCode = "404", description = "Room type not found")
     })
     public ResponseEntity<?> updateRoomTypeStatus(@PathVariable("id") Long id,@Valid @RequestBody UpdateRoomTypeStatusRequest request){
-        System.out.println("Room Types controller calling ---> update room type status");
+        log.debug("Room Types controller calling ---> update room type status");
         return roomTypeService.updateRoomTypeStatus(id, request);
     }
 }
