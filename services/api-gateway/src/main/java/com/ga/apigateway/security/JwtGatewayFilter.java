@@ -31,6 +31,7 @@ public class JwtGatewayFilter implements GlobalFilter, Ordered {
             "/auth/users/forgot",
             "/auth/users/reset",
             "/webhook",
+            "/api/availability/search",
             "/swagger-ui",
             "/v3/api-docs",
             "/uploads"
