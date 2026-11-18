@@ -25,7 +25,7 @@
 .dest,
 .hcard,
 .card.pad {
-  animation: rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation: rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
 }
 .dest img,
 .hc-img img {
@@ -141,5 +141,207 @@
   *::after {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+.dest,
+.hcard {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--ty, 0px));
+  transform-style: preserve-3d;
+  position: relative;
+}
+.hcard:hover,
+.dest:hover {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-4px);
+}
+.dest::before,
+.hcard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.28), transparent 55%);
+  transition: opacity 0.25s;
+}
+.dest:hover::before,
+.hcard:hover::before {
+  opacity: 1;
+}
+.pay-icon.ok {
+  position: relative;
+  animation: pop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+.pay-icon.ok::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid var(--green);
+  animation: ring 1.4s ease-out 0.3s 2 both;
+}
+.pay-icon.ok .ic polyline {
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: draw 0.55s ease-out 0.35s forwards;
+}
+.skel {
+  background: linear-gradient(100deg, #e8ecf1 30%, #f9fafc 45%, #e8ecf1 60%);
+  background-size: 300% 100%;
+}
+.lb-nav {
+  position: absolute;
+  top: 50%;
+  width: 52px;
+  height: 52px;
+  margin-top: -26px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 34px;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background 0.15s;
+}
+.lb-nav:hover {
+  background: rgba(255, 255, 255, 0.32);
+}
+.lightbox .lb-nav.prev {
+  left: 20px;
+  right: auto;
+  top: 50%;
+}
+.lightbox .lb-nav.next {
+  right: 20px;
+  top: 50%;
+}
+.lb-count {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 0.9rem;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+.lightbox img {
+  animation: fade 0.3s ease both;
+}
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  background: radial-gradient(circle at 50% 40%, #12306b, #050d22 75%);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  animation: fade 0.3s ease both;
+}
+.tour .tour-x {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+}
+.tour-stage {
+  width: 300px;
+  height: 200px;
+  perspective: 1100px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.tour-stage:active {
+  cursor: grabbing;
+}
+.tour-ring {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+.tour-item {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  width: 300px;
+  height: 200px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+  backface-visibility: hidden;
+}
+.tour-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+.tour-item figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 18px 12px 8px;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+}
+.tour-hint {
+  position: absolute;
+  bottom: 28px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.95rem;
+  margin: 0;
+}
+@media (max-width: 700px) {
+  .tour-stage,
+  .tour-item {
+    width: 220px;
+    height: 150px;
+  }
+}
+@keyframes pop {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

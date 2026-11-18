@@ -978,6 +978,7 @@ const hp = reactive({
   sel: [],
   q: null,
   lightbox: -1,
+  tour: false,
   view: null,
   viewImg: 0,
   reviews: [],
@@ -1010,6 +1011,7 @@ async function loadHotel(id, q) {
     sel: [],
     q: null,
     lightbox: -1,
+    tour: false,
     view: null,
     viewImg: 0,
   });
@@ -1170,6 +1172,56 @@ const policyText = (pol) =>
       }
     : null;
 const hotelPhotos = computed(() => hp.images.map((i) => i.imageUrl));
+
+const tour = reactive({ rot: 0, drag: false, x: 0 });
+const tourPhotos = computed(() => hotelPhotos.value.slice(0, 12));
+const tourRadius = computed(() =>
+  Math.round(150 / Math.tan(Math.PI / Math.max(tourPhotos.value.length, 3))),
+);
+const tourCaption = (i) =>
+  (hp.images[i] && hp.images[i].altText) || (hp.hotel && hp.hotel.name) || "";
+
+function lbStep(d) {
+  const n = hotelPhotos.value.length;
+  if (n && hp.lightbox >= 0) hp.lightbox = (hp.lightbox + d + n) % n;
+}
+function openTour() {
+  tour.rot = 0;
+  hp.tour = true;
+}
+function tourDown(e) {
+  tour.drag = true;
+  tour.x = e.clientX;
+  if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
+}
+function tourMove(e) {
+  if (!tour.drag) return;
+  tour.rot += (e.clientX - tour.x) * 0.4;
+  tour.x = e.clientX;
+}
+function tourUp() {
+  tour.drag = false;
+}
+let tourTimer = null;
+watch(
+  () => hp.tour,
+  (on) => {
+    clearInterval(tourTimer);
+    if (on) tourTimer = setInterval(() => { if (!tour.drag) tour.rot += 0.18; }, 30);
+  },
+);
+window.addEventListener("keydown", (e) => {
+  const step = 360 / Math.max(tourPhotos.value.length, 1);
+  if (hp.tour) {
+    if (e.key === "Escape") hp.tour = false;
+    else if (e.key === "ArrowLeft") tour.rot += step;
+    else if (e.key === "ArrowRight") tour.rot -= step;
+  } else if (hp.lightbox >= 0) {
+    if (e.key === "Escape") hp.lightbox = -1;
+    else if (e.key === "ArrowLeft") lbStep(-1);
+    else if (e.key === "ArrowRight") lbStep(1);
+  }
+});
 
 const bk = reactive({
   hotel: null,
@@ -3238,6 +3290,12 @@ const printPage = () => window.print();
           ></search-bar>
         </div>
 
+        <div class="wrap section" v-if="page.loading && !page.error">
+          <div class="grid g3">
+            <div v-for="i in 3" :key="i" class="skel" style="height: 190px"></div>
+          </div>
+        </div>
+
         <div class="wrap section" v-if="page.error">
           <alert-box type="error" :msg="page.error"></alert-box>
         </div>
@@ -3812,6 +3870,13 @@ const printPage = () => window.print();
                   <div class="rating-box"><span class="star-row" :style="{ '--pct': (hp.rating / 5) * 100 + '%' }" :aria-label="Number(hp.rating).toFixed(1) + ' out of 5 stars'">★★★★★</span><span class="xs muted"><b>{{ ratingLabel(hp.rating) }}</b> · {{ plural(hp.reviews.length, "review") }}</span></div>
                 </div>
                 <span v-else class="chip" style="margin: 0"><icon name="star" :size="14"></icon>New – no reviews yet</span>
+                <button
+                  v-if="hotelPhotos.length >= 3"
+                  class="btn btn-outline"
+                  @click="openTour"
+                >
+                  <icon name="building" :size="16"></icon>3D tour
+                </button>
                 <button class="btn btn-primary" @click="scrollToRooms">
                   See availability
                 </button>
@@ -3869,7 +3934,14 @@ const printPage = () => window.print();
               >
                 <icon name="x" :size="16"></icon>Close
               </button>
+              <button
+                v-if="hotelPhotos.length > 1"
+                class="lb-nav prev"
+                aria-label="Previous photo"
+                @click.stop="lbStep(-1)"
+              >‹</button>
               <img
+                :key="hp.lightbox"
                 :src="imgUrl(hotelPhotos[hp.lightbox])"
                 :alt="
                   (hp.images[hp.lightbox] && hp.images[hp.lightbox].altText) ||
@@ -3877,6 +3949,50 @@ const printPage = () => window.print();
                 "
                 @click.stop
               />
+              <button
+                v-if="hotelPhotos.length > 1"
+                class="lb-nav next"
+                aria-label="Next photo"
+                @click.stop="lbStep(1)"
+              >›</button>
+              <div class="lb-count">
+                {{ hp.lightbox + 1 }} / {{ hotelPhotos.length }}
+              </div>
+            </div>
+
+            <div v-if="hp.tour" class="tour" @click.self="hp.tour = false">
+              <button class="btn btn-light btn-sm tour-x" @click="hp.tour = false">
+                <icon name="x" :size="16"></icon>Close
+              </button>
+              <div
+                class="tour-stage"
+                @pointerdown="tourDown"
+                @pointermove="tourMove"
+                @pointerup="tourUp"
+                @pointercancel="tourUp"
+              >
+                <div
+                  class="tour-ring"
+                  :style="{
+                    transform:
+                      'translateZ(-' + tourRadius + 'px) rotateY(' + tour.rot + 'deg)',
+                  }"
+                >
+                  <figure
+                    v-for="(u, i) in tourPhotos"
+                    :key="i"
+                    class="tour-item"
+                    :style="{
+                      transform:
+                        'rotateY(' + (i * 360) / tourPhotos.length + 'deg) translateZ(' + tourRadius + 'px)',
+                    }"
+                  >
+                    <img :src="imgUrl(u)" :alt="tourCaption(i)" draggable="false" />
+                    <figcaption>{{ tourCaption(i) }}</figcaption>
+                  </figure>
+                </div>
+              </div>
+              <p class="tour-hint">Drag to look around · arrow keys · Esc to close</p>
             </div>
 
             <div class="layout-b mt2">
