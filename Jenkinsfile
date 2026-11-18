@@ -69,7 +69,10 @@ pipeline {
                             set -e
                             cd ~/hotel-booking-system
                             git pull --ff-only
-                            sed -i 's|^REGISTRY=.*|REGISTRY=$REGISTRY|; s|^TAG=.*|TAG=$TAG|' .env
+                            sed -i '/^REGISTRY=/d;/^TAG=/d' .env
+                            echo >> .env
+                            echo REGISTRY=$REGISTRY >> .env
+                            echo TAG=$TAG >> .env
                             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_HOST
                             docker compose pull
                             docker compose up -d --no-build
