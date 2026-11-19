@@ -817,7 +817,13 @@ async function enrichHotels(ids) {
   await Promise.all(
     todo.map(async (id) => {
       try {
-        hc[id] = await api("GET", `/api/hotels/${id}`, { auth: false });
+        const hotel = await api("GET", `/api/hotels/${id}`, { auth: false });
+        const rating = await api("GET", `/api/hotels/${id}/rating`, { auth: false }).catch(() => null);
+        if (rating && rating.reviewCount) {
+          hotel.averageRating = rating.averageRating;
+          hotel.reviewCount = rating.reviewCount;
+        }
+        hc[id] = hotel;
       } catch {
         hc[id] = { _failed: true };
       }

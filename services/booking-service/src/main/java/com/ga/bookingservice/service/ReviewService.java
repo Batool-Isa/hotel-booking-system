@@ -4,6 +4,7 @@ import com.ga.bookingservice.client.UserServiceClient;
 import com.ga.bookingservice.client.UserSummary;
 import com.ga.bookingservice.dto.request.ReviewRequest;
 import com.ga.bookingservice.dto.response.HotelRatingResponse;
+import com.ga.bookingservice.dto.response.HotelRatingSummaryResponse;
 import com.ga.bookingservice.dto.response.MessageResponse;
 import com.ga.bookingservice.dto.response.ReviewResponse;
 import com.ga.bookingservice.exception.custom.InformationExistException;
@@ -90,5 +91,11 @@ public class ReviewService {
         response.setReviews(reviewResponses);
         return ResponseEntity.ok(response);
 
+    }
+
+    public ResponseEntity<?> getHotelRating(Long hotelId) {
+        List<Review> reviewList = reviewRepository.findHotelReviews(hotelId);
+        double averageRating = reviewList.stream().mapToDouble(Review::getRating).average().orElse(0);
+        return ResponseEntity.ok(new HotelRatingSummaryResponse(averageRating, reviewList.size()));
     }
 }
