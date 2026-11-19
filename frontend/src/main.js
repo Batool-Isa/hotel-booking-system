@@ -7,12 +7,12 @@ import { initEffects } from './lib/effects'
 import AppIcon from './components/AppIcon.vue'
 import HotelMap from './components/HotelMap.vue'
 import HotelImg from './components/HotelImg.vue'
-import PanoViewer from './components/PanoViewer.vue'
 import FInput from './components/FInput.vue'
 import FSelect from './components/FSelect.vue'
 import AlertBox from './components/AlertBox.vue'
 import SearchBar from './components/SearchBar.vue'
 import BookingDetail from './components/BookingDetail.vue'
+import BookingTicket from './components/BookingTicket.vue'
 import ManagerBookings from './components/ManagerBookings.vue'
 import LookupPanel from './components/LookupPanel.vue'
 import BrandLogo from './components/BrandLogo.vue'
@@ -25,12 +25,12 @@ Object.assign(app.config.globalProperties, { fmtDate, fmtDateTime, money, imgUrl
 app.component('icon', AppIcon)
 app.component('hotel-map', HotelMap)
 app.component('hotel-img', HotelImg)
-app.component('pano-viewer', PanoViewer)
 app.component('f-input', FInput)
 app.component('f-select', FSelect)
 app.component('alert-box', AlertBox)
 app.component('search-bar', SearchBar)
 app.component('booking-detail', BookingDetail)
+app.component('booking-ticket', BookingTicket)
 app.component('lookup-panel', LookupPanel)
 app.component('manager-bookings', ManagerBookings)
 app.component('brand-logo', BrandLogo)

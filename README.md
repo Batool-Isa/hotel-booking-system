@@ -20,17 +20,17 @@ I first built it as one Spring Boot application. For this project I split it int
 **Hotel managers**
 - Create hotels (an admin approves them) and manage only their own hotels
 - Manage rooms, photos, amenities and the child policy
-- See new bookings live, without refreshing the page
+- See and manage the bookings of their own hotels
 
 **Admins**
 - Approve, reject, activate or deactivate hotels, assign managers, manage users and room types
 
 **Behind the scenes**
 - JWT login checked at the gateway, role based access, password hashing, validation, rate limits and one error format
-- Real time notifications with WebSocket and STOMP, and emails sent from Kafka events
+- Emails sent from Kafka events (booking confirmed or cancelled, hold expired, payment, verification, password reset)
 - Stripe payments with idempotency keys and a signed webhook
 - A job that cancels unpaid bookings when their 15 minute hold runs out
-- Row locks so two people cannot book the same room, or pay twice, at the same moment
+- A database lock per room so two people cannot book the same room at the same moment, and idempotency keys so nobody pays twice
 
 ## Architecture
 
@@ -68,7 +68,7 @@ Two small things to know: the `roles` table exists in both user-service and hote
 | api-gateway | 8000 | One entry point, JWT check, routing, CORS | none | all services (REST) |
 | user-service | 8081 | Register, login, email verification, password reset, profiles, roles, admin user management, audit log | users, profiles, roles, tokens, audit_logs | Kafka (publishes `user-events`, reads `audit-log-events`) |
 | hotel-service | 8082 | Hotels, rooms, room types, amenities, photos, child policy, hotel approval | hotels, rooms, room_types, amenities, images, child_policies | Kafka (publishes `audit-log-events`) |
-| booking-service | 8083 | Availability, bookings, guests, cancellation, hold expiry job, reviews, WebSocket events | bookings, booking_rooms, booking_guests, reviews | REST to hotel-service and user-service, Kafka (publishes `booking-events`, `audit-log-events`) |
+| booking-service | 8083 | Availability, bookings, guests, cancellation, hold expiry job, reviews | bookings, booking_rooms, booking_guests, reviews | REST to hotel-service and user-service, Kafka (publishes `booking-events`, `audit-log-events`) |
 | billing-service | 8084 | Stripe Checkout, webhook, idempotent payments | payments | REST to booking-service and user-service, Kafka (publishes `payment-events`) |
 | notification-service | 8085 | Sends emails from events | none | Kafka (reads `booking-events`, `payment-events`, `user-events`), SMTP |
 | frontend | 80 | Vue app served by nginx | none | api-gateway |
@@ -231,7 +231,7 @@ Every service has Spring Boot Actuator with a health endpoint (`/actuator/health
 | Kind | Where | What it covers |
 |---|---|---|
 | JUnit and Mockito | `booking-service`, `billing-service` (`service/*Test`) | Business rules for bookings, payments, reviews |
-| Concurrency | `BookingConcurrencyTest`, `PaymentConcurrencyTest`, `ReviewConcurrencyTest` | Many threads at once: one booking wins, one payment is confirmed, one review is saved |
+| Concurrency | `BookingConcurrencyTest` (booking-service) | Many threads at once on a real PostgreSQL (set `TEST_DB_URL`, because the lock is PostgreSQL specific): five users book one room and exactly one wins, different rooms or different dates all succeed |
 | Cucumber (BDD) | `booking-service` and `billing-service`, `src/test/resources/features` | Booking: reading my own booking, not other people's. Payment: paying my own booking, another user is refused (403), the same idempotency key pays once, a webhook with a wrong signature is rejected, a correctly signed webhook marks the payment as succeeded |
 
 Run them from the project root:
@@ -394,6 +394,8 @@ Every error uses the same JSON shape, with an `errors` map for validation proble
 
 ## Real time notifications
 
+**Status: not enabled in the microservice version yet.** This worked in the first (monolith) version. After the split, the server side (`WebSocketConfig` and `NotificationService` in booking-service) is commented out, so the frontend connects to `/ws` and receives no events. Managers see new bookings when they open or refresh their bookings page, and guests get emails from Kafka events. The plan is to bring it back by publishing the message from the booking events. The design below is what it was built to do.
+
 VibeStay uses WebSocket with STOMP at `ws://localhost:8000/ws`.
 
 A browser cannot send an `Authorization` header when it opens a WebSocket, so the JWT goes in the STOMP `CONNECT` frame. The server checks the token and that the account is active, and refuses the connection otherwise. Every subscription is checked too, and clients cannot publish.
@@ -430,7 +432,7 @@ The app sends verification, password reset and booking emails. They share one de
 
 **Paying twice and duplicate webhooks.** Each payment request carries an `Idempotency-Key` (unique in the `payments` table), so a double click returns the same Checkout session. Stripe can send the same webhook more than once, so the booking row is locked and an already confirmed booking is skipped.
 
-**Two people booking the same room.** The rooms being booked are locked with a pessimistic write lock before the overlap check, so only the first request wins. Concurrency tests prove it.
+**Two people booking the same room.** A new booking is an insert, so there is no row to lock yet. Instead each requested room is locked with a PostgreSQL advisory lock (`pg_advisory_xact_lock(roomId)`), always in sorted order so two requests cannot deadlock, and the overlap check runs inside the lock. The second request waits, then sees the first booking and gets a 409 conflict. The lock is released when the transaction commits. `BookingConcurrencyTest` proves it. The booking row itself is locked with `SELECT ... FOR UPDATE` when a payment is confirmed or a booking is cancelled.
 
 **Splitting the monolith.** Breaking the code into services meant breaking the foreign keys too. A booking can no longer join to the hotel table, so it stores `hotelId` and asks hotel-service over REST. I also had to decide what is REST and what is an event, and make the gateway the single place that checks the token.
 
@@ -438,19 +440,21 @@ The app sends verification, password reset and booking emails. They share one de
 
 **Stripe webhooks in the cloud.** The webhook needs a public address, so after deploying I pointed Stripe at the server and tested the signature check with a Cucumber scenario.
 
-**Secure WebSocket.** The token is checked when the socket connects, guests get a private queue, and managers can only listen to their own hotels.
+**Secure WebSocket (design from the monolith, not enabled in the microservice version yet).** The token is checked when the socket connects, guests get a private queue, and managers can only listen to their own hotels.
 
 **Emails with a map.** Google's static map needs billing, so I build the map picture from OpenStreetMap tiles.
 
 ## Unsolved problems
 
+- Live WebSocket notifications are switched off in the microservice version (the code is commented out in booking-service).
+- The concurrency test only runs when `TEST_DB_URL` points to a PostgreSQL database, so it is skipped in the normal Jenkins run.
 - Refunds are not handled when a paid booking is cancelled.
 - The notification consumers have no retry or dead letter topic yet.
 - Kafka and the services run on one server, so there is no high availability.
 - There is no caching yet, so hotel lookups hit the database each time (planned, see below).
 - Logs are only in Docker and files, with no central monitoring.
 - The site uses HTTP, not HTTPS.
-- Hotel photos live in a Docker volume on the server and are lost if the volume is removed.
+- Hotel photos live in a Docker volume on the server. They are backed up to S3 and restored after a rebuild, but they are not served from S3.
 
 ## Future improvements
 

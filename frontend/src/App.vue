@@ -1025,8 +1025,6 @@ async function loadHotel(id, q) {
   hp.policy = pol && pol !== "missing" ? pol : null;
   hp.policyMissing = pol === "missing";
   hp.images = Array.isArray(imgs) && imgs.length ? imgs : h.images || [];
-  pano.open = false;
-  loadPanos(h.id);
   searchF.reset({
     city: h.city || "",
     ...(q.in ? { checkIn: q.in } : {}),
@@ -1177,35 +1175,7 @@ function lbStep(d) {
   const n = hotelPhotos.value.length;
   if (n && hp.lightbox >= 0) hp.lightbox = (hp.lightbox + d + n) % n;
 }
-const pano = reactive({ open: false, items: [] });
-let panoIndex = null;
-async function loadPanos(hotelId) {
-  pano.items = [];
-  try {
-    if (!panoIndex) {
-      const base = import.meta.env.BASE_URL;
-      const r = await fetch(`${base}panoramas/index.json`, { cache: "no-cache" });
-      const j = await r.json();
-      panoIndex = Array.isArray(j.panoramas) ? j.panoramas : [];
-    }
-  } catch (e) {
-    panoIndex = [];
-  }
-  const own = panoIndex.filter((p) => Number(p.hotelId) === Number(hotelId));
-  const list = own.length ? own : panoIndex.filter((p) => p.hotelId == null);
-  if (hp.hotel && Number(hp.hotel.id) === Number(hotelId)) {
-    pano.items = list.map((p) => ({
-      src: `${import.meta.env.BASE_URL}panoramas/${p.file}`,
-      title: p.title,
-      sample: !!p.sample,
-    }));
-  }
-}
-function openPano() {
-  pano.open = true;
-}
 window.addEventListener("keydown", (e) => {
-  if (pano.open) return;
   if (hp.lightbox >= 0) {
     if (e.key === "Escape") hp.lightbox = -1;
     else if (e.key === "ArrowLeft") lbStep(-1);
@@ -3860,13 +3830,6 @@ const printPage = () => window.print();
                   <div class="rating-box"><span class="star-row" :style="{ '--pct': (hp.rating / 5) * 100 + '%' }" :aria-label="Number(hp.rating).toFixed(1) + ' out of 5 stars'">★★★★★</span><span class="xs muted"><b>{{ ratingLabel(hp.rating) }}</b> · {{ plural(hp.reviews.length, "review") }}</span></div>
                 </div>
                 <span v-else class="chip" style="margin: 0"><icon name="star" :size="14"></icon>New – no reviews yet</span>
-                <button
-                  v-if="pano.items.length"
-                  class="btn btn-outline"
-                  @click="openPano"
-                >
-                  <icon name="globe" :size="16"></icon>360° view
-                </button>
                 <button class="btn btn-primary" @click="scrollToRooms">
                   See availability
                 </button>
@@ -3913,14 +3876,6 @@ const printPage = () => window.print();
               >
                 <hotel-img :src="''" :name="hp.hotel.name"></hotel-img>
               </div>
-              <button
-                v-if="pano.items.length"
-                type="button"
-                class="pano-fab"
-                @click.stop="openPano"
-              >
-                <icon name="globe" :size="16"></icon>360° view
-              </button>
             </div>
             <div
               v-if="hp.lightbox >= 0"
@@ -3958,12 +3913,6 @@ const printPage = () => window.print();
                 {{ hp.lightbox + 1 }} / {{ hotelPhotos.length }}
               </div>
             </div>
-
-            <pano-viewer
-              v-if="pano.open"
-              :items="pano.items"
-              @close="pano.open = false"
-            ></pano-viewer>
 
             <div class="layout-b mt2">
               <div class="stack">
@@ -6873,6 +6822,11 @@ const printPage = () => window.print();
               </p>
             </template>
 
+            <booking-ticket
+              v-if="pay.booking && pay.state === 'confirmed'"
+              :b="pay.booking"
+            ></booking-ticket>
+
             <div v-if="pay.booking" class="card pad mt mb" style="text-align: left">
               <booking-detail :b="pay.booking"></booking-detail>
             </div>
@@ -7052,6 +7006,10 @@ const printPage = () => window.print();
           </button>
         </div>
         <div class="modal-b">
+          <booking-ticket
+            v-if="!bd.loading && bd.data && bd.data.status === 'CONFIRMED'"
+            :b="bd.data"
+          ></booking-ticket>
           <div v-if="bd.loading" class="skel" style="height: 200px"></div>
           <alert-box v-else-if="bd.err" type="error" :msg="bd.err"></alert-box
           ><booking-detail v-else-if="bd.data" :b="bd.data"></booking-detail>

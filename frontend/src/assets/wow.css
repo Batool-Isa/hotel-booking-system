@@ -278,37 +278,6 @@
 .gallery.three {
   grid-template-rows: 190px 190px;
 }
-.pano-fab {
-  position: absolute;
-  left: 16px;
-  bottom: 16px;
-  z-index: 4;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 0;
-  border-radius: 999px;
-  padding: 10px 18px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--navy-d);
-  background: var(--yellow);
-  cursor: pointer;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
-  animation: pulse 2.4s ease-in-out infinite;
-}
-.pano-fab:hover {
-  background: #ffd45e;
-}
-@keyframes pulse {
-  0%,
-  100% {
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 0 0 rgba(254, 187, 2, 0.6);
-  }
-  50% {
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 0 12px rgba(254, 187, 2, 0);
-  }
-}
 @media (max-width: 700px) {
   .gallery {
     grid-template-columns: 1fr 1fr;
@@ -323,195 +292,172 @@
   }
 }
 
-.pano {
-  position: fixed;
-  inset: 0;
-  z-index: 130;
-  background: #050d22;
-  animation: fade 0.3s ease both;
+.ticket-wrap {
+  margin: 18px 0 8px;
+  text-align: left;
 }
-.pano-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  cursor: grab;
-  touch-action: none;
-  opacity: 0;
-  transition: opacity 0.6s ease;
-}
-.pano-canvas.ready {
-  opacity: 1;
-}
-.pano-canvas:active {
-  cursor: grabbing;
-}
-.pano-load {
-  position: absolute;
-  inset: 0;
+.ticket {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: 600;
-  pointer-events: none;
+  background: linear-gradient(135deg, #00224f 0%, #003b95 60%, #0057b8 100%);
+  color: #fff;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(0, 34, 79, 0.35);
+  position: relative;
+  overflow: hidden;
+  animation: ticket-in 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
-.pano-spin {
-  width: 22px;
-  height: 22px;
-  border: 3px solid rgba(255, 255, 255, 0.25);
-  border-top-color: var(--yellow);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+.ticket-main {
+  flex: 1;
+  padding: 22px 26px;
+  min-width: 0;
 }
-.pano-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+.ticket-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px;
-  background: linear-gradient(rgba(5, 13, 34, 0.6), transparent);
-  pointer-events: none;
 }
-.pano-top > * {
-  pointer-events: auto;
+.ticket-tag {
+  background: #febb02;
+  color: #00224f;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
 }
-.pano-title {
+.ticket-hotel {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.15;
+  margin: 18px 0 16px;
+}
+.ticket-dates {
   display: flex;
   align-items: center;
+  gap: 16px;
   flex-wrap: wrap;
-  gap: 10px;
-  color: #fff;
+}
+.ticket-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.ticket-date {
+  font-size: 17px;
   font-weight: 700;
-  font-size: 1.05rem;
 }
-.pano-badge {
-  background: var(--yellow);
-  color: var(--navy-d);
-  border-radius: 999px;
-  padding: 3px 12px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
-.pano-sample {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 999px;
-  padding: 2px 10px;
-}
-.pano-tools {
+.ticket-nights {
+  flex: 1;
+  min-width: 60px;
   display: flex;
+  align-items: center;
   gap: 8px;
+  font-size: 12px;
+  opacity: 0.9;
 }
-.pano-btn {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border: 0;
-  border-radius: 50%;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(6px);
-  cursor: pointer;
-  transition: background 0.15s, transform 0.15s;
+.ticket-nights::before,
+.ticket-nights::after {
+  content: "";
+  flex: 1;
+  border-top: 2px dashed rgba(255, 255, 255, 0.45);
 }
-.pano-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.06);
+.ticket-meta {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  font-size: 14px;
 }
-.pano-btn.on {
-  background: var(--yellow);
-  color: var(--navy-d);
-}
-.pano-btn.on .ic {
-  animation: spin 3s linear infinite;
-}
-.pano-nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 44px;
-  height: 44px;
-  border: 0;
-  border-radius: 50%;
-  font-size: 1.8rem;
-  line-height: 1;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(6px);
-  cursor: pointer;
-}
-.pano-nav:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-.pano-nav.prev {
-  left: 16px;
-}
-.pano-nav.next {
-  right: 16px;
-}
-.pano-bottom {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+.ticket-stub {
+  width: 210px;
+  flex: none;
+  padding: 22px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border-left: 2px dashed rgba(255, 255, 255, 0.45);
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 16px 16px 24px;
-  background: linear-gradient(transparent, rgba(5, 13, 34, 0.65));
-  pointer-events: none;
 }
-.pano-bottom > * {
-  pointer-events: auto;
+.ticket-stub::before,
+.ticket-stub::after {
+  content: "";
+  position: absolute;
+  left: -11px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--card, #fff);
 }
-.pano-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
+.ticket-stub::before {
+  top: -10px;
 }
-.pano-tab {
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 999px;
-  padding: 7px 16px;
-  font-weight: 600;
-  font-size: 0.9rem;
+.ticket-stub::after {
+  bottom: -10px;
+}
+.ticket-ref {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin: 4px 0 12px;
+  word-break: break-all;
+}
+.ticket-bars {
+  width: 100%;
+  height: 40px;
   color: #fff;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(6px);
-  cursor: pointer;
-  transition: background 0.15s;
 }
-.pano-tab:hover {
-  background: rgba(255, 255, 255, 0.25);
+.ticket-total {
+  font-size: 22px;
+  font-weight: 800;
 }
-.pano-tab.on {
-  background: #fff;
-  color: var(--navy-d);
-  border-color: #fff;
+.ticket-stub .mt {
+  margin-top: 14px;
 }
-.pano-hint {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.9rem;
-  transition: opacity 0.6s ease;
+.ticket-actions {
+  margin-top: 14px;
+  gap: 10px;
 }
-.pano-hint.gone {
-  opacity: 0;
+@keyframes ticket-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 @media (max-width: 700px) {
-  .pano-nav {
-    display: none;
+  .ticket {
+    flex-direction: column;
+  }
+  .ticket-stub {
+    width: auto;
+    border-left: 0;
+    border-top: 2px dashed rgba(255, 255, 255, 0.45);
+  }
+  .ticket-stub::before,
+  .ticket-stub::after {
+    top: -10px;
+    bottom: auto;
+    left: -10px;
+  }
+  .ticket-stub::after {
+    left: auto;
+    right: -10px;
+  }
+  .ticket-hotel {
+    font-size: 22px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticket {
+    animation: none;
   }
 }
