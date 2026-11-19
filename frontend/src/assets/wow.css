@@ -419,10 +419,6 @@
 .ticket-stub .mt {
   margin-top: 14px;
 }
-.ticket-actions {
-  margin-top: 14px;
-  gap: 10px;
-}
 @keyframes ticket-in {
   from {
     opacity: 0;

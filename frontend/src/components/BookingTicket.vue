@@ -1,9 +1,6 @@
 <script>
 import { nightsBetween } from '@/lib/utils';
 
-const digits = (s) => String(s || '').slice(0, 10).replace(/\D/g, '');
-const esc = (s) => String(s || '').replace(/([,;\\])/g, '\\$1').replace(/\r?\n/g, '\\n');
-
 export default {
   props: { b: Object },
   computed: {
@@ -29,35 +26,6 @@ export default {
         x += 2;
       }
       return { list: out, width: x };
-    },
-  },
-  methods: {
-    addToCalendar() {
-      const b = this.b;
-      const lines = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//VibeStay//Booking//EN',
-        'CALSCALE:GREGORIAN',
-        'BEGIN:VEVENT',
-        `UID:${esc(b.bookingReference)}@vibestay`,
-        `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').slice(0, 15)}Z`,
-        `DTSTART;VALUE=DATE:${digits(b.checkIn)}`,
-        `DTEND;VALUE=DATE:${digits(b.checkOut)}`,
-        `SUMMARY:${esc('Stay at ' + b.hotelName)}`,
-        `DESCRIPTION:${esc('VibeStay booking ' + b.bookingReference)}`,
-        'END:VEVENT',
-        'END:VCALENDAR',
-      ];
-      const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `vibestay-${b.bookingReference}.ics`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
     },
   },
 };
@@ -105,11 +73,6 @@ export default {
         <div class="ticket-label mt">Total paid</div>
         <div class="ticket-total">{{ money(b.totalAmount) }}</div>
       </div>
-    </div>
-    <div class="row ticket-actions no-print" style="justify-content: center">
-      <button type="button" class="btn btn-yellow" @click="addToCalendar">
-        <icon name="calendar" :size="16"></icon>Add to calendar
-      </button>
     </div>
   </div>
 </template>
